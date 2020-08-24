@@ -18,7 +18,7 @@ function HomePage () {
     <div>
         <Navbar/>
          <Row>
-            <Col xs={6}><div><img src={Middle} /></div></Col>
+            <Col xs={6}><div>Image goes here</div></Col>
             <Col xs={6}><SignIn/></Col>
         </Row>
     </div>

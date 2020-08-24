@@ -23,6 +23,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Auth from '@aws-amplify/auth';
 
 function Copyright() {
   return (
@@ -72,7 +73,8 @@ export default function SignIn() {
   const classes = useStyles();
   const [values, setValues] = React.useState({
     password: '',
-    showPassword: false,
+    email:'',
+    showPassword: false
   });
 
 
@@ -87,6 +89,18 @@ export default function SignIn() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  const handleSubmit = async event => {
+    event.preventDefault();
+
+    try{
+      const user = await Auth.signIn(values.email,values.password);
+      console.log(user);
+
+    }catch(error){
+        console.log(error);
+    }
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -159,7 +173,8 @@ export default function SignIn() {
           <Button
             type="submit"
             variant="contained"
-            color="primary">
+            color="primary"
+            onClick={handleSubmit}>
             Submit
           </Button>
           <br/>
@@ -182,7 +197,7 @@ export default function SignIn() {
                   Intelligent Enterprise AI/ML platform
              </Typography>
              <Typography className={classes.marginTopSmall} style={{color:'grey'}} variant="subtitle2" gutterBottom>
-             Artificio is an AI/ML platform for extracting the data intelligently and accurately from any type of document (PDF,JPG,tif,Fax,emails) using OCR AI/ML and Speech AI/ML techniques for various industries
+               Artificio is an AI/ML platform for extracting the data intelligently and accurately from any type of document (PDF,JPG,tif,Fax,emails) using OCR AI/ML and Speech AI/ML techniques for various industries
             </Typography>
             </Grid>
           </Grid>

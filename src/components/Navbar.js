@@ -39,8 +39,7 @@ export default function Navbar() {
     <Button color="inherit" className={classes.button}>Help</Button>
     <Button color="inherit" className={classes.button}>Register</Button>
          
-         
-        </Toolbar>
+       </Toolbar>
       </AppBar>
     </div>
   );
