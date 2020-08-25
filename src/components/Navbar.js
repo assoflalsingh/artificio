@@ -14,6 +14,7 @@ import Col from 'react-bootstrap/Col'
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    
   },
   button: {
     marginRight: '2%',
@@ -28,7 +29,7 @@ export default function Navbar() {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <div className="position-sticky fixed-top">
       <AppBar position="static">
         <Toolbar>
       

@@ -17,9 +17,9 @@ function HomePage () {
   return (
     <div>
         <Navbar/>
-         <Row>
-            <Col xs={6}><div>Image goes here</div></Col>
-            <Col xs={6}><SignIn/></Col>
+         <Row className="m-0">
+            <Col xs={12} sm={6} md={6} lg={6}><div>Image goes here</div></Col>
+            <Col xs={12} sm={6} md={6} lg={6}><SignIn/></Col>
         </Row>
     </div>
   )
