@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col'
 import Navbar from '../components/Navbar'
 import SignIn from '../components/SignIn'
 
-import Middle from '../assets/images/Middle.png'
+
 
 
 function HomePage () {
