@@ -1,16 +1,18 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import HomePage from './containers/HomePage';
-import Dashboard from './containers/Dashboard';
-import Grid from '@material-ui/core/Grid';
-import Container from '@material-ui/core/Container';
-import { Box } from '@material-ui/core';
+import { Provider } from 'react-redux'
+
+import Router from './routes'
+import store from './store'
 
 function App() {
   return (
-    <div className="App">
-        <HomePage/>
+     <div className="App">
+        <Provider  store={store}>
+           <Router />
+        </Provider>
+        {/* <HomePage/>  */}
       
       {/* <Dashboard/> */}
     </div>

@@ -11,3 +11,20 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#homepgimg {
+  background-image: url(./assets/images/Middle.png);
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+#logo {
+  background-image: url(./assets/images/artificio-logo.png);
+  margin-left: 50px;
+  width: 125px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}

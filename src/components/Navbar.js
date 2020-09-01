@@ -9,7 +9,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-
+import logo from '../assets/images/artificio-logo.png'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,8 +34,9 @@ export default function Navbar() {
         <Toolbar>
       
    <Typography variant="h6" className={classes.title}>
-        ARTIFICIO
+        <img src={logo} ></img>
     </Typography>
+
 
     <Button color="inherit" className={classes.button}>Help</Button>
     <Button color="inherit" className={classes.button}>Register</Button>

@@ -24,6 +24,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Auth from '@aws-amplify/auth';
+import {navigate } from '@reach/router'
 
 function Copyright() {
   return (
@@ -59,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
   },
   marginTopSmall: {
-    marginTop: theme.spacing(1.5),
+    marginTop: theme.spacing(1),
   },
   divider: {
   marginTop: theme.spacing(3),
@@ -92,10 +93,26 @@ export default function SignIn() {
 
   const handleSubmit = async event => {
     event.preventDefault();
-
+    navigate(`/dashboard`);
     try{
       const user = await Auth.signIn(values.email,values.password);
       console.log(user);
+
+    }catch(error){
+        console.log(error);
+    }
+    try{
+      const email=values.email;
+      const username=values.email;
+      const password=values.password;
+      const signupRes = await Auth.signUp({
+        username,
+        password,
+        attributes:{
+          email:email
+        }
+      });
+      console.log(signupRes);
 
     }catch(error){
         console.log(error);
