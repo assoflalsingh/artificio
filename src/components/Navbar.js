@@ -34,12 +34,12 @@ export default function Navbar() {
         <Toolbar>
       
    <Typography variant="h6" className={classes.title}>
-        <img src={logo} ></img>
+   <div id="logo"></div>
     </Typography>
 
 
-    <Button color="inherit" className={classes.button}>Help</Button>
-    <Button color="inherit" className={classes.button}>Register</Button>
+    <Button color="inherit" className={classes.button} class="help">Help</Button>
+    <Button color="inherit" className={classes.button} class="btnblue">Register</Button>
          
        </Toolbar>
       </AppBar>
