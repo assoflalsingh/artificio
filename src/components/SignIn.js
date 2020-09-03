@@ -94,29 +94,29 @@ export default function SignIn() {
   const handleSubmit = async event => {
     event.preventDefault();
     navigate(`/dashboard`);
-    try{
-      const user = await Auth.signIn(values.email,values.password);
-      console.log(user);
+    // try{
+    //   const user = await Auth.signIn(values.email,values.password);
+    //   console.log(user);
 
-    }catch(error){
-        console.log(error);
-    }
-    try{
-      const email=values.email;
-      const username=values.email;
-      const password=values.password;
-      const signupRes = await Auth.signUp({
-        username,
-        password,
-        attributes:{
-          email:email
-        }
-      });
-      console.log(signupRes);
+    // }catch(error){
+    //     console.log(error);
+    // }
+    // try{
+    //   const email=values.email;
+    //   const username=values.email;
+    //   const password=values.password;
+    //   const signupRes = await Auth.signUp({
+    //     username,
+    //     password,
+    //     attributes:{
+    //       email:email
+    //     }
+    //   });
+    //   console.log(signupRes);
 
-    }catch(error){
-        console.log(error);
-    }
+    // }catch(error){
+    //     console.log(error);
+    // }
   }
 
   return (
