@@ -243,3 +243,11 @@
 .error {
   color: red;
 }
+
+.accordion-parent .MuiAccordion-root.Mui-expanded{
+    margin: 0px !important;
+}
+
+.accordion-parent .MuiAccordion-rounded:first-child {
+  margin: 0px !important;
+}

@@ -15,22 +15,32 @@ function Dashboard () {
  
   }, [])
   return (
-    <div>
-        <Navbar/>
+    <div className={"dboard"}>
+        {/* <Navbar/> */}
          <Row>
-            <Col xs={2}><AccordionList/></Col>
-            <Col xs={10}><Container><QuickLoad/></Container></Col>
+            <Col className={"leftnav"}>
+              <div className={"leftnavbg"}>
+              <div id="logodboard"></div>
+              </div>
+              <AccordionList/>
+            </Col>
+            <Col>
+            <div className={"topnav"}>
+              <p>Menu</p>
+            </div>
+            <Container>
+              <QuickLoad/></Container>
+            </Col>
         </Row>
     </div>
   )
 }
 
 
-
 export default Dashboard
 
 const Container = styled.div`
-background-color: white;
+background-color: #fff;
 min-height: 100vh;
 display: flex;
 flex-direction: column;

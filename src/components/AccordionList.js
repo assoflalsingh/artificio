@@ -20,7 +20,7 @@ export default function AccordionList() {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <div className={`${classes.root} accordion-parent`}>
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}

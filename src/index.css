@@ -40,6 +40,42 @@ code {
   background-repeat: no-repeat;
 }
 
+.leftnav {
+  max-width: 260px !important;
+  height: 100vh !important;
+}
+
+.leftnavbg {
+  background-color: #ffffff;
+  padding: 40px;
+  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+}
+
+.leftnav .MuiAccordion-rounded:first-child {
+  border-radius: 0px;
+}
+
+.leftnav .MuiAccordion-rounded:last-child {
+  border-radius: 0px;
+}
+
+.leftnav .MuiAccordion-root:before {
+background-color: rgba(0, 0, 0, 0);
+}
+
+.topnav {
+  padding: 28px 0px;
+}
+
+#logodboard {
+  background-image: url(./assets/images/artificio-logo.png);
+  width: 125px;
+  height: 16px;
+  margin: 0 auto;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 .help, .help a, .help a:focus {
   color: #7f7f7f;
   margin-right: 20px;
@@ -72,14 +108,16 @@ form .MuiButton-containedPrimary {
   font-size: 13px;
 }
 
-.row {
-  background-color: #f8fafb;
-}
-
 .marginright0 {
   margin-right: 0px;
 }
 
 header {
   position: relative !important;
+}
+
+.dboard .row {
+  background-color: #f8fafb;
+  padding: 0px;
+  margin: 0px;
 }
