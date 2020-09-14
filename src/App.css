@@ -244,6 +244,7 @@
   color: red;
 }
 
+<<<<<<< Updated upstream
 .accordion-parent .MuiAccordion-root.Mui-expanded{
     margin: 0px !important;
 }
@@ -251,3 +252,26 @@
 .accordion-parent .MuiAccordion-rounded:first-child {
   margin: 0px !important;
 }
+=======
+.react-tabs__tab--selected {
+  background: #fff !important;
+  border-color: #aaa;
+  color: blue !important;
+  border-radius: 5px 5px 0 0;
+}
+
+.react-tabs__tab {
+  display: inline-block;
+  
+  border-color: #aaa;
+
+  border: 1px solid;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+>>>>>>> Stashed changes

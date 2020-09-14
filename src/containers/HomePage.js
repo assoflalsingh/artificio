@@ -17,7 +17,7 @@ function HomePage () {
   return (
     <div>
         <Navbar/>
-         <Row class="bgcolor">
+         <Row className="bgcolor">
             <Col xs={12} sm={6} md={6} lg={6}><div id="homepgimg"></div></Col>
             <Col xs={12} sm={6} md={6} lg={6}><div id="bottomimg"><SignIn/></div></Col>
         </Row>

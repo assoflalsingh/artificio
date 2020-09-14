@@ -131,36 +131,73 @@ const filesSelected = () => {
         handleFiles(fileInputRef.current.files);
     }
 }
-const uploadFiles = () => {
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+const dataURLtoFile = (dataurl, filename) => {
+    const arr = dataurl.split(',')
+    const mime = arr[0].match(/:(.*?);/)[1]
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+    while (n) {
+      u8arr[n - 1] = bstr.charCodeAt(n - 1)
+      n -= 1 // to make eslint happy
+    }
+    return new File([u8arr], filename, { type: mime })
+  }
+const uploadFiles = async() => {
+   
     uploadModalRef.current.style.display = 'block';
     uploadRef.current.innerHTML = 'File(s) Uploading...';
     for (let i = 0; i < validFiles.length; i++) {
+        let randSeq= Math.floor(Math.random() * 100000000);
+        let date = new Date();
+        let dataSetId='';
+
+
+       let base64file=await toBase64(validFiles[i]);
+        dataSetId=date.toISOString().substring(0,10).replace(/\-/g, '') + randSeq
         const formData = new FormData();
-        formData.append('image', validFiles[i]);
+        //formData.append('file',base64file); 
+       formData.append('file',validFiles[i]); 
+        
+        console.log("validFiles",validFiles[i]);
+        console.log("formData",formData);
+        console.log("base64 ::",base64file)
+        
         // formData.append('key', 'add your API key here');
-        axios.post('https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final', formData,{
+        axios.post('https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final/', formData,{
             headers :{
+                'Content-Type': 'multipart/form-data',
+                'Access-Control-Allow-Origin': '*',
                 'user_name': 'sharat',
-                'data_set_id': 'fefegeid',
-                 'file_name':'jj.jpg'
+                'data_set_id': dataSetId,
+                 'file_name':validFiles[i].name
               }
-        }, {
-            onUploadProgress: (progressEvent) => {
-                const uploadPercentage = Math.floor((progressEvent.loaded / progressEvent.total) * 100);
-                progressRef.current.innerHTML = `${uploadPercentage}%`;
-                progressRef.current.style.width = `${uploadPercentage}%`;
-                if (uploadPercentage === 100) {
-                    uploadRef.current.innerHTML = 'File(s) Uploaded';
-                    validFiles.length = 0;
-                    setValidFiles([...validFiles]);
-                    setSelectedFiles([...validFiles]);
-                    setUnsupportedFiles([...validFiles]);
-                }
-            }
+      
+        }).then((response)=>{
+          console.log(response);
+          console.log("formData",formData);
+          let uploadPercentage = Math.floor((1 / 2) * 100);
+           uploadPercentage = Math.floor((2 / 2) * 100);
+          progressRef.current.innerHTML = `${uploadPercentage}%`;
+          progressRef.current.style.width = `${uploadPercentage}%`;
+          if (response.status === 200 && uploadPercentage === 100 ) {
+            uploadRef.current.innerHTML = 'File(s) Uploaded';
+            validFiles.length = 0;
+            setValidFiles([...validFiles]);
+            setSelectedFiles([...validFiles]);
+            setUnsupportedFiles([...validFiles]);
+           // closeUploadModal();
+        }
         })
         .catch(() => {
             // If error, display a message on the upload modal
-            uploadRef.current.innerHTML = `<span class="error">Error Uploading File(s)</span>`;
+            uploadRef.current.innerHTML = `<span className="error">Error Uploading File(s)</span>`;
             // set progress bar background color to red
             progressRef.current.style.backgroundColor = 'red';
         });
@@ -172,6 +209,7 @@ const closeUploadModal = () => {
 }
   
   return (
+    <OutlinedContainer>
     <Container>
       {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} 
 {unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
@@ -210,10 +248,10 @@ const closeUploadModal = () => {
         )
     }
 </div>
-            <dropMessage className="drop-message">
-            <uploadBox className="upload-icon"></uploadBox>
+            <DropMessage className="drop-message">
+            <UploadBox className="upload-icon"></UploadBox>
              Drag & Drop files here or click to upload
-            </dropMessage>
+            </DropMessage>
             <input
                 ref={fileInputRef}
                 className="file-input"
@@ -223,6 +261,7 @@ const closeUploadModal = () => {
             />
             </DropContainer>
        </Container>
+       </OutlinedContainer>
   )
 }
 
@@ -230,6 +269,14 @@ const closeUploadModal = () => {
 
 export default QuickLoad
 
+
+const OutlinedContainer = styled.div`
+background-color: white;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center`
 const Container = styled.div`
 transform: translateY(-100%);
 
@@ -249,7 +296,7 @@ height: 200px;
 border: 4px dashed #4aa1f3;
 `
 
-const uploadBox = styled.div`
+const UploadBox = styled.div`
     width: 50px;
     height: 50px;
     
@@ -258,7 +305,7 @@ const uploadBox = styled.div`
     margin: 0 auto;
     padding-top: 30px;
 `
-const dropMessage = styled.div`
+const DropMessage = styled.div`
 
     text-align: center;
     color: #4aa1f3;

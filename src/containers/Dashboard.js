@@ -3,7 +3,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Navbar from '../components/Navbar'
 import AccordionList  from '../components/AccordionList'
-import QuickLoad  from '../components/QuickLoad'
+import Tabs  from '../components/Tabs'
 import styled from 'styled-components'
 
 
