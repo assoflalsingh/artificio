@@ -4,6 +4,8 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import styled from 'styled-components'
 import axios from 'axios'
+import { Button, Card, CardActionArea, CardContent, Chip, Typography } from '@material-ui/core'
+import MenuCard from './MenuTile';
 
 
 
@@ -22,7 +24,7 @@ function QuickLoad () {
     const uploadRef = useRef();
     const progressRef = useRef();
 
- 
+
 
     useEffect(() => {
         let filteredArray = selectedFiles.reduce((file, current) => {
@@ -34,7 +36,7 @@ function QuickLoad () {
             }
         }, []);
         setValidFiles([...filteredArray]);
-    
+
     }, [selectedFiles]);
 
   const handleFiles = (files) => {
@@ -150,7 +152,7 @@ const dataURLtoFile = (dataurl, filename) => {
     return new File([u8arr], filename, { type: mime })
   }
 const uploadFiles = async() => {
-   
+
     uploadModalRef.current.style.display = 'block';
     uploadRef.current.innerHTML = 'File(s) Uploading...';
     for (let i = 0; i < validFiles.length; i++) {
@@ -162,13 +164,13 @@ const uploadFiles = async() => {
        let base64file=await toBase64(validFiles[i]);
         dataSetId=date.toISOString().substring(0,10).replace(/\-/g, '') + randSeq
         const formData = new FormData();
-        //formData.append('file',base64file); 
-       formData.append('file',validFiles[i]); 
-        
+        //formData.append('file',base64file);
+       formData.append('file',validFiles[i]);
+
         console.log("validFiles",validFiles[i]);
         console.log("formData",formData);
         console.log("base64 ::",base64file)
-        
+
         // formData.append('key', 'add your API key here');
         axios.post('https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final/', formData,{
             headers :{
@@ -178,7 +180,7 @@ const uploadFiles = async() => {
                 'data_set_id': dataSetId,
                  'file_name':validFiles[i].name
               }
-      
+
         }).then((response)=>{
           console.log(response);
           console.log("formData",formData);
@@ -207,11 +209,16 @@ const uploadFiles = async() => {
 const closeUploadModal = () => {
     uploadModalRef.current.style.display = 'none';
 }
-  
+
   return (
-    <OutlinedContainer>
-    <Container>
-      {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''} 
+<>
+<Button variant="contained" color="primary">Primary button</Button><br/>
+<Chip variant="default" color="primary" label="Sample button" onClick={()=>{}}></Chip>
+<MenuTile label="Data Manager" buttonLabel="Create Data set"/>
+    {/* <OutlinedContainer> */}
+
+    {/* <Container>
+      {unsupportedFiles.length === 0 && validFiles.length ? <button className="file-upload-btn" onClick={() => uploadFiles()}>Upload Files</button> : ''}
 {unsupportedFiles.length ? <p>Please remove all unsupported files.</p> : ''}
        <div className="modal" ref={modalRef}>
             <div className="overlay"></div>
@@ -235,7 +242,7 @@ const closeUploadModal = () => {
                     onClick={fileInputClicked}>
       <div className="file-display-container">
     {
-       validFiles.map((data, i) => 
+       validFiles.map((data, i) =>
             <div className="file-status-bar" key={i} >
                 <div onClick={!data.invalid ? () => openImageModal(data) : () => removeFile(data.name)}>
                     <div className="file-type-logo"></div>
@@ -260,8 +267,10 @@ const closeUploadModal = () => {
                 onChange={filesSelected}
             />
             </DropContainer>
-       </Container>
-       </OutlinedContainer>
+       </Container> */}
+       {/* </OutlinedContainer> */}
+
+       </>
   )
 }
 
@@ -299,7 +308,7 @@ border: 4px dashed #4aa1f3;
 const UploadBox = styled.div`
     width: 50px;
     height: 50px;
-    
+
     background-size: 100%;
     text-align: center;
     margin: 0 auto;

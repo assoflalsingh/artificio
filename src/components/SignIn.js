@@ -24,7 +24,9 @@ import FormControl from '@material-ui/core/FormControl';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Auth from '@aws-amplify/auth';
-import {navigate } from '@reach/router'
+import {navigate } from '@reach/router';
+
+import {Link as LinkRouter} from 'react-router-dom';
 
 function Copyright() {
   return (
@@ -66,8 +68,8 @@ const useStyles = makeStyles((theme) => ({
   marginTop: theme.spacing(3),
   borderTop: 'solid #bbb',
   borderRadius: '2px',
-  
-  
+
+
   }
 }));
 export default function SignIn() {
@@ -133,9 +135,9 @@ export default function SignIn() {
             </Typography>
             </Grid>
           </Grid>
-        
+
           <form className={classes.form} noValidate>
-       
+
           <FormControl className={classes.marginTop} fullWidth variant="outlined">
           <InputLabel htmlFor="outlined-adornment-amount">Email</InputLabel>
           <OutlinedInput
@@ -169,8 +171,8 @@ export default function SignIn() {
             labelWidth={70}
           />
         </FormControl>
-      
-        
+
+
            <Grid container>
             <Grid item xs>
              <FormControlLabel
@@ -185,15 +187,18 @@ export default function SignIn() {
             </Grid>
           </Grid>
         <br/>
-     
-       
+
+
+        <LinkRouter to='/dashboard'>
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            onClick={handleSubmit}>
+            // onClick={handleSubmit}
+            >
             Submit
           </Button>
+          </LinkRouter>
           <br/>
           <div className={classes.marginTop}>
           <Link  href="#" variant="body2" >
@@ -204,7 +209,7 @@ export default function SignIn() {
           <a href="#" className="fa fa-facebook"></a>
           <a href="#" className="fa fa-twitter"></a>
           <a href="#" className="fa fa-google"></a>
-          </div>   
+          </div>
           <div>
           <Divider className={classes.divider} variant="middle" />
           </div>
@@ -218,7 +223,7 @@ export default function SignIn() {
             </Typography>
             </Grid>
           </Grid>
-     
+
         </form>
       </div>
     </Container>
