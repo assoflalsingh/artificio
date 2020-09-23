@@ -1,4 +1,4 @@
-.MuiAppBar-colorPrimary {
+/* .MuiAppBar-colorPrimary {
   color: #0062cc!important;
   background-color: #fff!important;
 }
@@ -184,7 +184,7 @@
 
 .file-input {
   display: none;
-} 
+}
 
 
 .upload-modal {
@@ -244,7 +244,6 @@
   color: red;
 }
 
-<<<<<<< Updated upstream
 .accordion-parent .MuiAccordion-root.Mui-expanded{
     margin: 0px !important;
 }
@@ -252,7 +251,6 @@
 .accordion-parent .MuiAccordion-rounded:first-child {
   margin: 0px !important;
 }
-=======
 .react-tabs__tab--selected {
   background: #fff !important;
   border-color: #aaa;
@@ -262,7 +260,7 @@
 
 .react-tabs__tab {
   display: inline-block;
-  
+
   border-color: #aaa;
 
   border: 1px solid;
@@ -273,5 +271,4 @@
   padding: 6px 12px;
   cursor: pointer;
 }
-
->>>>>>> Stashed changes
+ */
