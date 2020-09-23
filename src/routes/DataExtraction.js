@@ -14,7 +14,7 @@ import seedrandom from 'seedrandom';
 import axios from 'axios';
 
 // const UPLOAD_URL = 'https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final';
-const UPLOAD_URL = 'http://54.187.136.177/upload-to-s3'
+const UPLOAD_URL = 'https://54.187.136.177/upload-to-s3';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -109,7 +109,7 @@ function FileUploadProgress({fileUploadInfo=[], ...props}) {
 }
 
 function QuickStart() {
-  const username = 'aditya';
+  const username = 'test_user';
   const prng = new seedrandom(username.length.toString());
   const randUploadNo = Math.abs(prng.int32()).toString().substr(0, 6);
   const MAX_FILES = 10;
@@ -119,6 +119,7 @@ function QuickStart() {
   const [progressOpen, setProgressOpen] = useState(false);
   const [progressFileInfo, setProgressFileInfo] = useState([]);
   const [allProcessed, setAllProcessed] = useState(true);
+  const [fileuploaderKey, setFileuploaderKey] = useState(0);
 
   /* progressFileInfo sample record
     {
@@ -136,7 +137,8 @@ function QuickStart() {
   }, [progressFileInfo]);
 
   const onSubmitClick = () => {
-    let dataSetId= `${getEpochNow()}${randUploadNo}`;
+    let txnId = `${getEpochNow()}${randUploadNo}`;
+    setFileuploaderKey(fileuploaderKey+1);
     setProgressFileInfo(files.map((files)=>{
       return {
         name: files.name, progress: 0,
@@ -163,8 +165,8 @@ function QuickStart() {
         headers :{
           'Content-Type': 'multipart/form-data',
           'Access-Control-Allow-Origin': '*',
-          'username': 'aditya',
-          'txn_id': dataSetId,
+          'username': username,
+          'txn_id': txnId,
           'file_name': file.name
         },
         onUploadProgress: (e)=>{
@@ -192,7 +194,7 @@ function QuickStart() {
     <Box className={classes.root}>
       <Typography color="primary" variant="h5" gutterBottom>Quick add files to start annotation.</Typography>
       <Typography>To start annotations your project, import your files in single or multi-page formats. You can upload {MAX_FILES} files at a time.</Typography>
-      <FileDropZone filesLimit={MAX_FILES} onChange={(files) => setFiles(files)} />
+      <FileDropZone filesLimit={MAX_FILES} onChange={(files) => setFiles(files)} key={fileuploaderKey} />
       <Button variant="contained" color="secondary" onClick={onSubmitClick} disabled={files.length == 0 || !allProcessed}>{allProcessed ? 'Submit' : 'Uploading...'}</Button>
       <Button className={classes.marginLeft1} variant="outlined" onClick={()=>{setProgressOpen(true)}}>Check progress</Button>
       <FileUploadProgress fileUploadInfo={progressFileInfo} open={progressOpen} onClose={()=>{setProgressOpen(false)}} />
