@@ -6,7 +6,6 @@ import FileDropZone from '../components/FileDropZone';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import MUIDataTable from "mui-datatables";
-import CancelIcon from '@material-ui/icons/Cancel';
 import DoneIcon from '@material-ui/icons/Done';
 import ErrorIcon from '@material-ui/icons/Error';
 
@@ -14,7 +13,7 @@ import seedrandom from 'seedrandom';
 import axios from 'axios';
 
 // const UPLOAD_URL = 'https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final';
-const UPLOAD_URL = 'https://54.187.136.177/upload-to-s3';
+const UPLOAD_URL = 'http://54.187.136.177/upload-to-s3';
 
 
 const useStyles = makeStyles((theme) => ({
