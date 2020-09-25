@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Paper, Tab, Tabs } from '@material-ui/core';
+import { Box, Paper, Tab, Tabs, Typography } from '@material-ui/core';
 
 
 function TabPanel({children, className, value, index}) {
   return (
-    <Paper hidden={value !== index} style={{height: '100%'}} className={className}>{value === index && children}</Paper>
+    <Typography style={{height: '100%'}} component="div" hidden={value !== index}>
+      <Paper style={{height: '100%'}} className={className}>{children}</Paper>
+    </Typography>
   );
 }
 

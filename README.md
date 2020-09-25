@@ -1,6 +1,78 @@
 This is the front end for the artificio.ai app.
 
-Clone the repo and `cd front-end-react`. Run the below scripts as per your need.
+## Deploy the app to prod
+```
+# Clean up the server app dir
+
+ssh -i aml.pem ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com
+
+cd /home/ec2-user
+
+rm -rf app
+
+mkdir app
+
+# In a new terminal
+
+git clone https://gitlab.com/artificio2020/front-end-react.git
+
+cd front-end-react
+
+npm install
+
+npm build
+
+cd build
+
+scp -i aml.pem -pr * ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com:/home/ec2-user/app
+
+
+# Going back to SSH
+
+ssh -i aml.pem ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com
+
+cd /var/www/artificio.ai/
+
+rm -rf *
+
+sudo cp -R /home/ec2-user/app/* .
+
+sudo chown -R nginx:nginx *
+
+sudo systemctl restart nginx.service
+
+sudo systemctl status nginx.service
+
+```
+
+## nginx conf for aritificio.ai
+
+```
+[ec2-user@ip-10-0-1-13 ~]$ cat /etc/nginx/conf.d/artificio.ai.conf
+server {
+        listen 443 ssl;
+        listen [::]:443;
+	ssl_certificate /etc/ssl/certs/artificio.cert;
+	ssl_certificate_key /etc/ssl/certs/artificio.key;
+
+        root /var/www/artificio.ai;
+        index index.html index.htm;
+
+        server_name artificio.ai www.artificio.ai;
+
+        location / {
+                try_files $uri $uri/ /index.html;
+        }
+}
+
+
+server {
+    listen 80;
+    server_name artificio.ai www.artificio.ai;
+    return 301 https://artificio.ai$request_uri;
+}
+```
+
 
 ## Available Scripts
 
@@ -16,20 +88,3 @@ Launches the test runner in the interactive watch mode.<br />
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br />
-
-Sample nginx config:
-Copy the content from build directory to /var/www/example.com
-
-server {
-        listen 80;
-        listen [::]:80;
-
-        root /var/www/example.com;
-        index index.html index.htm;
-
-        server_name example.com www.example.com;
-
-        location / {
-                try_files $uri $uri/ /index.html;
-        }
-}

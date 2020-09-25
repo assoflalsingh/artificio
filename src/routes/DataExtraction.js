@@ -6,8 +6,7 @@ import FileDropZone from '../components/FileDropZone';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import MUIDataTable from "mui-datatables";
-import DoneIcon from '@material-ui/icons/Done';
-import ErrorIcon from '@material-ui/icons/Error';
+import FileUploadProgress from '../components/FileUploadProgress';
 
 import seedrandom from 'seedrandom';
 import axios from 'axios';
@@ -49,64 +48,6 @@ function getEpochNow(){
   return (d.getTime()-d.getMilliseconds())/1000;
 }
 
-const useStylesFP = makeStyles(()=>({
-  root: {
-    fontSize: '1.25rem',
-  },
-  fileroot: {
-    display: 'flex',
-    padding: '1rem',
-    minWidth: '400px',
-    marginBottom: '0.5rem',
-  },
-  filedetails: {
-    flexGrow: 1,
-  },
-  rightAlign: {
-    marginLeft: 'auto',
-  }
-}));
-
-function FileUploadProgress({fileUploadInfo=[], ...props}) {
-  const classes = useStylesFP();
-  const SingleFile = ({name, progress, done, error}) => {
-    const showProgress = error ? false : (!done ? true : false);
-    return (
-      <Paper className={classes.fileroot} elevation={2}>
-        <Box className={classes.filedetails}>
-          <Box display="flex">
-            <Box>{name}</Box>
-            {showProgress && <Box className={classes.rightAlign}>{progress}%</Box>}
-          </Box>
-          {showProgress && <LinearProgress variant="determinate" value={progress} />}
-        </Box>
-        {done && !error &&
-          <Box className={classes.rightAlign}>
-            <DoneIcon color="secondary" />
-          </Box>
-        }
-        {error &&
-          <Box className={classes.rightAlign}>
-            <Tooltip title={error}>
-              <ErrorIcon color="error" />
-            </Tooltip>
-          </Box>
-        }
-      </Paper>
-    )
-  }
-  return (
-    <Dialog {...props} className={classes.root}>
-      <DialogTitle>Files upload progress</DialogTitle>
-      <DialogContent>
-        {fileUploadInfo.map((fileInfo)=>{
-          return <SingleFile name={fileInfo.name} progress={fileInfo.progress} done={fileInfo.done} error={fileInfo.error}/>
-        })}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 function QuickStart() {
   const username = 'test_user';
   const prng = new seedrandom(username.length.toString());
@@ -119,12 +60,6 @@ function QuickStart() {
   const [progressFileInfo, setProgressFileInfo] = useState([]);
   const [allProcessed, setAllProcessed] = useState(true);
   const [fileuploaderKey, setFileuploaderKey] = useState(0);
-
-  /* progressFileInfo sample record
-    {
-      name: 'xyz', progress: '25', done: false, error: 'some error'
-    }
-  */
 
   useEffect(()=>{
     for(let i=0; i<progressFileInfo.length; i++) {
@@ -216,51 +151,86 @@ function DataSet() {
 
   const columns = [
     {
-     name: "name",
-     label: "Name",
-     options: {
-      filter: true,
-      sort: true,
-     }
+      name: "filename",
+      label: "Filename",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true
+      }
     },
     {
-     name: "company",
-     label: "Company",
-     options: {
-      filter: true,
-      sort: false,
-     }
+      name: "datasetId",
+      label: "Data Set ID",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true
+      }
     },
     {
-     name: "city",
-     label: "City",
-     options: {
-      filter: true,
-      sort: false,
-     }
+      name: "createdBy",
+      label: "Created By",
+      options: {
+        filter: true,
+        sort: true,
+      }
     },
     {
-     name: "state",
-     label: "State",
-     options: {
-      filter: true,
-      sort: false,
-     }
+      name: "systemStatus",
+      label: "System Status",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRender: (value, tableMeta)=>{
+          if(value == 'N') {
+            return <Chip label="New" color="primary" />;
+          } else{
+            return <Chip label="Processed" color="secondary" />;
+          }
+        }
+      },
     },
-   ];
-
+    {
+      name: "assinedUser",
+      label: "Assigned User",
+      options: {
+        filter: true,
+        sort: true,
+      }
+    },
+    {
+      name: "dateTime",
+      label: "Date time",
+      options: {
+        filter: true,
+        sort: true,
+      }
+    },
+    {
+      name: "action",
+      label: "Action",
+      options: {
+        filter: false,
+        sort: false,
+        draggable: false,
+      }
+    },
+  ];
 
    const data = [
-    { name: "Joe James", company: "Test Corp", city: "Yonkers", state: "NY" },
-    { name: "John Walsh", company: "Test Corp", city: "Hartford", state: "CT" },
-    { name: "Bob Herm", company: "Test Corp", city: "Tampa", state: "FL" },
-    { name: "James Houston", company: "Test Corp", city: "Dallas", state: "TX" },
+    { filename: "Demo_001", datasetId: "IN-003", createdBy: "Yonkers", systemStatus: "N", assinedUser: 'Paul Doe', dateTime: '25 Sep, 2020\n12:55AM' },
+    { filename: "Demo_002", datasetId: "IN-003", createdBy: "Hartford", systemStatus: "P", assinedUser: 'Paul Doe', dateTime: '25 Sep, 2020\n12:55AM' },
+    { filename: "a_long_file_name_is_possible", datasetId: "IN-003", createdBy: "Tampa", systemStatus: "N", assinedUser: 'Paul Doe', dateTime: '25 Sep, 2020\n12:55AM' },
+    { filename: "Demo_001", datasetId: "IN-003", createdBy: "Dallas", systemStatus: "N", assinedUser: 'Paul Doe', dateTime: '25 Sep, 2020\n12:55AM' },
    ];
 
 
   const options = {
     filterType: 'checkbox',
+    filterType: 'dropdown',
     elevation: 0,
+    draggableColumns: {enabled: true}
   };
 
   return (
@@ -281,6 +251,7 @@ function DataSet() {
       data={data}
       columns={columns}
       options={options}
+
     />
     </>
   )

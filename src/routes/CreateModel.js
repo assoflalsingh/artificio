@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 import MenuTile from '../components/MenuTile';
 import DataMangerIcon from '../assets/images/data-manager.svg';
-import Classifier from '../assets/images/Classifier.svg';
+import Classifier from '../assets/images/classifier.svg';
 import {Switch as RouterSwitch, Route} from 'react-router-dom';
 import DataManger from './DataManager';
 
@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CreateModel({match}) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
   const baseUrl = match.url;
 
   return (
