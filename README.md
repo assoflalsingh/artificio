@@ -33,7 +33,7 @@ ssh -i aml.pem ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com
 
 cd /var/www/artificio.ai/
 
-rm -rf *
+sudo rm -rf *
 
 sudo cp -R /home/ec2-user/app/* .
 
