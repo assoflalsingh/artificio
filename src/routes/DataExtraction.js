@@ -108,11 +108,13 @@ function QuickStart() {
           let completed = Math.round((e.loaded * 100) / e.total);
           setProgressForFile(i, {
             progress: completed,
-            done: completed == 100
+            done: false
           });
         }
-      }).then((resp)=>{
-        console.log(resp);
+      }).then(()=>{
+        setProgressForFile(i, {
+          done: true
+        });
       })
       .catch((error) => {
         console.error(error);
