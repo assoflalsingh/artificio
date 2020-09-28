@@ -7,6 +7,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import MUIDataTable from "mui-datatables";
 import FileUploadProgress from '../components/FileUploadProgress';
+import getURL from './getURL';
 
 import seedrandom from 'seedrandom';
 import axios from 'axios';
@@ -95,7 +96,7 @@ function QuickStart() {
     files.forEach((file, i) => {
       const formData = new FormData();
       formData.append('file',file);
-      axios.post(UPLOAD_URL, formData,{
+      axios.post(getURL('UPLOAD_TO_S3'), formData,{
         headers :{
           'Content-Type': 'multipart/form-data',
           'Access-Control-Allow-Origin': '*',
