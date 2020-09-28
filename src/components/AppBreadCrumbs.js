@@ -11,7 +11,7 @@ const useStylesContent = makeStyles((theme)=>({
   },
   breadcrumbs: {
     width: '100%',
-    padding: '1rem'
+    padding: '0.5rem 1rem'
   },
   breadcrumbsDashboard: {
     fontWeight: 'bold',

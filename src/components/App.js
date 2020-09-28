@@ -28,8 +28,8 @@ const useStyles = makeStyles((theme)=>({
   },
   rightSide: {
     width: '100%',
-    paddingLeft: '1rem',
-    paddingRight: '1rem',
+    paddingLeft: '0.5rem',
+    paddingRight: '0.5rem',
   },
   bottomSide: {
     flexGrow: 1,

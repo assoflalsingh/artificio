@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Dialog, DialogTitle, Paper, DialogContent, LinearProgress, Tooltip } from '@material-ui/core';
+import { Box, Dialog, DialogTitle, Paper, DialogContent, LinearProgress, Tooltip, Typography } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import ErrorIcon from '@material-ui/icons/Error';
 
@@ -65,9 +65,12 @@ export default function FileUploadProgress({fileUploadInfo=[], ...props}) {
     <Dialog {...props} className={classes.root}>
       <DialogTitle>Files upload progress</DialogTitle>
       <DialogContent>
-        {fileUploadInfo.map((fileInfo)=>{
+        {fileUploadInfo.length > 0 && fileUploadInfo.map((fileInfo)=>{
           return <SingleFile name={fileInfo.name} progress={fileInfo.progress} done={fileInfo.done} error={fileInfo.error}/>
         })}
+        {fileUploadInfo.length == 0 &&
+          <Typography>No files uploaded !!</Typography>
+        }
       </DialogContent>
     </Dialog>
   );

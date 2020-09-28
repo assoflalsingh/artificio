@@ -50,7 +50,7 @@ function getEpochNow(){
 }
 
 function QuickStart() {
-  const username = 'test_user';
+  const username = 'sharat';
   const prng = new seedrandom(username.length.toString());
   const randUploadNo = Math.abs(prng.int32()).toString().substr(0, 6);
   const MAX_FILES = 10;

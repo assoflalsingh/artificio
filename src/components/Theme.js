@@ -117,6 +117,9 @@ const theme = createMuiTheme({
           }
         },
         MuiTabs: {
+          root: {
+            minHeight: '2.5rem',
+          },
           indicator: {
             display: 'none',
           }
@@ -126,6 +129,7 @@ const theme = createMuiTheme({
             borderTopLeftRadius: '1rem',
             borderTopRightRadius: '1rem',
             marginRight: '0.75rem',
+            minHeight: '2.5rem',
           },
           textColorInherit: {
             textTransform: 'none',

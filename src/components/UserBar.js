@@ -1,15 +1,16 @@
 import React from 'react';
-import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton } from '@material-ui/core';
+import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover } from '@material-ui/core';
 import TextFieldRounded from './TextFieldRounded';
 import SearchIcon from '@material-ui/icons/Search';
 import MailOutline from '@material-ui/icons/MailOutline';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
+import SettingsIcon from '@material-ui/icons/Settings';
 import clsx from 'clsx';
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {
-    paddingTop: '1rem',
-    paddingBottom: '1rem',
+    paddingTop: '0.5rem',
+    paddingBottom: '0.5rem',
     display: 'flex',
     alignItems: 'center'
   },
@@ -29,6 +30,14 @@ const useStylesUserBar = makeStyles((theme)=>({
 
 export default function UserBar({className}) {
   const classes = useStylesUserBar();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const onSettingsClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}
@@ -54,9 +63,26 @@ export default function UserBar({className}) {
           </Badge>
         </IconButton>
         <Typography color="textSecondary" className={classes.rightItem}>Hi, Paul Deo</Typography>
-        <Box className={classes.rightItem}>
-          <Avatar alt='Paul Deo' className={classes.avatar}>P</Avatar>
-        </Box>
+        <IconButton onClick={onSettingsClick}>
+          <SettingsIcon />
+        </IconButton>
+        <Popover
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <MenuItem onClick={handleClose}>My account</MenuItem>
+          <MenuItem onClick={handleClose}>Logout</MenuItem>
+        </Popover>
       </Box>
     </Box>
   );
