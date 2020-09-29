@@ -7,14 +7,13 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import MUIDataTable from "mui-datatables";
 import FileUploadProgress from '../components/FileUploadProgress';
-import getURL from './getURL';
-
 import seedrandom from 'seedrandom';
-import axios from 'axios';
+import {getInstance, URL_MAP} from '../apis/artificio.instance';
 
 // const UPLOAD_URL = 'https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final';
 const UPLOAD_URL = 'http://54.187.136.177/upload-to-s3';
 
+const api = getInstance(localStorage.getItem('token'));
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -96,7 +95,7 @@ function QuickStart() {
     files.forEach((file, i) => {
       const formData = new FormData();
       formData.append('file',file);
-      axios.post(getURL('UPLOAD_TO_S3'), formData,{
+      api.post(URL_MAP.UPLOAD_TO_S3, formData,{
         headers :{
           'Content-Type': 'multipart/form-data',
           'Access-Control-Allow-Origin': '*',

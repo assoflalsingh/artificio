@@ -6,6 +6,7 @@ import MailOutline from '@material-ui/icons/MailOutline';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import SettingsIcon from '@material-ui/icons/Settings';
 import clsx from 'clsx';
+import { withRouter } from 'react-router-dom';
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {
@@ -28,7 +29,7 @@ const useStylesUserBar = makeStyles((theme)=>({
   }
 }));
 
-export default function UserBar({className}) {
+function UserBar({className, history}) {
   const classes = useStylesUserBar();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const onSettingsClick = (event) => {
@@ -37,6 +38,11 @@ export default function UserBar({className}) {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const onLogoutClick = () => {
+    localStorage.removeItem('token', null);
+    window.location.reload();
   };
   return (
     <Box className={clsx(className, classes.root)}>
@@ -81,9 +87,11 @@ export default function UserBar({className}) {
           }}
         >
           <MenuItem onClick={handleClose}>My account</MenuItem>
-          <MenuItem onClick={handleClose}>Logout</MenuItem>
+          <MenuItem onClick={onLogoutClick}>Logout</MenuItem>
         </Popover>
       </Box>
     </Box>
   );
 }
+
+export default withRouter(UserBar);

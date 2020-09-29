@@ -23,10 +23,12 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Auth from '@aws-amplify/auth';
-import {navigate } from '@reach/router';
 
-import {Link as LinkRouter} from 'react-router-dom';
+import {Link as LinkRouter, useHistory} from 'react-router-dom';
+import axios from 'axios';
+import {getInstance, URL_MAP} from '../apis/artificio.instance';
+
+const api = getInstance();
 
 function Copyright() {
   return (
@@ -68,18 +70,16 @@ const useStyles = makeStyles((theme) => ({
   marginTop: theme.spacing(3),
   borderTop: 'solid #bbb',
   borderRadius: '2px',
-
-
   }
 }));
-export default function SignIn() {
+export default function SignIn({history, location}) {
   const classes = useStyles();
   const [values, setValues] = React.useState({
     password: '',
-    email:'',
-    showPassword: false
+    username:'',
+    showPassword: false,
+    authorizing: false,
   });
-
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -94,31 +94,27 @@ export default function SignIn() {
   };
 
   const handleSubmit = async event => {
-    event.preventDefault();
-    navigate(`/dashboard`);
-    // try{
-    //   const user = await Auth.signIn(values.email,values.password);
-    //   console.log(user);
-
-    // }catch(error){
-    //     console.log(error);
-    // }
-    // try{
-    //   const email=values.email;
-    //   const username=values.email;
-    //   const password=values.password;
-    //   const signupRes = await Auth.signUp({
-    //     username,
-    //     password,
-    //     attributes:{
-    //       email:email
-    //     }
-    //   });
-    //   console.log(signupRes);
-
-    // }catch(error){
-    //     console.log(error);
-    // }
+    api.post('/auth', {
+      'username': values.username,
+      'password': values.password,
+    },{
+      headers :{
+        'Access-Control-Allow-Origin': '*',
+      },
+    }).then((resp)=>{
+      console.log(resp);
+      localStorage.setItem('token', resp.data.token);
+      history.push('/dashboard');
+    })
+    .catch((error) => {
+      console.error(error);
+      localStorage.setItem('token', 'autherror');
+      if(location.state) {
+        history.push(location.state.from);
+      } else {
+        history.push('/dashboard');
+      }
+    });
   }
 
   return (
@@ -143,7 +139,7 @@ export default function SignIn() {
           <OutlinedInput
             id="outlined-adornment-email"
             value={values.amount}
-            onChange={handleChange('email')}
+            onChange={handleChange('username')}
             startAdornment={<InputAdornment position="start"><ExitToAppIcon/></InputAdornment>}
             labelWidth={60}
           />
@@ -189,16 +185,15 @@ export default function SignIn() {
         <br/>
 
 
-        <LinkRouter to='/dashboard'>
+        {/* <LinkRouter to='/dashboard'> */}
           <Button
-            type="submit"
             variant="contained"
             color="primary"
-            // onClick={handleSubmit}
+            onClick={handleSubmit}
             >
             Submit
           </Button>
-          </LinkRouter>
+          {/* </LinkRouter> */}
           <br/>
           <div className={classes.marginTop}>
           <Link  href="#" variant="body2" >

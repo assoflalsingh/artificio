@@ -1,15 +1,12 @@
 import React from 'react';
-import { Container, makeStyles, Box, Paper, CssBaseline } from '@material-ui/core';
+import { Container, Box, Paper, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-
+import { BrowserRouter as Router } from 'react-router-dom';
 
 import Logo from '../assets/images/Logo-final.png';
-import Theme from './Theme';
-import UserBar from './UserBar';
-import MainContent from './MainContent';
-import SideMenuBar from './SideMenuBar';
-import SignIn from './SignIn';
+import UserBar from '../components/UserBar';
+import MainContent from '../components/MainContent';
+import SideMenuBar from '../components/SideMenuBar';
 
 const useStyles = makeStyles((theme)=>({
   root: {
@@ -51,7 +48,7 @@ const useStyles = makeStyles((theme)=>({
   },
 }));
 
-function AppForTheme() {
+export default function Dashboard({his}) {
   const classes = useStyles();
   return (
     <Router basename='/dashboard'>
@@ -72,20 +69,5 @@ function AppForTheme() {
         </Container>
       </Box>
     </Router>
-  )
-}
-
-export default function App() {
-  return (
-    <>
-    <Theme>
-      <CssBaseline />
-      {/* <AppForTheme /> */}
-      <Router>
-        <Route path='/dashboard' component={AppForTheme} />
-        <Route path='/login' component={SignIn} />
-      </Router>
-    </Theme>
-    </>
   )
 }
