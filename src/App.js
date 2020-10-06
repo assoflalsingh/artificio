@@ -6,6 +6,8 @@ import Theme from './components/Theme';
 import SignIn from './routes/SignIn';
 import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './routes/Dashboard';
+import SignUp from './routes/SignUp';
+import Activate from './routes/Activate';
 
 export default function App() {
   return (
@@ -15,6 +17,8 @@ export default function App() {
       <Router>
         <PrivateRoute path='/dashboard' component={Dashboard} />
         <Route path='/login' component={SignIn} />
+        <Route path='/signup' component={SignUp} />
+        <Route path='/activate' component={Activate} />
       </Router>
     </Theme>
     </>

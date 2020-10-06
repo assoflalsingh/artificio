@@ -26,7 +26,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import {Link as LinkRouter, useHistory} from 'react-router-dom';
 import axios from 'axios';
-import {getInstance, URL_MAP} from '../apis/artificio.instance';
+import {getInstance, URL_MAP} from '../others/artificio_api.instance';
 
 const api = getInstance();
 
@@ -72,6 +72,7 @@ const useStyles = makeStyles((theme) => ({
   borderRadius: '2px',
   }
 }));
+
 export default function SignIn({history, location}) {
   const classes = useStyles();
   const [values, setValues] = React.useState({

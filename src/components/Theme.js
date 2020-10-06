@@ -82,6 +82,9 @@ const theme = createMuiTheme({
           }
         },
         MuiOutlinedInput: {
+          root: {
+            borderRadius: '0.5rem',
+          },
           input: {
             padding: '0.75rem 1.5rem',
           },
@@ -181,6 +184,17 @@ const theme = createMuiTheme({
           root: {
             padding: '0.5rem 1rem',
             minWidth: '600px',
+          }
+        },
+        MuiFormLabel: {
+          asterisk: {
+            fontSize: '0.8em',
+            color: globalTheme.palette.error.main,
+          }
+        },
+        MuiFormControlLabel: {
+          root: {
+            marginLeft: 0
           }
         }
     }

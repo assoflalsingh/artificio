@@ -8,7 +8,7 @@ import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import MUIDataTable from "mui-datatables";
 import FileUploadProgress from '../components/FileUploadProgress';
 import seedrandom from 'seedrandom';
-import {getInstance, URL_MAP} from '../apis/artificio.instance';
+import {getInstance, URL_MAP} from '../others/artificio_api.instance';
 
 // const UPLOAD_URL = 'https://q4zw8vpl77.execute-api.us-west-2.amazonaws.com/upload-s3-final';
 const UPLOAD_URL = 'http://54.187.136.177/upload-to-s3';
