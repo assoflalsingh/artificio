@@ -34,8 +34,20 @@ export default function Activate({location, history}) {
     }).then((resp)=>{
       setActive(true);
       setMessage('User is activated successfully !!');
-    }).catch((error)=>{
+    }).catch((err)=>{
       setMessage('Activation failed !!');
+      if (err.response) {
+        // client received an error response (5xx, 4xx)
+        if(err.response.data.message) {
+          setFormError(err.response.data.message);
+        } else {
+          setFormError(err.response.statusText + '. Activation failed.');
+        }
+      } else if (err.request) {
+        // client never received a response, or request never left
+      } else {
+        // anything else
+      }
     }).then(()=>{
       setActivating(false);
     });
