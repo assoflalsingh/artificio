@@ -192,7 +192,11 @@ export default function SignUp({match, history}) {
       }).catch((err)=>{
         if (err.response) {
           // client received an error response (5xx, 4xx)
-          setFormError(err.response.data.message);
+          if(err.response.data.message) {
+            setFormError(err.response.data.message);
+          } else {
+            setFormError(err.response.statusText + '. Contact administrator.');
+          }
         } else if (err.request) {
           // client never received a response, or request never left
         } else {

@@ -4,7 +4,7 @@ This is the front end for the artificio.ai app.
 ```
 # Clean up the server app dir
 
-ssh -i aml.pem ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com
+ssh -i aml.pem ec2-user@artificio.ai
 
 cd /home/ec2-user
 
@@ -24,12 +24,12 @@ npm build
 
 cd build
 
-scp -i aml.pem -pr * ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com:/home/ec2-user/app
+scp -i aml.pem -pr * ec2-user@artificio.ai:/home/ec2-user/app
 
 
 # Going back to SSH
 
-ssh -i aml.pem ec2-user@ec2-54-202-142-24.us-west-2.compute.amazonaws.com
+ssh -i aml.pem ec2-user@artificio.ai
 
 cd /var/www/artificio.ai/
 

@@ -27,6 +27,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import {Link as LinkRouter, useHistory} from 'react-router-dom';
 import axios from 'axios';
 import {getInstance, URL_MAP} from '../others/artificio_api.instance';
+import Alert from '@material-ui/lab/Alert';
 
 const api = getInstance();
 
@@ -81,6 +82,7 @@ export default function SignIn({history, location}) {
     showPassword: false,
     authorizing: false,
   });
+  const [formError, setFormError] = React.useState('');
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -95,8 +97,9 @@ export default function SignIn({history, location}) {
   };
 
   const handleSubmit = async event => {
-    api.post('/auth', {
-      'username': values.username,
+    setFormError('');
+    api.post('/auth/login/', {
+      'email': values.username,
       'password': values.password,
     },{
       headers :{
@@ -104,16 +107,25 @@ export default function SignIn({history, location}) {
       },
     }).then((resp)=>{
       console.log(resp);
-      localStorage.setItem('token', resp.data.token);
-      history.push('/dashboard');
-    })
-    .catch((error) => {
-      console.error(error);
-      localStorage.setItem('token', 'autherror');
-      if(location.state) {
+      localStorage.setItem('token', resp.data);
+      if(location.state && location.state.from === 'login') {
         history.push(location.state.from);
       } else {
         history.push('/dashboard');
+      }
+    })
+    .catch((err) => {
+      if (err.response) {
+        // client received an error response (5xx, 4xx)
+        if(err.response.data.message) {
+          setFormError(err.response.data.message);
+        } else {
+          setFormError(err.response.statusText + '. Contact administrator.');
+        }
+      } else if (err.request) {
+        // client never received a response, or request never left
+      } else {
+        // anything else
       }
     });
   }
@@ -168,7 +180,10 @@ export default function SignIn({history, location}) {
             labelWidth={70}
           />
         </FormControl>
-
+        {formError &&
+          <Box className={classes.formRow}>
+            <Alert severity="error">{formError}</Alert>
+          </Box>}
 
            <Grid container>
             <Grid item xs>
