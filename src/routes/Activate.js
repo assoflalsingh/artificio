@@ -39,9 +39,9 @@ export default function Activate({location, history}) {
       if (err.response) {
         // client received an error response (5xx, 4xx)
         if(err.response.data.message) {
-          setFormError(err.response.data.message);
+          setMessage(err.response.data.message);
         } else {
-          setFormError(err.response.statusText + '. Activation failed.');
+          setMessage(err.response.statusText + '. Activation failed.');
         }
       } else if (err.request) {
         // client never received a response, or request never left
