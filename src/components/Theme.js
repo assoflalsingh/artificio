@@ -44,6 +44,9 @@ const globalTheme = createMuiTheme({
     },
     shadows: defaultTheme.shadows,
     spacing: factor => `${0.25 * factor}rem`,
+    typography: {
+      htmlFontSize: 16
+    }
 });
 
 const theme = createMuiTheme({
@@ -94,17 +97,19 @@ const theme = createMuiTheme({
         },
         MuiButton: {
           root: {
-            borderRadius: '0.5rem',
+            borderRadius: '3.5rem',
             textTransform: 'none',
-            padding: '0.5rem 0.75rem',
+            padding: '0.5rem 2rem',
             fontWeight: 'inherit',
-            padding: '0.5rem 0.75rem',
           },
           contained: {
             boxShadow: 'none',
           },
           outlined: {
-            padding: '0.5rem 0.75rem',
+            padding: '0.5rem 2rem',
+          },
+          startIcon: {
+            marginRight: '0.25rem'
           }
         },
         MuiButtonGroup: {
@@ -187,6 +192,9 @@ const theme = createMuiTheme({
           }
         },
         MuiFormLabel: {
+          root: {
+            fontSize: '0.875rem',
+          },
           asterisk: {
             fontSize: '0.8em',
             color: globalTheme.palette.error.main,
