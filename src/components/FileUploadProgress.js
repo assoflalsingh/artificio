@@ -65,8 +65,8 @@ export default function FileUploadProgress({fileUploadInfo=[], ...props}) {
     <Dialog {...props} className={classes.root}>
       <DialogTitle>Files upload progress</DialogTitle>
       <DialogContent>
-        {fileUploadInfo.length > 0 && fileUploadInfo.map((fileInfo)=>{
-          return <SingleFile name={fileInfo.name} progress={fileInfo.progress} done={fileInfo.done} error={fileInfo.error}/>
+        {fileUploadInfo.length > 0 && fileUploadInfo.map((fileInfo, i)=>{
+          return <SingleFile key={i} name={fileInfo.name} progress={fileInfo.progress} done={fileInfo.done} error={fileInfo.error}/>
         })}
         {fileUploadInfo.length == 0 &&
           <Typography>No files uploaded !!</Typography>

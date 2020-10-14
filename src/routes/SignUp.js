@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography } from '@material-ui/core';
-import MenuTile from '../components/MenuTile';
-import DataExtractionIcon from '../assets/images/data-extraction.svg';
-import DataExtraction from './DataExtraction';
-import {Switch as RouterSwitch, Route} from 'react-router-dom';
 import HomeIcon from '@material-ui/icons/Home';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import BusinessIcon from '@material-ui/icons/Business';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import MuiPhoneNumber from 'material-ui-phone-number';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import SignUpImg from '../assets/images/office-workspace.png';
 import {getInstance, URL_MAP} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
+import { FormInputText } from '../components/FormElements';
 
 const api = getInstance();
 
@@ -33,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightBold,
     color: theme.palette.text.primary
   },
-  formInput: {
+  FormInputText: {
     marginTop: '0.5rem'
   },
   img: {
@@ -42,50 +37,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const FormInput = ({label, InputIcon, errorMsg, required, isPhoneNo, onChange, ...inpProps}) => {
-  const classes = useStyles();
-  return (
-    <Box>
-      <FormLabel required={required} className={classes.formLabel}>{label}</FormLabel>
-      {isPhoneNo &&
-      <MuiPhoneNumber
-        variant="outlined"
-        helperText={errorMsg}
-        fullWidth
-        className={classes.formInput}
-        error={Boolean(errorMsg)}
-        inputProps={{
-          'data-label': label,
-          'data-required': required
-        }}
-        onChange={onChange}
-        {...inpProps}
-      />
-      }
-      {!isPhoneNo &&
-      <TextField
-        variant="outlined"
-        InputProps={{
-          startAdornment: <InputAdornment position="start"><InputIcon fontSize='small' /></InputAdornment>,
-        }}
-        helperText={errorMsg}
-        fullWidth
-        className={classes.formInput}
-        error={Boolean(errorMsg)}
-        data-label={label}
-        data-required={required}
-        inputProps={{
-          'data-label': label,
-          'data-required': required
-        }}
-        onChange={onChange}
-        onBlur={onChange}
-        {...inpProps}
-      />
-      }
-    </Box>
-  )
-}
 
 export default function SignUp({match, history}) {
   const classes = useStyles();
@@ -176,6 +127,8 @@ export default function SignUp({match, history}) {
   }
 
   const onRegisterClick = (e)=>{
+    setFormError('');
+    setFormSuccess('');
     if(validateForm()) {
       setSaving(true);
       api.post(URL_MAP.SIGN_UP, {
@@ -224,32 +177,32 @@ export default function SignUp({match, history}) {
             <form className={classes.root} noValidate autoComplete="off">
               <Grid container spacing={2} className={classes.formRow}>
                 <Grid item md={6} xs={12}>
-                  <FormInput name="first_name" value={fields.first_name} label="First name"
+                  <FormInputText name="first_name" value={fields.first_name} label="First name"
                     InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.first_name} required/>
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <FormInput name="last_name" value={fields.last_name} label="Last name"
+                  <FormInputText name="last_name" value={fields.last_name} label="Last name"
                     InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.last_name} required/>
                 </Grid>
               </Grid>
               <Box className={classes.formRow}>
-                <FormInput name="email" value={fields.email} label="Email id"
+                <FormInputText name="email" value={fields.email} label="Email id"
                   InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.email} required/>
               </Box>
               <Box className={classes.formRow}>
-                <FormInput name="org" value={fields.org} label="Organisation"
+                <FormInputText name="org" value={fields.org} label="Organisation"
                   InputIcon={BusinessIcon} onChange={onChange} errorMsg={errors.org} />
               </Box>
               <Box className={classes.formRow}>
-                <FormInput isPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
+                <FormInputText isPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
                   defaultCountry={'us'} onChange={(value)=>{fieldChanged('phone_no', value)}} errorMsg={errors.phone_no} />
               </Box>
               <Box className={classes.formRow}>
-                <FormInput name="password" value={fields.password} label="Password"
+                <FormInputText name="password" value={fields.password} label="Password"
                   InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
               </Box>
               <Box className={classes.formRow}>
-                <FormInput name="confirm_pass" value={fields.confirm_pass} label="Confirm password"
+                <FormInputText name="confirm_pass" value={fields.confirm_pass} label="Confirm password"
                   InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.confirm_pass} required />
               </Box>
               {formSuccess &&

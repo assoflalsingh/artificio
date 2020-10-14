@@ -107,7 +107,7 @@ export default function SignIn({history, location}) {
       },
     }).then((resp)=>{
       console.log(resp);
-      localStorage.setItem('token', resp.data);
+      localStorage.setItem('token', resp.data.data);
       if(location.state && location.state.from === 'login') {
         history.push(location.state.from);
       } else {
