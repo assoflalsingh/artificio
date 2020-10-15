@@ -19,11 +19,11 @@ export default function CreateLabel({onCancel, ...props}) {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [saving, setSaving] = useState(false);
-  const noneOpts = [
-    {value: '', label: 'None'},
-  ];
-  const [assignShapeOpts, setAssignShapeOpts] = useState(noneOpts);
-  const [dataTypeOpts, setDataTypeOpts] = useState(noneOpts);
+
+  const [opLoading, setOpLoading] = useState(false);
+  const [assignShapeOpts, setAssignShapeOpts] = useState([]);
+  const [dataTypeOpts, setDataTypeOpts] = useState([]);
+
   const api = getInstance(localStorage.getItem('token'));
 
   const formValidators = {
@@ -34,25 +34,14 @@ export default function CreateLabel({onCancel, ...props}) {
   }
 
   useEffect(()=>{
-    const loadingOpts = [
-      {value: '', label: 'Loading...'},
-    ];
-    setAssignShapeOpts(loadingOpts);
-    setDataTypeOpts(loadingOpts);
+    setOpLoading(true);
 
     api.get(URL_MAP.GET_LABEL_PREQUISITE).then((resp)=>{
       let data = resp.data.data;
-      setAssignShapeOpts([
-        ...noneOpts,
-        ...(data.shapes.map((shape)=>({value: shape, label: shape})))
-      ]);
-      setDataTypeOpts([
-        ...noneOpts,
-        ...(data.data_types.map((dt)=>({value: dt, label: dt})))
-      ]);
+      setAssignShapeOpts(data.shapes);
+      setDataTypeOpts(data.data_types);
     }).catch((err)=>{
-      setAssignShapeOpts(noneOpts);
-      setDataTypeOpts(noneOpts);
+      setOpLoading(false);
       if (err.response) {
         // client received an error response (5xx, 4xx)
         if(err.response.data.message) {
@@ -66,6 +55,8 @@ export default function CreateLabel({onCancel, ...props}) {
       } else {
         setFormError('Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.');
       }
+    }).then(()=>{
+      setOpLoading(false);
     });
   }, []);
 
@@ -157,11 +148,11 @@ export default function CreateLabel({onCancel, ...props}) {
       <FormRow>
         <FormRowItem>
           <FormInputSelect label="Assign shape" name='shape' onChange={onTextChange}
-            value={formData.shape} options={assignShapeOpts} />
+            firstEmpty={true} loading={opLoading} value={formData.shape} options={assignShapeOpts} />
         </FormRowItem>
         <FormRowItem>
           <FormInputSelect label="Data type" name='data_type' onChange={onTextChange}
-            value={formData.data_type} options={dataTypeOpts} />
+            firstEmpty={true} loading={opLoading} value={formData.data_type} options={dataTypeOpts} />
         </FormRowItem>
       </FormRow>
       <FormRow>

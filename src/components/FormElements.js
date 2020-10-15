@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField } from '@material-ui/core';
 import MuiPhoneNumber from 'material-ui-phone-number';
 import { ColorPalette, ColorButton } from 'material-ui-color';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const useStyles = makeStyles((theme) => ({
   formRoot: {
@@ -112,76 +113,6 @@ function FormColorPalette({className, value, onChange}) {
   )
 }
 
-
-export function getControlForType(type, props, classes) {
-  let {InputIcon, errorMsg, required, onChange, label, options, validators, errorMessages, ...inpProps} = props;
-
-  const onChangeWithValidator = (newValue)=>{
-
-
-  }
-
-  if(type == 'phone') {
-    return (
-      <MuiPhoneNumber
-        variant="outlined"
-        helperText={errorMsg}
-        fullWidth
-        className={classes.formInput}
-        error={Boolean(errorMsg)}
-        inputProps={{
-          'data-label': label,
-          'data-required': required
-        }}
-        onChange={onChange}
-        {...inpProps}
-      />
-    );
-  } else if(type == 'select') {
-    options = options || [];
-    return (
-      <Select
-        value={10}
-        onChange={onChange}
-        variant="outlined"
-        className={classes.formInput}
-        fullWidth
-      >
-        <MenuItem value=""><em>None</em></MenuItem>
-        {options.map((opt)=>{
-          return  <MenuItem value={opt.value}>{opt.label}</MenuItem>
-        })}
-      </Select>
-    )
-  } else if(type == 'color') {
-    return (
-      <FormColorPalette className={classes.formInput} onChange={onChange} {...inpProps}/>
-    );
-  } else {
-    return (
-      <TextField
-        variant="outlined"
-        InputProps={{
-          startAdornment: InputIcon && <InputAdornment position="start"><InputIcon fontSize='small' /></InputAdornment>,
-        }}
-        helperText={errorMsg}
-        fullWidth
-        className={classes.formInput}
-        error={Boolean(errorMsg)}
-        data-label={label}
-        data-required={required}
-        inputProps={{
-          'data-label': label,
-          'data-required': required
-        }}
-        onChange={onChange}
-        onBlur={onChange}
-        {...inpProps}
-      />
-    );
-  }
-}
-
 export function FormInput({children, ...props}) {
   const classes = useStyles();
   return (
@@ -220,7 +151,7 @@ export function doValidation(value, validators, errorMessages) {
   return errMsg;
 }
 
-export function FormInputText({InputIcon, errorMsg, required, onChange, label, validators, errorMessages, ...props}) {
+export function FormInputText({InputIcon, errorMsg, required, onChange, label, ...props}) {
   const classes = useStyles();
 
   return (
@@ -248,29 +179,87 @@ export function FormInputText({InputIcon, errorMsg, required, onChange, label, v
   );
 }
 
-export function FormInputSelect({
-    errorMsg, required, onChange, label, options, validators, errorMessages, firstEmpty=false, ...props}) {
+export function FormInputPhoneNo({InputIcon, errorMsg, required, onChange, label, ...props}) {
   const classes = useStyles();
-  options = options || [];
+
   return (
     <FormInput required={required} label={label}>
-      <Select
-        onChange={onChange}
+      <MuiPhoneNumber
         variant="outlined"
-        className={classes.formInput}
+        helperText={errorMsg}
         fullWidth
+        className={classes.formInput}
+        error={Boolean(errorMsg)}
+        data-label={label}
+        data-required={required}
+        inputProps={{
+          'data-label': label,
+          'data-required': required
+        }}
+        onChange={onChange}
         {...props}
-      >
-        {firstEmpty && <MenuItem value=""><em>None</em></MenuItem>}
-        {options.map((opt)=>{
-          if(opt.value === '') {
-            return <MenuItem key={opt.value} value={opt.value}><em>{opt.label}</em></MenuItem>
-          }
-          return  <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-        })}
-      </Select>
+      />
     </FormInput>
-  )
+  );
+}
+
+export function FormInputSelect({
+    errorMsg, required, onChange, label, options, firstEmpty=false, loading, multiple, ...props}) {
+  const classes = useStyles();
+  const noOptions = (options.length == 0);
+  options = options || [];
+
+  if(multiple) {
+    return (
+      <FormInput required={required} label={label}>
+        <Autocomplete
+          multiple
+          options={options}
+          loading={loading}
+          filterSelectedOptions
+          onChange={onChange}
+          className={classes.formInput}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              label=""
+            />
+          )}
+          ChipProps={{
+            variant:"outlined",
+          }}
+          {...props}
+        />
+      </FormInput>
+    );
+  } else {
+    return (
+      <FormInput required={required} label={label}>
+        <Select
+          onChange={onChange}
+          variant="outlined"
+          className={classes.formInput}
+          fullWidth
+          {...props}
+        >
+          {noOptions && <MenuItem value=''><em>{loading ? 'Loading...' : 'None'}</em></MenuItem>}
+          {!noOptions && firstEmpty && <MenuItem value=""><em>None</em></MenuItem>}
+          {options.map((opt)=>{
+            let label = '', value = '';
+
+            if(typeof(opt) === 'string') {
+              label = value = opt;
+            } else {
+              label = opt.label;
+              value = opt.value;
+            }
+            return  <MenuItem key={value} value={value}>{label}</MenuItem>
+          })}
+        </Select>
+      </FormInput>
+    );
+  }
 }
 
 export function FormInputColor({

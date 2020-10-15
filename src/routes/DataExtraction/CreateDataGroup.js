@@ -10,19 +10,18 @@ export default function CreateDataGroup({onCancel, ...props}) {
     dg_desc: '',
     assign_user: '',
     pre_trained_model: '',
-    assign_label: '',
+    assign_label: [],
   }
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [saving, setSaving] = useState(false);
-  const noneOpts = [
-    {value: '', label: 'None'},
-  ];
-  const [userOpts, setUserOpts] = useState(noneOpts);
-  const [ptmOpts, setPtmOpts] = useState(noneOpts);
-  const [labelOpts, setLabelOpts] = useState(noneOpts);
+
+  const [opLoading, setOpLoading] = useState(false);
+  const [userOpts, setUserOpts] = useState([]);
+  const [ptmOpts, setPtmOpts] = useState([]);
+  const [labelOpts, setLabelOpts] = useState([]);
 
   const api = getInstance(localStorage.getItem('token'));
 
@@ -34,30 +33,14 @@ export default function CreateDataGroup({onCancel, ...props}) {
   }
 
   useEffect(()=>{
-    const loadingOpts = [
-      {value: '', label: 'Loading...'},
-    ];
-    setUserOpts(loadingOpts);
-    setPtmOpts(loadingOpts);
-    setLabelOpts(loadingOpts);
+    setOpLoading(true);
 
     api.get(URL_MAP.CREATE_DG_PREQUISITE).then((resp)=>{
-      setUserOpts([
-        ...noneOpts,
-        // {value: 'Polygon', label: 'Polygon'}
-      ]);
-      setPtmOpts([
-        ...noneOpts,
-        // {value: 'Polygon', label: 'Polygon'}
-      ]);
-      setLabelOpts([
-        ...noneOpts,
-        // {value: 'Polygon', label: 'Polygon'}
-      ]);
+      setUserOpts([]);
+      setPtmOpts([]);
+      setLabelOpts([]);
     }).catch((err)=>{
-      setUserOpts(noneOpts);
-      setPtmOpts(noneOpts);
-      setLabelOpts(noneOpts);
+      setLabelOpts(['label1', 'label2', 'label3', 'label4']);
       if (err.response) {
         // client received an error response (5xx, 4xx)
         if(err.response.data.message) {
@@ -71,6 +54,8 @@ export default function CreateDataGroup({onCancel, ...props}) {
       } else {
         setFormError('Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.');
       }
+    }).then(()=>{
+      setOpLoading(false);
     });
   }, []);
 
@@ -113,7 +98,7 @@ export default function CreateDataGroup({onCancel, ...props}) {
     if(isFormValid) {
       setSaving(true);
       api.post(URL_MAP.CREATE_DATA_GROUP, formData).then((resp)=>{
-        setFormSuccess('Label created sucessfully.');
+        setFormSuccess('Data group created sucessfully.');
         setFormData(defaults);
       }).catch((err)=>{
         if (err.response) {
@@ -152,17 +137,17 @@ export default function CreateDataGroup({onCancel, ...props}) {
       <FormRow>
         <FormRowItem>
           <FormInputSelect label="Assign user" name='assign_user' onChange={onTextChange}
-            value={formData.assign_user} options={userOpts} />
+            firstEmpty={true} loading={opLoading} value={formData.assign_user} options={userOpts} />
         </FormRowItem>
         <FormRowItem>
           <FormInputSelect label="Pre-trained model" name='pre_trained_model' onChange={onTextChange}
-            value={formData.pre_trained_model} options={ptmOpts} />
+            firstEmpty={true} loading={opLoading} value={formData.pre_trained_model} options={ptmOpts} />
         </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect label="Assign label" name='assign_label' onChange={onTextChange}
-            value={formData.assign_label} options={labelOpts} />
+          <FormInputSelect multiple label="Assign label" name='assign_label' onChange={(e, value)=>{onTextChange(value, 'assign_label')}}
+            loading={opLoading} value={formData.assign_label} options={labelOpts} />
         </FormRowItem>
         <FormRowItem></FormRowItem>
       </FormRow>

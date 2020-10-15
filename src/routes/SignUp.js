@@ -9,7 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import SignUpImg from '../assets/images/office-workspace.png';
 import {getInstance, URL_MAP} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { FormInputText } from '../components/FormElements';
+import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
 
 const api = getInstance();
 
@@ -194,8 +194,8 @@ export default function SignUp({match, history}) {
                   InputIcon={BusinessIcon} onChange={onChange} errorMsg={errors.org} />
               </Box>
               <Box className={classes.formRow}>
-                <FormInputText isPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
-                  defaultCountry={'us'} onChange={(value)=>{fieldChanged('phone_no', value)}} errorMsg={errors.phone_no} />
+                <FormInputPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
+                  defaultCountry={'us'} onChange={(value)=>{console.log(value); fieldChanged('phone_no', value)}} errorMsg={errors.phone_no} />
               </Box>
               <Box className={classes.formRow}>
                 <FormInputText name="password" value={fields.password} label="Password"

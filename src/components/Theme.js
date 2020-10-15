@@ -204,6 +204,18 @@ const theme = createMuiTheme({
           root: {
             marginLeft: 0
           }
+        },
+        MuiAutocomplete: {
+          inputRoot: {
+            '&[class*="MuiOutlinedInput-root"]': {
+              padding: '0.125rem',
+            }
+          },
+          input: {
+            '&:first-child': {
+              padding: '0.75rem 1.5rem',
+            }
+          }
         }
     }
 }, globalTheme);
