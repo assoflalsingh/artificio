@@ -2,8 +2,8 @@ import axios from 'axios';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
-    // baseURL: 'https://api.artificio.ai',
-    baseURL: 'http://localhost:6060',
+    baseURL: 'https://api.artificio.ai',
+    // baseURL: 'http://localhost:6060',
   });
 
   if (token) {
@@ -25,7 +25,7 @@ export const URL_MAP = {
   SIGN_UP: 'auth/signup/',
   /* annotation */
   UPLOAD_TO_S3: 'upload-to-s3',
-  CREATE_LABEL: 'label/post-label/',
+  CREATE_LABEL: 'label/post-labels/',
   GET_LABEL_PREQUISITE: 'label/get-labels/',
   CREATE_DATA_GROUP: 'create-dg/',
   CREATE_DG_PREQUISITE: 'create-dg-dropdowns/',
