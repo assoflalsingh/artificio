@@ -103,12 +103,7 @@ export default function CreateLabel({onCancel, ...props}) {
     if(isFormValid) {
       setSaving(true);
 
-      let labelId = `label_${account}_${getEpochNow()}`;
-      let data = {
-        [labelId]: formData
-      };
-
-      api.post(URL_MAP.CREATE_LABEL, data).then((resp)=>{
+      api.post(URL_MAP.CREATE_LABEL, formData).then((resp)=>{
         setFormSuccess('Label created sucessfully.');
         setFormData(defaults);
       }).catch((err)=>{
