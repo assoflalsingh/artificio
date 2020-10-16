@@ -127,6 +127,10 @@ function getDefaultValidator(name) {
   const VALIDATORS = {
     'required': (value)=>{
       return (value != null && value != '' && typeof(value) != 'undefined');
+    },
+    'regex': (value, exp)=>{
+      const checker = new RegExp(exp);
+      return checker.test(value);
     }
   }
 
@@ -135,6 +139,7 @@ function getDefaultValidator(name) {
 
 export function doValidation(value, validators, errorMessages) {
   let errMsg = '';
+  let validatorParam = null;
   validators = validators || [];
   errorMessages = errorMessages || [];
 
@@ -142,8 +147,11 @@ export function doValidation(value, validators, errorMessages) {
     let validator = validators[i];
     if(typeof(validator) === 'string') {
       validator = getDefaultValidator(validator);
+    } else if(typeof(validator) === 'object') {
+      validatorParam = validator.param;
+      validator = getDefaultValidator(validator.type);
     }
-    if(!validator(value)) {
+    if(!validator(value, validatorParam)) {
       errMsg = errorMessages[i] || 'Invalid';
       break;
     }
@@ -204,7 +212,8 @@ export function FormInputPhoneNo({InputIcon, errorMsg, required, onChange, label
 }
 
 export function FormInputSelect({
-    errorMsg, required, onChange, label, options, firstEmpty=false, loading, multiple, ...props}) {
+    errorMsg, required, onChange, label, options, firstEmpty=false, loading, multiple,
+    labelKey='label', valueKey='value', ...props}) {
   const classes = useStyles();
   const noOptions = (options.length == 0);
   options = options || [];
@@ -219,6 +228,7 @@ export function FormInputSelect({
           filterSelectedOptions
           onChange={onChange}
           className={classes.formInput}
+          getOptionLabel={(option) => typeof(option) === 'string' ? option : option[labelKey]}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -251,8 +261,8 @@ export function FormInputSelect({
             if(typeof(opt) === 'string') {
               label = value = opt;
             } else {
-              label = opt.label;
-              value = opt.value;
+              label = opt[labelKey];
+              value = opt[valueKey];
             }
             return  <MenuItem key={value} value={value}>{label}</MenuItem>
           })}

@@ -6,11 +6,12 @@ import Alert from '@material-ui/lab/Alert';
 
 export default function CreateDataGroup({onCancel, ...props}) {
   const defaults = {
-    dg_name: '',
-    dg_desc: '',
+    name: '',
+    desc: '',
     assign_user: '',
-    pre_trained_model: '',
+    ptm: '',
     assign_label: [],
+    data_struct: '',
   }
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
@@ -22,23 +23,38 @@ export default function CreateDataGroup({onCancel, ...props}) {
   const [userOpts, setUserOpts] = useState([]);
   const [ptmOpts, setPtmOpts] = useState([]);
   const [labelOpts, setLabelOpts] = useState([]);
+  const [dataStructOpts, setDataStructOpts] = useState([]);
 
   const api = getInstance(localStorage.getItem('token'));
 
   const formValidators = {
-    dg_name: {
-      validators: ['required'],
-      messages: ['This field is required'],
+    name: {
+      validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
+      messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
     }
   }
 
   useEffect(()=>{
     setOpLoading(true);
 
+    // {
+    //   users: [
+    //     {id: 1, name: ‘the name’},
+    //     {id: 2, name: ‘another name’}
+    //     …
+    //   ],
+    //   ptms : [‘pertained mode 1’, ‘some other model’]
+    //   labels: [
+    //     {id: ‘label_12345_LABEL1’, name: ‘LABEL1’},
+    //     {id: ‘label_12345_LABEL2’, name: ‘LABEL2’}
+    //   ],
+    //   data_structs: [‘001’, ‘002’]
+    // }
     api.get(URL_MAP.CREATE_DG_PREQUISITE).then((resp)=>{
-      setUserOpts([]);
-      setPtmOpts([]);
-      setLabelOpts([]);
+      let data = resp.data;
+      setUserOpts(data.users);
+      setPtmOpts(data.ptms);
+      setLabelOpts(data.labels);
     }).catch((err)=>{
       setLabelOpts(['label1', 'label2', 'label3', 'label4']);
       if (err.response) {
@@ -126,30 +142,35 @@ export default function CreateDataGroup({onCancel, ...props}) {
     <Form>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Data group Name" required name='dg_name'
-            value={formData.dg_name} errorMsg={formDataErr.dg_name} onChange={onTextChange}/>
+          <FormInputText label="Data group Name" required name='name'
+            value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="Description" name='dg_desc'
-            value={formData.dg_desc} onChange={onTextChange}/>
+          <FormInputText label="Description" name='desc'
+            value={formData.desc} onChange={onTextChange}/>
         </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
           <FormInputSelect label="Assign user" name='assign_user' onChange={onTextChange}
-            firstEmpty={true} loading={opLoading} value={formData.assign_user} options={userOpts} />
+            firstEmpty={true} loading={opLoading} value={formData.assign_user} options={userOpts}
+            labelKey='name' valueKey='id' />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect label="Pre-trained model" name='pre_trained_model' onChange={onTextChange}
-            firstEmpty={true} loading={opLoading} value={formData.pre_trained_model} options={ptmOpts} />
+          <FormInputSelect label="Pre-trained model" name='ptm' onChange={onTextChange}
+            firstEmpty={true} loading={opLoading} value={formData.ptm} options={ptmOpts} />
         </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
           <FormInputSelect multiple label="Assign label" name='assign_label' onChange={(e, value)=>{onTextChange(value, 'assign_label')}}
-            loading={opLoading} value={formData.assign_label} options={labelOpts} />
+            loading={opLoading} value={formData.assign_label} options={labelOpts}
+            labelKey='name' valueKey='id' />
         </FormRowItem>
-        <FormRowItem></FormRowItem>
+        <FormRowItem>
+          <FormInputSelect label="Default structure ID" name='data_struct' onChange={onTextChange}
+            loading={opLoading} value={formData.data_struct} options={dataStructOpts} />
+        </FormRowItem>
       </FormRow>
       {(formError || formSuccess) &&
       <FormRow>

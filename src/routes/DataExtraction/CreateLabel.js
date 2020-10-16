@@ -28,8 +28,8 @@ export default function CreateLabel({onCancel, ...props}) {
 
   const formValidators = {
     name: {
-      validators: ['required'],
-      messages: ['This field is required'],
+      validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
+      messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
     }
   }
 
@@ -132,7 +132,7 @@ export default function CreateLabel({onCancel, ...props}) {
     <Form>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Label Name" required name='name'
+          <FormInputText label="Label ID" required name='name'
             value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
