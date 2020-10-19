@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, ButtonGroup, Chip, Typography } from '@material-ui/core';
-import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-
-const api = getInstance(localStorage.getItem('token'));
+import { Box, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
 

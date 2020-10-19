@@ -20,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Annotation({match}) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
 
   return (
     <RouterSwitch>

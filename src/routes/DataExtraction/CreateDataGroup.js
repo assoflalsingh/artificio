@@ -50,13 +50,13 @@ export default function CreateDataGroup({onCancel, ...props}) {
     //   ],
     //   data_structs: [‘001’, ‘002’]
     // }
-    api.get(URL_MAP.CREATE_DG_PREQUISITE).then((resp)=>{
-      let data = resp.data;
+    api.get(URL_MAP.GET_DG_PREQUISITE).then((resp)=>{
+      let data = resp.data.data;
       setUserOpts(data.users);
       setPtmOpts(data.ptms);
       setLabelOpts(data.labels);
+      setDataStructOpts(data.data_structs);
     }).catch((err)=>{
-      setLabelOpts(['label1', 'label2', 'label3', 'label4']);
       if (err.response) {
         // client received an error response (5xx, 4xx)
         if(err.response.data.message) {
@@ -113,7 +113,12 @@ export default function CreateDataGroup({onCancel, ...props}) {
 
     if(isFormValid) {
       setSaving(true);
-      api.post(URL_MAP.CREATE_DATA_GROUP, formData).then((resp)=>{
+      let newFormData = {
+        ...formData,
+        assign_label: formData.assign_label.map((label)=>label._id),
+      }
+      console.log(JSON.stringify(newFormData));
+      api.post(URL_MAP.CREATE_DATA_GROUP, newFormData).then((resp)=>{
         setFormSuccess('Data group created sucessfully.');
         setFormData(defaults);
       }).catch((err)=>{

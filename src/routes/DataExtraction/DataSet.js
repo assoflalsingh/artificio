@@ -1,22 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, ButtonGroup, Chip, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import MUIDataTable from "mui-datatables";
-import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
 import SecondaryAddButton from '../../components/SecondaryAddButton';
-import OverlayForm from '../../components/OverlayForm';
-import CreateLabel from './CreateLabel';
 import CreateDataGroup from './CreateDataGroup';
 
-import { BrowserRouter, MemoryRouter, Route, Switch } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-
 import {Stacked, StackItem} from '../../components/Stacked';
-
-const api = getInstance(localStorage.getItem('token'));
-
-const customHistory = createBrowserHistory();
+import CreateLabel from './CreateLabel';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {

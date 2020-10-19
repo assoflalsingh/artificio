@@ -215,8 +215,9 @@ export function FormInputSelect({
     errorMsg, required, onChange, label, options, firstEmpty=false, loading, multiple,
     labelKey='label', valueKey='value', ...props}) {
   const classes = useStyles();
-  const noOptions = (options.length == 0);
   options = options || [];
+
+  const noOptions = (options.length == 0);
 
   if(multiple) {
     return (
