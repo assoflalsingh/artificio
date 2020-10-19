@@ -8,6 +8,7 @@ import CreateDataGroup from './CreateDataGroup';
 
 import {Stacked, StackItem} from '../../components/Stacked';
 import CreateLabel from './CreateLabel';
+import { AnnotateTool } from './AnnotateTool';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -23,9 +24,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function DataSet() {
   const classes = useStyles();
-  const [createLabelOpen, setCreateLabelOpen] = useState(false);
-  const [createDGOpen, setDGOpen] = useState(false);
   const [stackPath, setStackPath] = useState('home');
+  const [annotateOpen, setAnnotateOpen] = useState(false);
 
   const columns = [
     {
@@ -112,6 +112,7 @@ export default function DataSet() {
   };
 
   return (
+    <>
     <Box className={classes.root}>
       <Stacked to={stackPath}>
         <StackItem path='createlabel' hasBack onBack={()=>{setStackPath('home')}}>
@@ -128,7 +129,7 @@ export default function DataSet() {
               />
             <SecondaryAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} />
             <Box className={classes.rightAlign}>
-              <Button><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
+              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
               <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>
@@ -144,5 +145,7 @@ export default function DataSet() {
       </StackItem>
       </Stacked>
     </Box>
+    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} />
+    </>
   )
 }

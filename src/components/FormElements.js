@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField } from '@material-ui/core';
 import MuiPhoneNumber from 'material-ui-phone-number';
-import { ColorPalette, ColorButton } from 'material-ui-color';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { ColorPalette, ColorButton } from 'material-ui-color';
 
 const useStyles = makeStyles((theme) => ({
   formRoot: {
@@ -63,54 +63,6 @@ export function FormRowItem({children, ...props}) {
       {children}
     </Grid>
   );
-}
-
-
-function FormColorPalette({className, value, onChange}) {
-  const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  onChange = onChange || (()=>{});
-  const palette = {
-    red: '#ff0000',
-    blue: '#0000ff',
-    green: '#00ff00',
-    // yellow: 'yellow',
-    // cyan: 'cyan',
-    // lime: 'lime',
-    // gray: 'gray',
-    // orange: 'orange',
-    // purple: 'purple',
-    // black: 'black',
-    // white: 'white',
-    // pink: 'pink',
-    // darkblue: 'darkblue',
-  };
-  return (
-    <>
-      <Popover
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        open={Boolean(anchorEl)}
-        onClose={()=>setOpen(false)}
-        anchorEl={anchorEl}
-      >
-        <ColorPalette palette={palette} onSelect={(k, v)=>{
-          onChange(v);
-          setAnchorEl(null);
-        }}/>
-      </Popover>
-      <ColorButton className={className} color={value} onClick={(e)=>setAnchorEl(e.target)}
-        style={{boxShadow: 'none'}}
-      />
-    </>
-  )
 }
 
 export function FormInput({children, ...props}) {

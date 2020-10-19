@@ -1,5 +1,5 @@
 import React from 'react';
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, StylesProvider } from '@material-ui/core';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import Theme from './components/Theme';
@@ -14,12 +14,14 @@ export default function App() {
     <>
     <Theme>
       <CssBaseline />
-      <Router>
-        <PrivateRoute path='/dashboard' component={Dashboard} />
-        <Route path='/login' component={SignIn} />
-        <Route path='/signup' component={SignUp} />
-        <Route path='/activate' component={Activate} />
-      </Router>
+      <StylesProvider injectFirst>
+        <Router>
+          <PrivateRoute path='/dashboard' component={Dashboard} />
+          <Route path='/login' component={SignIn} />
+          <Route path='/signup' component={SignUp} />
+          <Route path='/activate' component={Activate} />
+        </Router>
+      </StylesProvider>
     </Theme>
     </>
   )
