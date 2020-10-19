@@ -104,6 +104,10 @@ export default function CreateDataGroup({onCancel, ...props}) {
 
   const onSave = () =>{
     let isFormValid = true;
+
+    setFormError('');
+    setFormSuccess('');
+
     /* Validate */
     Object.keys(formValidators).forEach(name => {
       if(Boolean(validateField(name, formData[name]))) {
@@ -117,7 +121,6 @@ export default function CreateDataGroup({onCancel, ...props}) {
         ...formData,
         assign_label: formData.assign_label.map((label)=>label._id),
       }
-      console.log(JSON.stringify(newFormData));
       api.post(URL_MAP.CREATE_DATA_GROUP, newFormData).then((resp)=>{
         setFormSuccess('Data group created sucessfully.');
         setFormData(defaults);

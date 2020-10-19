@@ -2,8 +2,8 @@ import axios from 'axios';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
-    // baseURL: 'https://api.artificio.ai',
-    baseURL: 'http://localhost:6060',
+    baseURL: 'https://api.artificio.ai',
+    // baseURL: 'http://localhost:6060',
   });
 
   if (token) {
