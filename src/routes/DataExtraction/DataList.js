@@ -53,7 +53,7 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
   return(
     <Dialog disableBackdropClick disableEscapeKeyDown open={open} onClose={onClose}>
       <DialogContent>
-        <FormInputSelect hasSearch label="Assign label" name='assign_label'
+        <FormInputSelect hasSearch label="Assign data group"
           onChange={(e, value)=>{setDatagroup(value)}} loading={opLoading} value={datagroup} options={datagroupOpts}
               labelKey='name' valueKey='_id' />
       </DialogContent>
