@@ -3,10 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import CommonTabs from '../../components/CommonTabs';
 import {getInstance} from '../../others/artificio_api.instance';
 import UploadFile from './UploadFile';
-import DataSet from './DataSet';
+import DataList from './DataList';
 import Results from './Results';
 
-const api = getInstance(localStorage.getItem('token'));
+
 
 const useStyles = makeStyles((theme) => ({
   panelClasses: {
@@ -20,7 +20,7 @@ export default function DataExtraction() {
     <CommonTabs tabs={
       {
         "Upload file": <UploadFile />,
-        "Datasets": <DataSet />,
+        "Data list": <DataList />,
         "Results": <Results />,
       }
     } panelClasses={classes.panelClasses}/>

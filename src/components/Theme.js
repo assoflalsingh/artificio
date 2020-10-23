@@ -42,6 +42,17 @@ const globalTheme = createMuiTheme({
           secondary: '#737373'
         }
     },
+    transitions: {
+      duration: {
+        shortest: 150,
+        shorter: 200,
+        short: 250,
+        standard: 300,
+        complex: 375,
+        enteringScreen: 225,
+        leavingScreen: 195,
+      }
+    },
     shadows: defaultTheme.shadows,
     spacing: factor => `${0.25 * factor}rem`,
     typography: {

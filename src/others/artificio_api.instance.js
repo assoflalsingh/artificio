@@ -2,8 +2,8 @@ import axios from 'axios';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
-    baseURL: 'https://api.artificio.ai',
-    // baseURL: 'http://localhost:6060',
+    // baseURL: 'https://api.artificio.ai',
+    baseURL: 'http://localhost:6060',
   });
 
   if (token) {
@@ -24,9 +24,15 @@ export const URL_MAP = {
   ACTIVATE: 'auth/activate-user/',
   SIGN_UP: 'auth/signup/',
   /* annotation */
-  UPLOAD_TO_S3: 'upload-to-s3',
+  UPLOAD_TO_S3: 'upload-to-s3/',
+
   CREATE_LABEL: 'label/post-labels/',
   GET_LABEL_PREQUISITE: 'label/get-labels/',
+
   CREATE_DATA_GROUP: 'label/post-datagroups/',
-  GET_DG_PREQUISITE: 'label/get-datagroups/',
+  GET_DATAGROUP_PREQUISITES: 'label/get-datagroup-prequisites/',
+  GET_DATAGROUPS: 'label/get-datagroups/',
+  ASSIGN_DATAGROUP: 'label/assign-datagroup/',
+
+  GET_DATA_LIST: 'label/get-data-list/',
 };

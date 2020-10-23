@@ -164,18 +164,18 @@ export function FormInputPhoneNo({InputIcon, errorMsg, required, onChange, label
 }
 
 export function FormInputSelect({
-    errorMsg, required, onChange, label, options, firstEmpty=false, loading, multiple,
+    errorMsg, required, onChange, label, options, firstEmpty=false, loading, multiple, hasSearch=false,
     labelKey='label', valueKey='value', ...props}) {
   const classes = useStyles();
   options = options || [];
 
   const noOptions = (options.length == 0);
 
-  if(multiple) {
+  if(hasSearch) {
     return (
       <FormInput required={required} label={label}>
         <Autocomplete
-          multiple
+          multiple={multiple}
           options={options}
           loading={loading}
           filterSelectedOptions

@@ -50,7 +50,7 @@ export default function CreateDataGroup({onCancel, ...props}) {
     //   ],
     //   data_structs: [‘001’, ‘002’]
     // }
-    api.get(URL_MAP.GET_DG_PREQUISITE).then((resp)=>{
+    api.get(URL_MAP.GET_DATAGROUP_PREQUISITES).then((resp)=>{
       let data = resp.data.data;
       setUserOpts(data.users);
       setPtmOpts(data.ptms);
@@ -171,7 +171,7 @@ export default function CreateDataGroup({onCancel, ...props}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect multiple label="Assign label" name='assign_label' onChange={(e, value)=>{onTextChange(value, 'assign_label')}}
+          <FormInputSelect hasSearch multiple label="Assign label" name='assign_label' onChange={(e, value)=>{onTextChange(value, 'assign_label')}}
             loading={opLoading} value={formData.assign_label} options={labelOpts}
             labelKey='name' valueKey='id' />
         </FormRowItem>
