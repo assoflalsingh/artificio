@@ -7,8 +7,6 @@ import seedrandom from 'seedrandom';
 import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
 import {getEpochNow} from '../../others/utils';
 
-const api = getInstance(localStorage.getItem('token'));
-
 const useStyles = makeStyles((theme) => ({
   root: {
     lineHeight: 2.5,
@@ -29,6 +27,7 @@ export default function UploadFile() {
   const prng = new seedrandom(username.length.toString());
   const randUploadNo = Math.abs(prng.int32()).toString().substr(0, 6);
   const MAX_FILES = 10;
+  const api = getInstance(localStorage.getItem('token'));
 
   const classes = useStyles();
   const [files, setFiles] = useState([]);
