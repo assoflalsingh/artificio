@@ -24,6 +24,7 @@ export default function FileDropZone({filesLimit=10, ...props}) {
             deleteIcon: classes.previewChipIcon
           }
         }}
+        maxFileSize={10485760}
         {...props}
       />
   )
