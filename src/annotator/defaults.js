@@ -16,11 +16,16 @@ const useStyles = makeStyles((theme)=>({
 
 }));
 
-export function RegionLeftToolBar() {
+export function RegionLeftToolBar({dispatch}) {
   const classes = useStyles();
+
+  const onClickItem = useEventCallback((event) => {
+    dispatch({ type: "LEFT_TOOLBAR", button: event.currentTarget.dataset.name })
+  });
+
   return(
     <Box className={classes.leftBar}>
-      <IconButton><SaveIcon fontSize="large" /></IconButton>
+      <IconButton data-name="save" onClick={onClickItem}><SaveIcon fontSize="large" /></IconButton>
     </Box>
   )
 }

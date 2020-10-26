@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover } from '@material-ui/core';
 import TextFieldRounded from './TextFieldRounded';
 import SearchIcon from '@material-ui/icons/Search';
@@ -29,7 +29,7 @@ const useStylesUserBar = makeStyles((theme)=>({
   }
 }));
 
-function UserBar({className, history}) {
+function UserBar({className, userDispName, history}) {
   const classes = useStylesUserBar();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const onSettingsClick = (event) => {
@@ -68,7 +68,7 @@ function UserBar({className, history}) {
             <NotificationsNoneIcon />
           </Badge>
         </IconButton>
-        <Typography color="textSecondary" className={classes.rightItem}>Hi, Paul Deo</Typography>
+        <Typography color="textSecondary" className={classes.rightItem}>Hi, {userDispName}</Typography>
         <IconButton onClick={onSettingsClick}>
           <SettingsIcon />
         </IconButton>

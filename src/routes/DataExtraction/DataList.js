@@ -82,13 +82,6 @@ export default function DataList() {
 
   const columns = [
     {
-      name: "_id",
-      label: "",
-      options: {
-        display: 'excluded'
-      }
-    },
-    {
       name: "file",
       label: "Filename",
       options: {
@@ -118,21 +111,22 @@ export default function DataList() {
       },
     },
     {
-      name: "owner",
-      label: "Created By",
+      name: "created_by",
+      label: "Created by",
       options: {
         filter: true,
         sort: true,
       }
     },
     {
-      name: "id",
+      name: "timestamp",
       label: "Date time",
       options: {
-        filter: true,
+        filter: false,
         sort: true,
         customBodyRender: (value, tableMeta)=>{
-          return '25 Sep, 2020\n12:55AM';
+          let d = new Date(`${value}+00:00`);
+          return d.toLocaleString();
         }
       }
     },
@@ -152,7 +146,6 @@ export default function DataList() {
     },
     rowsSelected: rowsSelected,
     onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelectedNow)=>{
-      console.log(currentRowsSelected, allRowsSelected, rowsSelectedNow);
       setRowsSelected(rowsSelectedNow)
     }
   };
@@ -167,7 +160,6 @@ export default function DataList() {
 
   const onAssignDatagroup = (id, name) => {
     handleClose();
-    console.log(id, name);
     setShowProcessing(true);
     let datafile_ids = rowsSelected.map((i)=>{
       return datalist[i]._id;

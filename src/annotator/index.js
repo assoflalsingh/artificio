@@ -16,6 +16,7 @@ import { Box, makeStyles, } from '@material-ui/core';
 import getActiveImage from 'react-image-annotate/Annotator/reducers/get-active-image';
 import ImageCanvas from 'react-image-annotate/ImageCanvas';
 import { RegionLabelValues } from "./RegionLabelValues";
+import RegionEditLabel from './RegionEditLabel';
 
 export const Annotator = ({
   images,
@@ -40,7 +41,6 @@ export const Annotator = ({
   keyframes = {},
   taskDescription = "",
   fullImageSegmentationMode = false,
-  // RegionEditLabel,
   videoSrc,
   videoTime = 0,
   videoName,
@@ -104,15 +104,22 @@ export const Annotator = ({
   )
 
   const dispatch = useEventCallback((action) => {
-    if (action.type === "HEADER_BUTTON_CLICKED") {
-      if (["Exit", "Done", "Save", "Complete"].includes(action.buttonName)) {
-        return onExit(without(state, "history"))
-      } else if (action.buttonName === "Next" && onNextImage) {
-        return onNextImage(without(state, "history"))
-      } else if (action.buttonName === "Prev" && onPrevImage) {
-        return onPrevImage(without(state, "history"))
+    // if (action.type === "HEADER_BUTTON_CLICKED") {
+    //   if (["Exit", "Done", "Save", "Complete"].includes(action.buttonName)) {
+    //     return onExit(without(state, "history"))
+    //   } else if (action.buttonName === "Next" && onNextImage) {
+    //     return onNextImage(without(state, "history"))
+    //   } else if (action.buttonName === "Prev" && onPrevImage) {
+    //     return onPrevImage(without(state, "history"))
+    //   }
+    // }
+
+    if(action.type === "LEFT_TOOLBAR") {
+      if(action.button === 'save') {
+        console.log(activeImage.regions);
       }
     }
+
     dispatchToReducer(action)
   })
 
@@ -216,7 +223,7 @@ export const Annotator = ({
       onSelectRegion={action("SELECT_REGION", "region")}
       onBeginMovePoint={action("BEGIN_MOVE_POINT", "point")}
       onImageLoaded={action("IMAGE_LOADED", "image")}
-      // RegionEditLabel={RegionEditLabel}
+      RegionEditLabel={RegionEditLabel}
       onImageOrVideoLoaded={action("IMAGE_OR_VIDEO_LOADED", "metadata")}
       onChangeVideoTime={action("CHANGE_VIDEO_TIME", "newTime")}
       onChangeVideoPlaying={action("CHANGE_VIDEO_PLAYING", "isPlaying")}
@@ -226,7 +233,7 @@ export const Annotator = ({
 
   return <>
     <Box display="flex" style={{width: '100%', height: '100%'}}>
-      <RegionLeftToolBar dispatch={dispatch} />
+      <RegionLeftToolBar dispatch={dispatch} regions={activeImage.regions} />
       <Box style={{flexGrow: 1}}>
         <RegionTopToolBar dispatch={dispatch} />
         <Box style={{backgroundColor: 'black'}}>

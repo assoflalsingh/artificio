@@ -14,7 +14,7 @@ export function AnnotateTool({open, onClose}) {
       disableEscapeKeyDown
       PaperProps={{style: {height: '100%'}}}>
 
-      <Annotator regionClsList={[]}
+      <Annotator
         regionClsList={['label1', 'label2']}
         images={[
           {

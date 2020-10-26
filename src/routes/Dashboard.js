@@ -59,7 +59,7 @@ export default function Dashboard({his}) {
                 <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
                   <img src={Logo} className={classes.logoImg}></img>
                 </Paper>
-                <UserBar className={classes.rightSide}/>
+                <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
             </Box>
             <Box display="flex" className={classes.bottomSide}>
                 <Paper item className={classes.leftSide}><SideMenuBar /></Paper>
