@@ -44,13 +44,13 @@ const globalTheme = createMuiTheme({
     },
     transitions: {
       duration: {
-        shortest: 150,
-        shorter: 200,
-        short: 250,
-        standard: 300,
-        complex: 375,
-        enteringScreen: 225,
-        leavingScreen: 195,
+        shortest: 100,
+        shorter: 150,
+        short: 200,
+        standard: 200,
+        complex: 300,
+        enteringScreen: 150,
+        leavingScreen: 175,
       }
     },
     shadows: defaultTheme.shadows,

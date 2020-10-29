@@ -9,11 +9,24 @@ export const getInstance = (token) => {
   if (token) {
     //applying token
     artificioApi.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+
+    /* Auth interceptor */
+    artificioApi.interceptors.response.use(response=>response,
+      error=>{
+        if (error.response) {
+          // client received an error response (5xx, 4xx)
+          console.log('return to login');
+
+        }
+        return Promise.reject(error);
+      }
+    );
   } else {
     //deleting the token from header
     delete artificioApi.defaults.headers.common['Authorization'];
   }
   artificioApi.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+
   return artificioApi;
 };
 

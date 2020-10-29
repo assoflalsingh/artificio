@@ -1,7 +1,8 @@
 // @flow
 
-import React, { useReducer, useEffect, useRef } from "react"
+import React, { useReducer, useEffect, useRef, useState } from "react"
 
+import CommonTabs from '../components/CommonTabs';
 import combineReducers from "react-image-annotate/Annotator/reducers/combine-reducers.js";
 import generalReducer from "react-image-annotate/Annotator/reducers/general-reducer.js";
 import imageReducer from "react-image-annotate/Annotator/reducers/image-reducer.js";
@@ -14,9 +15,30 @@ import useEventCallback from "use-event-callback"
 import makeImmutable, { without } from "seamless-immutable"
 import { Box, makeStyles, } from '@material-ui/core';
 import getActiveImage from 'react-image-annotate/Annotator/reducers/get-active-image';
-import ImageCanvas from 'react-image-annotate/ImageCanvas';
-import { RegionLabelValues } from "./RegionLabelValues";
+// import ImageCanvas from 'react-image-annotate/ImageCanvas';
+import ImageCanvas from './ImageCanvas';
+import LabelValues, { RegionLabelValues } from "./LabelValues";
 import RegionEditLabel from './RegionEditLabel';
+
+
+function getRegionsInPixels(pixelSize, regions) {
+  let {w:iw, h:ih} = pixelSize;
+
+
+  return regions.map((region)=>{
+    let {x, y, w, h} = region;
+    const inner = [
+      [x * iw, y * ih],
+      [x * iw + w * iw, y * ih],
+      [x * iw + w * iw, y * ih + h * ih],
+      [x * iw, y * ih + h * ih],
+    ]
+    return {
+      ...region,
+      pixel: inner
+    }
+  });
+}
 
 export const Annotator = ({
   images,
@@ -49,6 +71,7 @@ export const Annotator = ({
   onPrevImage,
   keypointDefinitions,
   autoSegmentationOptions = { type: "autoseg" },
+  jsonD
   // RegionLabelValues,
   // RegionLeftToolBar,
   // RegionTopToolBar,
@@ -57,8 +80,15 @@ export const Annotator = ({
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
     if (selectedImage === -1) selectedImage = undefined
   }
-  const annotationType = images ? "image" : "video";
+  const annotationType = "image";
   const memoizedActionFns = useRef({});
+
+  let initLabelsData = {};
+  regionClsList.forEach((regionCls)=>{
+    initLabelsData[regionCls] = '';
+  });
+
+  const [labelsData, setLabelsData] = useState(initLabelsData);
 
   const [state, dispatchToReducer] = useReducer(
     historyHandler(
@@ -116,7 +146,9 @@ export const Annotator = ({
 
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
-        console.log(activeImage.regions);
+        console.log(getRegionsInPixels(activeImage.pixelSize, activeImage.regions))
+        console.log(labelsData);
+        console.log(state.selectedImage, activeImage);
       }
     }
 
@@ -240,7 +272,17 @@ export const Annotator = ({
           {canvas}
         </Box>
       </Box>
-      <RegionLabelValues regions={activeImage.regions} />
+      <Box>
+        <Box>
+          LABEL/ANNOTATION
+        </Box>
+        <CommonTabs tabs={
+          {
+            "Custom OCR": <LabelValues activeImage={activeImage} labelsData={labelsData} setLabelsData={setLabelsData}/>,
+            "Optimal OCR": <h4>Under construction</h4>,
+          }
+        }/>
+      </Box>
     </Box>
   </>
 }

@@ -12127,6 +12127,13 @@ react-base16-styling@^0.6.0:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
+react-context-hook@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-context-hook/-/react-context-hook-2.2.0.tgz#edeba0a77b8eb03f68f50463f24b39ff4f60d91d"
+  integrity sha512-8MtdMhEfqmO6lCB53rvKsh19wbce2vDsvrEkCvxH/XtiHss4D+e8ZMMPYF7xLl4ybNd25eEphrJjQyzRLKevtA==
+  dependencies:
+    redux "^4.0.5"
+
 react-dev-utils@^10.2.1:
   version "10.2.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-10.2.1.tgz#f6de325ae25fa4d546d09df4bb1befdc6dd19c19"

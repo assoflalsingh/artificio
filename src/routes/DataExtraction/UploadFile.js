@@ -74,7 +74,6 @@ export default function UploadFile() {
         headers :{
           'Content-Type': 'multipart/form-data',
           'Access-Control-Allow-Origin': '*',
-          'username': username,
           'txn_id': txnId,
           'file_name': file.name
         },

@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Box, Paper, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { BrowserRouter as Router } from 'react-router-dom';
+import {withStore} from 'react-context-hook';
 
 import Logo from '../assets/images/Logo-final.png';
 import UserBar from '../components/UserBar';
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme)=>({
   },
 }));
 
-export default function Dashboard({his}) {
+const Dashboard = () => {
   const classes = useStyles();
   return (
     <Router basename='/dashboard'>
@@ -71,3 +72,5 @@ export default function Dashboard({his}) {
     </Router>
   )
 }
+
+export default withStore(Dashboard);
