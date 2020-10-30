@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover } from '@material-ui/core';
 import TextFieldRounded from './TextFieldRounded';
 import SearchIcon from '@material-ui/icons/Search';
@@ -7,6 +7,7 @@ import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import SettingsIcon from '@material-ui/icons/Settings';
 import clsx from 'clsx';
 import { withRouter } from 'react-router-dom';
+import { Context } from '../store';
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {
@@ -44,6 +45,9 @@ function UserBar({className, userDispName, history}) {
     localStorage.removeItem('token', null);
     window.location.reload();
   };
+
+  const [globalContext, globalContextDispatch] = useContext(Context);
+  console.log(globalContext);
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}

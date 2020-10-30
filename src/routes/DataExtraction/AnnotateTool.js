@@ -8656,7 +8656,7 @@ export function AnnotateTool({open, onClose}) {
     });
   });
 
-  console.log(regionValues);
+//   console.log(regionValues);
   return (
     <Dialog
       fullWidth

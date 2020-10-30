@@ -14,11 +14,14 @@ export const getInstance = (token) => {
     artificioApi.interceptors.response.use(response=>response,
       error=>{
         if (error.response) {
-          // client received an error response (5xx, 4xx)
-          console.log('return to login');
-
+          if(error.response.status === 401) {
+            console.log('Session expired...');
+            localStorage.removeItem('token', null);
+            window.location.reload();
+          }
+        } else {
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
       }
     );
   } else {

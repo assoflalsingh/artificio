@@ -3,12 +3,10 @@
  */
 
 import { fromJS } from 'immutable'
-import appReducer from './appReducer'
-import accountReducer from './accountReducer'
+import userReducer from './userReducer'
 
 export default (state, action) => {
   return fromJS({
-    app: appReducer(state.get('app'), action),
-   // account: accountReducer(state.get('account'), action)
+    user: userReducer(state.get('user'), action)
   })
 }
