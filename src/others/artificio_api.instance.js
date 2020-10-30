@@ -13,12 +13,10 @@ export const getInstance = (token) => {
     /* Auth interceptor */
     artificioApi.interceptors.response.use(response=>response,
       error=>{
-        if (error.response) {
-          if(error.response.status === 401) {
-            console.log('Session expired...');
-            localStorage.removeItem('token', null);
-            window.location.reload();
-          }
+        if (error.response && error.response.status === 401) {
+          console.log('Session expired...');
+          localStorage.removeItem('token', null);
+          window.location.reload();
         } else {
           return Promise.reject(error);
         }

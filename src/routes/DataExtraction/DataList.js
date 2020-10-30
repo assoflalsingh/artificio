@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Popover, Tooltip, Typography } from '@material-ui/core';
+import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
@@ -13,6 +13,7 @@ import CreateLabel from './CreateLabel';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
+import Alert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -81,6 +82,7 @@ export default function DataList() {
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
+  const [ajaxMessage, setAjaxMessage] = useState(null);
 
   const columns = [
     {
@@ -175,7 +177,6 @@ export default function DataList() {
     handleClose();
     setPageMessage('Assigning data group...');
     let data_lists = {};
-    console.log(rowsSelected);
     rowsSelected.map((i)=>{
       let row = datalist[i];
       data_lists[row._id] = data_lists[row._id] || [];
@@ -186,13 +187,22 @@ export default function DataList() {
       datagroup_id: id,
       data_lists: data_lists
     }).then((res)=>{
+      setAjaxMessage({
+        error: false, text: 'Data group assigned successfully !!',
+      });
       let newDatalist = datalist;
       rowsSelected.forEach((i)=>{
         newDatalist[i].datagroup_name = name;
       });
       setDatalist(newDatalist);
-    }).catch((err)=>{
-      console.log(err);
+    }).catch((error)=>{
+      if(error.response) {
+        setAjaxMessage({
+          error: true, text: error.response.data.message,
+        });
+      } else {
+        console.log(error);
+      }
     }).then(()=>{
       setPageMessage(null);
     })
@@ -284,6 +294,11 @@ export default function DataList() {
             <CircularProgress color="inherit" />
             <Typography style={{marginLeft: '0.25rem'}} variant='h4'>{pageMessage}</Typography>
           </Backdrop>
+          <Snackbar open={Boolean(ajaxMessage)} autoHideDuration={6000} >
+            {ajaxMessage && <Alert onClose={()=>{setAjaxMessage(null)}} severity={ajaxMessage.error ? "error" : "success"}>
+              {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
+            </Alert>}
+          </Snackbar>
           <Box display="flex">
             <Typography color="primary" variant="h6">Data List</Typography>
             <Tooltip title="Refresh data list">
