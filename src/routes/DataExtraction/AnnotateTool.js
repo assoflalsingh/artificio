@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dialog } from "@material-ui/core";
 // import ReactImageAnnotate from "react-image-annotate/ImageCanvas";
 import Annotator from '../../annotator';
+import { URL_MAP } from '../../others/artificio_api.instance';
 
 
 let sampleJson = {
@@ -8627,9 +8628,10 @@ let sampleJson = {
   ]
 }
 
-export function AnnotateTool({open, onClose}) {
-
+export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
+  const annotateImages = useRef();
   let regionValues = [];
+  const [thumbnails, setThumbnails] = useState([]);
 
   let {height:ih, width:iw} = sampleJson.metadata.image_details.file_size;
   sampleJson.text_annotations.forEach((one_block)=>{
@@ -8656,6 +8658,68 @@ export function AnnotateTool({open, onClose}) {
     });
   });
 
+  useEffect(()=>{
+    if(open) {
+        annotateImages.current = getAnnotateImages();
+        let data_lists = {};
+        annotateImages.current.forEach((img)=>{
+          data_lists[img._id] = data_lists[img._id] || [];
+          data_lists[img._id].push({
+              [img.page_no]: img.img_thumb
+          });
+        });
+        api.post(URL_MAP.GET_THUMBNAILS, data_lists)
+        .then((res)=>{
+
+        }).catch((err)=>{
+
+        }).then(()=>{
+            let data = {
+                "data_lists" : {
+                            "5f9c3594920d9e5fad533c1943": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1944": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1942": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1941": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1940": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1939": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1939": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1938": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1937": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                            "5f9c3594920d9e5fad533c1936": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
+                                }
+            }
+
+            data = data.data_lists;
+
+            data = {
+                "5f9c3594920d9e5fad533c19": {
+                    "page_1": "https://artificio-datasets.s3.amazonaws.com/annotation/202010271864-sample_pdf_multiple_page-0.jpg?AWSAccessKeyId=AKIAZHJVRDUFAWRLD3GO&Signature=3uh70oaM3GbU1857vFE1IetmmMs%3D&Expires=1604348128",
+                    "page_2": "https://artificio-datasets.s3.amazonaws.com/annotation/202010304426-test_image.jpg?AWSAccessKeyId=AKIAZHJVRDUFAWRLD3GO&Signature=QhZcbKesytw2iIamX7gmeUh8elo%3D&Expires=1604348128"
+                },
+                "5f9c3594920d9e5fad533c1944": {
+                    "page_1": "https://artificio-datasets.s3.amazonaws.com/annotation/202010274182-INV_8603009_20170329135800_test-0.jpg?AWSAccessKeyId=AKIAZHJVRDUFAWRLD3GO&Signature=YixzbJNMNCc0qEaE84yLfx5Wxn4%3D&Expires=1604348128"
+                }
+            };
+            let tmp_thumbs = [];
+            for (const _id in data) {
+                let tmp_thumb
+                for(const page_no in data[_id]) {
+                    tmp_thumbs.push({
+                        _id: _id,
+                        page_no: page_no,
+                        src: data[_id][page_no]
+                    });
+                }
+            }
+            console.log(tmp_thumbs);
+            setThumbnails(tmp_thumbs);
+        });
+    }
+  }, [open])
+
+
+
+
 //   console.log(regionValues);
   return (
     <Dialog
@@ -8677,7 +8741,8 @@ export function AnnotateTool({open, onClose}) {
             regions: [],
             region_values: regionValues,
           }
-        ]}/>
+        ]}
+        thumbnails={thumbnails}/>
     </Dialog>
   )
 }

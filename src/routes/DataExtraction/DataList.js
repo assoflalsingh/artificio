@@ -254,6 +254,7 @@ export default function DataList() {
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
           datagroup_name: datum.images[page].datagroup_name,
+          img_thumb: datum.images[page].img_thumb
         });
       });
     });
@@ -349,7 +350,7 @@ export default function DataList() {
       </StackItem>
       </Stacked>
     </Box>
-    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} />
+    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} />
     </>
   )
 }

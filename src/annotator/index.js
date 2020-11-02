@@ -13,7 +13,7 @@ import {RegionLeftToolBar, RegionTopToolBar} from "./defaults";
 
 import useEventCallback from "use-event-callback"
 import makeImmutable, { without } from "seamless-immutable"
-import { Box, makeStyles, } from '@material-ui/core';
+import { Box, Card, CardActionArea, CardMedia, makeStyles, } from '@material-ui/core';
 import getActiveImage from 'react-image-annotate/Annotator/reducers/get-active-image';
 // import ImageCanvas from 'react-image-annotate/ImageCanvas';
 import ImageCanvas from './ImageCanvas';
@@ -71,7 +71,8 @@ export const Annotator = ({
   onPrevImage,
   keypointDefinitions,
   autoSegmentationOptions = { type: "autoseg" },
-  jsonD
+  jsonD,
+  thumbnails
   // RegionLabelValues,
   // RegionLeftToolBar,
   // RegionTopToolBar,
@@ -266,10 +267,25 @@ export const Annotator = ({
   return <>
     <Box display="flex" style={{width: '100%', height: '100%'}}>
       <RegionLeftToolBar dispatch={dispatch} regions={activeImage.regions} />
-      <Box style={{flexGrow: 1}}>
+      <Box style={{flexGrow: 1, overflow: 'hidden'}}>
         <RegionTopToolBar dispatch={dispatch} />
         <Box style={{backgroundColor: 'black'}}>
           {canvas}
+        </Box>
+        <Box style={{overflowY: 'hidden', overflowX: 'auto'}} display="flex">
+          <Box display="flex">
+            {thumbnails.map((thumb)=>
+              <Card style={{margin: '0.25rem', whiteSpace: 'nowrap'}}>
+                <CardActionArea>
+                  <CardMedia style={{height: 50, width: 50}}
+                    // className={}
+                    image={thumb.src}
+                    // title="Contemplative Reptile"
+                  />
+                </CardActionArea>
+              </Card>
+            )}
+          </Box>
         </Box>
       </Box>
       <Box>
@@ -287,4 +303,4 @@ export const Annotator = ({
   </>
 }
 
-export default Annotator
+export default Annotator;
