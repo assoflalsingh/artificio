@@ -8,6 +8,7 @@ import generalReducer from "react-image-annotate/Annotator/reducers/general-redu
 import imageReducer from "react-image-annotate/Annotator/reducers/image-reducer.js";
 import videoReducer from "react-image-annotate/Annotator/reducers/video-reducer.js";
 import historyHandler from "react-image-annotate/Annotator/reducers/history-handler.js";
+import localReducer from './annotator-reducer';
 
 import {RegionLeftToolBar, RegionTopToolBar} from "./defaults";
 
@@ -42,6 +43,7 @@ function getRegionsInPixels(pixelSize, regions) {
 
 export const Annotator = ({
   images,
+  dataImages,
   allowedArea,
   selectedImage = images && images.length > 0 ? 0 : undefined,
   showPointDistances,
@@ -72,7 +74,8 @@ export const Annotator = ({
   keypointDefinitions,
   autoSegmentationOptions = { type: "autoseg" },
   jsonD,
-  thumbnails
+  thumbnails,
+  onThumbnailClick,
   // RegionLabelValues,
   // RegionLeftToolBar,
   // RegionTopToolBar,
@@ -95,7 +98,8 @@ export const Annotator = ({
     historyHandler(
       combineReducers(
         annotationType === "image" ? imageReducer : videoReducer,
-        generalReducer
+        generalReducer,
+        localReducer
       )
     ),
     makeImmutable({
@@ -147,7 +151,7 @@ export const Annotator = ({
 
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
-        console.log(getRegionsInPixels(activeImage.pixelSize, activeImage.regions))
+        // console.log(getRegionsInPixels(activeImage.pixelSize, activeImage.regions))
         console.log(labelsData);
         console.log(state.selectedImage, activeImage);
       }
@@ -164,13 +168,28 @@ export const Annotator = ({
   })
 
   useEffect(() => {
+    console.log('in', selectedImage);
     if (selectedImage === undefined) return
+    let currImg = state.images[selectedImage];
+    let newImgData = dataImages[`${currImg._id}:${currImg.page_no}`];
+    console.log(newImgData);
     dispatchToReducer({
       type: "SELECT_IMAGE",
       imageIndex: selectedImage,
-      image: state.images[selectedImage],
+      image: {
+        ...currImg,
+        src: newImgData ? newImgData.src : currImg.src,
+      },
     })
   }, [selectedImage])
+
+  useEffect(()=>{
+    console.log('dataImages updated')
+    dispatchToReducer({
+      type: "UPDATE_IMAGE_SRC",
+      dataImages: dataImages,
+    });
+  }, [dataImages])
 
   if (!images && !videoSrc)
     return 'Missing required prop "images" or "videoSrc"'
@@ -196,7 +215,7 @@ export const Annotator = ({
   }
 
   const { currentImageIndex, activeImage } = getActiveImage(state);
-
+  console.log(activeImage);
   const canvas = (
     <ImageCanvas
       // {...settings}
@@ -213,11 +232,10 @@ export const Annotator = ({
       modifyingAllowedArea={state.selectedTool === "modify-allowed-area"}
       regionClsList={state.regionClsList}
       regionTagList={state.regionTagList}
-      regions={activeImage.regions ?  activeImage.regions : []}
+      regions={activeImage ? activeImage.regions || [] : []}
       realSize={activeImage ? activeImage.realSize : undefined}
       videoPlaying={state.videoPlaying}
-      imageSrc={state.annotationType === "image" ? activeImage.src : null}
-      videoSrc={state.annotationType === "video" ? state.videoSrc : null}
+      imageSrc={activeImage ? activeImage.src : null}
       pointDistancePrecision={state.pointDistancePrecision}
       createWithPrimary={state.selectedTool.includes("create")}
       dragWithPrimary={state.selectedTool === "pan"}
@@ -266,7 +284,7 @@ export const Annotator = ({
 
   return <>
     <Box display="flex" style={{width: '100%', height: '100%'}}>
-      <RegionLeftToolBar dispatch={dispatch} regions={activeImage.regions} />
+      <RegionLeftToolBar dispatch={dispatch} regions={activeImage ? activeImage.regions : []} />
       <Box style={{flexGrow: 1, overflow: 'hidden'}}>
         <RegionTopToolBar dispatch={dispatch} />
         <Box style={{backgroundColor: 'black'}}>
@@ -274,12 +292,12 @@ export const Annotator = ({
         </Box>
         <Box style={{overflowY: 'hidden', overflowX: 'auto'}} display="flex">
           <Box display="flex">
-            {thumbnails.map((thumb)=>
+            {images.map((thumb)=>
               <Card style={{margin: '0.25rem', whiteSpace: 'nowrap'}}>
-                <CardActionArea>
+                <CardActionArea onClick={()=>{onThumbnailClick(thumb._id, thumb.page_no)}}>
                   <CardMedia style={{height: 50, width: 50}}
                     // className={}
-                    image={thumb.src}
+                    image={thumb.img_thumb_src}
                     // title="Contemplative Reptile"
                   />
                 </CardActionArea>
@@ -294,7 +312,7 @@ export const Annotator = ({
         </Box>
         <CommonTabs tabs={
           {
-            "Custom OCR": <LabelValues activeImage={activeImage} labelsData={labelsData} setLabelsData={setLabelsData}/>,
+            "Custom OCR": (activeImage && <LabelValues activeImage={activeImage} labelsData={labelsData} setLabelsData={setLabelsData}/>),
             "Optimal OCR": <h4>Under construction</h4>,
           }
         }/>

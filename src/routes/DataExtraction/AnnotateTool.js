@@ -8629,9 +8629,12 @@ let sampleJson = {
 }
 
 export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
-  const annotateImages = useRef();
   let regionValues = [];
-  const [thumbnails, setThumbnails] = useState([]);
+  const [dataImages, setDataImages] = useState({});
+  const [selectedImage, setSelectedImage] = useState(undefined);
+  const [imageLabels, setImageLabels] = useState([]);
+  const [thumbCalled, setThumbCalled] = useState(false);
+  const [compKey, setCompKey] = useState(false);
 
   let {height:ih, width:iw} = sampleJson.metadata.image_details.file_size;
   sampleJson.text_annotations.forEach((one_block)=>{
@@ -8660,67 +8663,77 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
 
   useEffect(()=>{
     if(open) {
-        annotateImages.current = getAnnotateImages();
+        let annotateImages = getAnnotateImages();
+        /* Set the images */
+
+        /* Get the thumbnails */
+        let tmpDataImages = {};
         let data_lists = {};
-        annotateImages.current.forEach((img)=>{
-          data_lists[img._id] = data_lists[img._id] || [];
-          data_lists[img._id].push({
-              [img.page_no]: img.img_thumb
-          });
+        annotateImages.forEach((img)=>{
+          tmpDataImages[`${img._id}:${img.page_no}`] = {
+            _id: img._id,
+            // src: "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg",
+            name: img.img_name,
+            regions: [],
+            region_values: null,
+            page_no: img.page_no,
+            img_thumb: img.img_thumb,
+            img_thumb_src: null,
+          }
+          data_lists[img._id] = data_lists[img._id] || {};
+          data_lists[img._id][img.page_no] = img.img_thumb;
         });
-        api.post(URL_MAP.GET_THUMBNAILS, data_lists)
+        setThumbCalled(false);
+        setDataImages(tmpDataImages);
+    }
+  }, [open]);
+
+  useEffect(()=>{
+    setCompKey((prev)=>!prev);
+    if(!thumbCalled) {
+        setThumbCalled(true);
+        let data_lists = {};
+        Object.values(dataImages).forEach((img)=>{
+            data_lists[img._id] = data_lists[img._id] || {};
+            data_lists[img._id][img.page_no] = img.img_thumb;
+          });
+        api.post(URL_MAP.GET_THUMBNAILS, {'data_lists': data_lists})
         .then((res)=>{
-
-        }).catch((err)=>{
-
-        }).then(()=>{
-            let data = {
-                "data_lists" : {
-                            "5f9c3594920d9e5fad533c1943": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1944": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1942": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1941": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1940": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1939": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1939": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1938": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1937": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                            "5f9c3594920d9e5fad533c1936": {"page_1": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg", "page_2": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg"},
-                                }
-            }
-
-            data = data.data_lists;
-
-            data = {
-                "5f9c3594920d9e5fad533c19": {
-                    "page_1": "https://artificio-datasets.s3.amazonaws.com/annotation/202010271864-sample_pdf_multiple_page-0.jpg?AWSAccessKeyId=AKIAZHJVRDUFAWRLD3GO&Signature=3uh70oaM3GbU1857vFE1IetmmMs%3D&Expires=1604348128",
-                    "page_2": "https://artificio-datasets.s3.amazonaws.com/annotation/202010304426-test_image.jpg?AWSAccessKeyId=AKIAZHJVRDUFAWRLD3GO&Signature=QhZcbKesytw2iIamX7gmeUh8elo%3D&Expires=1604348128"
-                },
-                "5f9c3594920d9e5fad533c1944": {
-                    "page_1": "https://artificio-datasets.s3.amazonaws.com/annotation/202010274182-INV_8603009_20170329135800_test-0.jpg?AWSAccessKeyId=AKIAZHJVRDUFAWRLD3GO&Signature=YixzbJNMNCc0qEaE84yLfx5Wxn4%3D&Expires=1604348128"
-                }
-            };
-            let tmp_thumbs = [];
+            let data = res.data.data;
+            let newDataImages = dataImages;
+            console.log(newDataImages);
             for (const _id in data) {
-                let tmp_thumb
                 for(const page_no in data[_id]) {
-                    tmp_thumbs.push({
-                        _id: _id,
-                        page_no: page_no,
-                        src: data[_id][page_no]
-                    });
+                    console.log(`${_id}:${page_no}`)
+                    newDataImages[`${_id}:${page_no}`].img_thumb_src = data[_id][page_no];
                 }
             }
-            console.log(tmp_thumbs);
-            setThumbnails(tmp_thumbs);
+            setDataImages(newDataImages);
+            // setThumbnails(tmp_thumbs);
+        }).catch((err)=>{
+            console.log(err);
+        }).then(()=>{
+
         });
     }
-  }, [open])
+  }, [dataImages]);
 
+  useEffect(()=>{
+    console.log('main',  selectedImage);
+    if(selectedImage > -1) {
+        let selectedImageData = Object.values(dataImages)[selectedImage];
+        if(selectedImageData && !selectedImageData.src) {
+            /* Get the image src and other data */
+            let newDataImages = {
+                ...dataImages
+            };
+            newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].src = "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg";
+            console.log(newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`]);
+            setDataImages(newDataImages);
+        }
+    }
+  }, [selectedImage]);
 
-
-
-//   console.log(regionValues);
   return (
     <Dialog
       fullWidth
@@ -8732,17 +8745,27 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
       PaperProps={{style: {height: '100%'}}}>
 
       <Annotator
-        regionClsList={['label1', 'label2']}
-        images={[
-          {
-            // "src": "https://images.unsplash.com/photo-1561518776-e76a5e48f731?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-            "src": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg",
-            "name": "car-image-1",
-            regions: [],
-            region_values: regionValues,
-          }
-        ]}
-        thumbnails={thumbnails}/>
+        // key = {compKey}
+        regionClsList={imageLabels}
+        images={Object.values(dataImages)}
+        dataImages={dataImages}
+        // {[
+        //   {
+        //     // "src": "https://images.unsplash.com/photo-1561518776-e76a5e48f731?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
+        //     "src": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg",
+        //     "name": "car-image-1",
+        //     regions: [],
+        //     region_values: regionValues,
+        //   }
+        // ]}
+        // thumbnails={thumbnails}
+        selectedImage={selectedImage}
+        // selectedImageSrc={selectedImage > -1 ? Object.values(dataImages)[selectedImage].src : null}
+        onThumbnailClick={(_id, page_no)=>{
+            let i = Object.keys(dataImages).indexOf(`${_id}:${page_no}`);
+            setSelectedImage(i);
+        }}
+        />
     </Dialog>
   )
 }
