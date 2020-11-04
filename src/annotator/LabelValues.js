@@ -63,7 +63,6 @@ function rectanglesIntersect(
   let aAboveB = minAy > maxBy;
   let aBelowB = maxAy < minBy;
 
-  console.log(aLeftOfB, aRightOfB, aAboveB, aBelowB);
   return !( aLeftOfB || aRightOfB || aAboveB || aBelowB );
 }
 

@@ -139,7 +139,6 @@ export default function SignUp({match, history}) {
         phone_no: fields.phone_no,
         password: fields.password,
       }).then((resp)=>{
-        console.log(resp);
         setFormSuccess('User registered sucessfully.');
         setFileds(defaults);
       }).catch((err)=>{

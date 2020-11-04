@@ -45,7 +45,7 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
           setDatagroupOpts(data);
         })
         .catch((err)=>{
-          console.log(err);
+          console.error(err);
         })
         .then(()=>{
           setOpLoading(false);
@@ -201,7 +201,7 @@ export default function DataList() {
           error: true, text: error.response.data.message,
         });
       } else {
-        console.log(error);
+        console.error(error);
       }
     }).then(()=>{
       setPageMessage(null);
@@ -272,7 +272,7 @@ export default function DataList() {
         setDatalistMessage(null);
       })
       .catch((err)=>{
-        console.log(err);
+        console.error(err);
       });
   }
 

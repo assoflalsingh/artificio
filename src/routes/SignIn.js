@@ -106,7 +106,6 @@ export default function SignIn({history, location}) {
         'Access-Control-Allow-Origin': '*',
       },
     }).then((resp)=>{
-      console.log(resp);
       localStorage.setItem('token', resp.data.data);
       if(location.state && location.state.from === 'login') {
         history.push(location.state.from);

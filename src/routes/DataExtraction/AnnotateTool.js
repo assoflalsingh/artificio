@@ -71,14 +71,13 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
             let newDataImages = dataImages;
             for (const _id in data) {
                 for(const page_no in data[_id]) {
-                    console.log(`${_id}:${page_no}`)
                     newDataImages[`${_id}:${page_no}`].img_thumb_src = data[_id][page_no];
                 }
             }
             setDataImages(newDataImages);
             // setThumbnails(tmp_thumbs);
         }).catch((err)=>{
-            console.log(err);
+            console.error(err);
         }).then(()=>{
 
         });
@@ -203,7 +202,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
                 setSelectedImage(newSelectedImage);
             })
             .catch((err)=>{
-                console.log(err);
+                console.error(err);
             })
         } else if(selectedImageData && selectedImageData.src && newSelectedImage != selectedImage) {
             setSelectedImage(newSelectedImage);
