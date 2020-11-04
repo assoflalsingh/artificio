@@ -30,7 +30,7 @@ import useExcludePattern from "react-image-annotate/ImageCanvas/../hooks/use-exc
 import { useRafState } from "react-use"
 import PointDistances from "react-image-annotate/ImageCanvas/../PointDistances"
 import RegionTags from "react-image-annotate/ImageCanvas/../RegionTags"
-import RegionLabel from "react-image-annotate/ImageCanvas/../RegionLabel"
+import RegionLabel from "./RegionEditLabel";
 import ImageMask from "react-image-annotate/ImageCanvas/../ImageMask"
 import RegionSelectAndTransformBoxes from "react-image-annotate/ImageCanvas/../RegionSelectAndTransformBoxes"
 import VideoOrImageCanvasBackground from "react-image-annotate/ImageCanvas/../VideoOrImageCanvasBackground"
@@ -171,7 +171,7 @@ export const ImageCanvas = ({
     onMouseMove,
     onMouseDown,
     onMouseUp,
-  })
+  });
 
   useLayoutEffect(() => changeMat(mat.clone()), [windowSize])
 
@@ -372,7 +372,7 @@ export const ImageCanvas = ({
           showHighlightBox={showHighlightBox}
         />
       )}
-      {imageLoaded && showTags && !dragging && (
+      {/* {imageLoaded && showTags && !dragging && (
         <PreventScrollToParents key="regionTags">
           <RegionTags
             regions={regions}
@@ -390,8 +390,8 @@ export const ImageCanvas = ({
             onRegionClassAdded={onRegionClassAdded}
           />
         </PreventScrollToParents>
-      )}
-      {!showTags && highlightedRegion && (
+      )} */}
+      {highlightedRegion && (
         <div key="topLeftTag" className={classes.fixedRegionLabel}>
           <RegionLabel
             disableClose

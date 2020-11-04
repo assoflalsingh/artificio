@@ -13,14 +13,36 @@ import localReducer from './annotator-reducer';
 import {RegionLeftToolBar, RegionTopToolBar} from "./defaults";
 
 import useEventCallback from "use-event-callback"
-import makeImmutable, { without } from "seamless-immutable"
+import makeImmutable, { without, getIn } from "seamless-immutable"
 import { Box, Card, CardActionArea, CardMedia, makeStyles, } from '@material-ui/core';
-import getActiveImage from 'react-image-annotate/Annotator/reducers/get-active-image';
-// import ImageCanvas from 'react-image-annotate/ImageCanvas';
 import ImageCanvas from './ImageCanvas';
 import LabelValues, { RegionLabelValues } from "./LabelValues";
 import RegionEditLabel from './RegionEditLabel';
 
+
+function getActiveImage(state, dataImages) {
+  let currentImageIndex = null,
+    pathToActiveImage,
+    activeImage;
+
+  currentImageIndex = state.selectedImage;
+
+  if (currentImageIndex === -1) {
+    currentImageIndex = null
+    activeImage = null
+  } else {
+    pathToActiveImage = ["images", currentImageIndex]
+    if(dataImages.length > 0) {
+      activeImage = {
+        ...getIn(state, pathToActiveImage),
+        src: dataImages[currentImageIndex].src,
+        image_labels: dataImages[currentImageIndex].image_labels,
+        region_values: dataImages[currentImageIndex].region_values,
+      }
+    }
+  }
+  return { currentImageIndex, pathToActiveImage, activeImage }
+}
 
 function getRegionsInPixels(pixelSize, regions) {
   let {w:iw, h:ih} = pixelSize;
@@ -43,7 +65,6 @@ function getRegionsInPixels(pixelSize, regions) {
 
 export const Annotator = ({
   images,
-  dataImages,
   allowedArea,
   selectedImage = images && images.length > 0 ? 0 : undefined,
   showPointDistances,
@@ -76,9 +97,6 @@ export const Annotator = ({
   jsonD,
   thumbnails,
   onThumbnailClick,
-  // RegionLabelValues,
-  // RegionLeftToolBar,
-  // RegionTopToolBar,
 }) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
@@ -88,9 +106,9 @@ export const Annotator = ({
   const memoizedActionFns = useRef({});
 
   let initLabelsData = {};
-  regionClsList.forEach((regionCls)=>{
-    initLabelsData[regionCls] = '';
-  });
+  // regionClsList.forEach((regionCls)=>{
+  //   initLabelsData[regionCls] = '';
+  // });
 
   const [labelsData, setLabelsData] = useState(initLabelsData);
 
@@ -151,7 +169,6 @@ export const Annotator = ({
 
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
-        // console.log(getRegionsInPixels(activeImage.pixelSize, activeImage.regions))
         console.log(labelsData);
         console.log(state.selectedImage, activeImage);
       }
@@ -168,34 +185,19 @@ export const Annotator = ({
   })
 
   useEffect(() => {
-    console.log('in', selectedImage);
     if (selectedImage === undefined) return
-    let currImg = state.images[selectedImage];
-    let newImgData = dataImages[`${currImg._id}:${currImg.page_no}`];
-    console.log(newImgData);
+    let image = state.images[selectedImage];
+    setLabelsData({});
     dispatchToReducer({
       type: "SELECT_IMAGE",
       imageIndex: selectedImage,
-      image: {
-        ...currImg,
-        src: newImgData ? newImgData.src : currImg.src,
-      },
-    })
-  }, [selectedImage])
-
-  useEffect(()=>{
-    console.log('dataImages updated')
-    dispatchToReducer({
-      type: "UPDATE_IMAGE_SRC",
-      dataImages: dataImages,
+      image: image,
     });
-  }, [dataImages])
+  }, [selectedImage]);
 
   if (!images && !videoSrc)
     return 'Missing required prop "images" or "videoSrc"'
 
-
-  // const settings = useSettings();
   const action = (type, ...params) => {
     const fnKey = `${type}(${params.join(",")})`
     if (memoizedActionFns.current[fnKey])
@@ -214,15 +216,9 @@ export const Annotator = ({
     return fn
   }
 
-  const { currentImageIndex, activeImage } = getActiveImage(state);
-  console.log(activeImage);
+  const { currentImageIndex, activeImage } = getActiveImage(state, images);
   const canvas = (
     <ImageCanvas
-      // {...settings}
-      // showCrosshairs={
-      //   settings.showCrosshairs &&
-      //   !["select", "pan", "zoom"].includes(state.selectedTool)
-      // }
       key={state.selectedImage}
       showMask={state.showMask}
       fullImageSegmentationMode={state.fullImageSegmentationMode}
@@ -230,7 +226,7 @@ export const Annotator = ({
       showTags={state.showTags}
       allowedArea={state.allowedArea}
       modifyingAllowedArea={state.selectedTool === "modify-allowed-area"}
-      regionClsList={state.regionClsList}
+      regionClsList={activeImage ? activeImage.image_labels : []}
       regionTagList={state.regionTagList}
       regions={activeImage ? activeImage.regions || [] : []}
       realSize={activeImage ? activeImage.realSize : undefined}

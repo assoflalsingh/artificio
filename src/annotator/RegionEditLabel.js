@@ -104,7 +104,7 @@ const RegionEditLabel = ({
                   region.cls ? { label: region.cls, value: region.cls } : null
                 }
                 options={asMutable(
-                  allowedClasses.map((c) => ({ value: c, label: c }))
+                  allowedClasses.map((c) => ({ value: c.label_name, label: c.label_name }))
                 )}
               />
             </div>
