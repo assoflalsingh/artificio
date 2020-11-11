@@ -173,6 +173,20 @@ export const ImageCanvas = ({
     onMouseUp,
   });
 
+  mouseEvents.onWheel = (e) => {
+    const direction = e.deltaY;
+    const point = mousePosition.current;
+    const [mx, my] = [point.x, point.y]
+    let scale = typeof direction === "object" ? direction.to / mat.a : 1 + 0.01 * direction;
+    // NOTE: We're mutating mat here
+    mat.translate(mx, my).scaleU(scale)
+    if (mat.a > 2) mat.scaleU(2 / mat.a)
+    if (mat.a < 0.05) mat.scaleU(0.05 / mat.a)
+    mat.translate(-mx, -my)
+
+    changeMat(mat.clone())
+  };
+
   useLayoutEffect(() => changeMat(mat.clone()), [windowSize])
 
   const innerMousePos = mat.applyToPoint(

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dialog } from "@material-ui/core";
+import { Backdrop, CircularProgress, Dialog, Typography } from "@material-ui/core";
 // import ReactImageAnnotate from "react-image-annotate/ImageCanvas";
 import Annotator from '../../annotator';
 import { URL_MAP } from '../../others/artificio_api.instance';
@@ -33,7 +33,6 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [imageLabels, setImageLabels] = useState([]);
   const [thumbCalled, setThumbCalled] = useState(false);
-
   useEffect(()=>{
     if(open) {
         let annotateImages = getAnnotateImages();
@@ -48,6 +47,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
             page_no: img.page_no,
             img_thumb: img.img_thumb,
             img_thumb_src: null,
+            labels_data: [],
           }
           data_lists[img._id] = data_lists[img._id] || {};
           data_lists[img._id][img.page_no] = img.img_thumb;
@@ -194,16 +194,18 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
                 let newDataImages = {
                     ...dataImages
                 };
+                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].document_file_name = data.document_file_name;
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].src = data.image_url;
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].region_values = processImageJson(data.image_json);
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].image_labels = data.image_labels;
+                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].labels_data = data.labels_data || {};
                 setImageLabels(data.image_labels);
                 setDataImages(newDataImages);
                 setSelectedImage(newSelectedImage);
             })
             .catch((err)=>{
                 console.error(err);
-            })
+            });
         } else if(selectedImageData && selectedImageData.src && newSelectedImage != selectedImage) {
             setSelectedImage(newSelectedImage);
         }
@@ -216,10 +218,9 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
       maxWidth='lg'
       open={open}
       onClose={onClose}
-      disableBackdropClick={false}
+      disableBackdropClick
       disableEscapeKeyDown
       PaperProps={{style: {height: '100%'}}}>
-
       <Annotator
         regionClsList={imageLabels}
         images={Object.values(dataImages)}
@@ -236,6 +237,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
         selectedImage={selectedImage}
         // selectedImageSrc={selectedImage > -1 ? Object.values(dataImages)[selectedImage].src : null}
         onThumbnailClick={onThumbnailClick}
+        onAnnotatorClose={onClose}
         />
     </Dialog>
   )

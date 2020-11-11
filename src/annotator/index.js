@@ -13,36 +13,13 @@ import localReducer from './annotator-reducer';
 import {RegionLeftToolBar, RegionTopToolBar} from "./defaults";
 
 import useEventCallback from "use-event-callback"
-import makeImmutable, { without, getIn } from "seamless-immutable"
-import { Box, Card, CardActionArea, CardMedia, makeStyles, } from '@material-ui/core';
+import makeImmutable, { without, getIn, setIn } from "seamless-immutable"
+import { Box, Button, Card, CardActionArea, CardMedia, makeStyles, Typography, } from '@material-ui/core';
 import ImageCanvas from './ImageCanvas';
 import LabelValues, { RegionLabelValues } from "./LabelValues";
 import RegionEditLabel from './RegionEditLabel';
-
-
-function getActiveImage(state, dataImages) {
-  let currentImageIndex = null,
-    pathToActiveImage,
-    activeImage;
-
-  currentImageIndex = state.selectedImage;
-
-  if (currentImageIndex === -1) {
-    currentImageIndex = null
-    activeImage = null
-  } else {
-    pathToActiveImage = ["images", currentImageIndex]
-    if(dataImages.length > 0) {
-      activeImage = {
-        ...getIn(state, pathToActiveImage),
-        src: dataImages[currentImageIndex].src,
-        image_labels: dataImages[currentImageIndex].image_labels,
-        region_values: dataImages[currentImageIndex].region_values,
-      }
-    }
-  }
-  return { currentImageIndex, pathToActiveImage, activeImage }
-}
+import getActiveImage from "react-image-annotate/Annotator/reducers/get-active-image";
+import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
 
 function getRegionsInPixels(pixelSize, regions) {
   let {w:iw, h:ih} = pixelSize;
@@ -63,10 +40,23 @@ function getRegionsInPixels(pixelSize, regions) {
   });
 }
 
+const useClasses = makeStyles((theme)=>({
+  thumbnail : {
+    margin: '0.25rem',
+    whiteSpace: 'nowrap'
+  },
+  thumbnailActive : {
+    border: '0.125rem solid',
+    borderColor: theme.palette.primary.main,
+    margin: '0.25rem',
+    whiteSpace: 'nowrap'
+  },
+}));
+
 export const Annotator = ({
   images,
   allowedArea,
-  selectedImage = images && images.length > 0 ? 0 : undefined,
+  selectedImage,
   showPointDistances,
   pointDistancePrecision,
   showTags = true,
@@ -97,6 +87,7 @@ export const Annotator = ({
   jsonD,
   thumbnails,
   onThumbnailClick,
+  onAnnotatorClose,
 }) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
@@ -104,13 +95,7 @@ export const Annotator = ({
   }
   const annotationType = "image";
   const memoizedActionFns = useRef({});
-
-  let initLabelsData = {};
-  // regionClsList.forEach((regionCls)=>{
-  //   initLabelsData[regionCls] = '';
-  // });
-
-  const [labelsData, setLabelsData] = useState(initLabelsData);
+  const classes = useClasses();
 
   const [state, dispatchToReducer] = useReducer(
     historyHandler(
@@ -169,7 +154,6 @@ export const Annotator = ({
 
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
-        console.log(labelsData);
         console.log(state.selectedImage, activeImage);
       }
     }
@@ -178,21 +162,46 @@ export const Annotator = ({
   })
 
   const onRegionClassAdded = useEventCallback((cls) => {
+    console.log('region class added', cls);
     dispatchToReducer({
       type: "ON_CLS_ADDED",
       cls: cls,
     })
   })
 
+  const setLabelsData = (data) => {
+    dispatchToReducer({
+      type: "SET_LABELS_DATA",
+      imageIndex: selectedImage,
+      data: data
+    });
+  }
+
+  // useEffect(()=>{
+  //   dispatchToReducer({
+  //     type: "SELECT_IMAGE",
+  //     imageIndex: 0,
+  //   });
+  // }, [])
+
   useEffect(() => {
     if (selectedImage === undefined) return
     let image = state.images[selectedImage];
-    setLabelsData({});
-    dispatchToReducer({
-      type: "SELECT_IMAGE",
-      imageIndex: selectedImage,
-      image: image,
-    });
+    if(image.src) {
+      dispatchToReducer({
+        type: "SELECT_IMAGE",
+        imageIndex: selectedImage,
+      });
+    } else {
+      dispatchToReducer({
+        type: "SELECT_IMAGE_WITH_DETAILS",
+        imageIndex: selectedImage,
+        src: images[selectedImage].src,
+        image_labels: images[selectedImage].image_labels,
+        region_values: images[selectedImage].region_values,
+        label_values: images[selectedImage].label_values,
+      });
+    }
   }, [selectedImage]);
 
   if (!images && !videoSrc)
@@ -286,10 +295,14 @@ export const Annotator = ({
         <Box style={{backgroundColor: 'black'}}>
           {canvas}
         </Box>
+        <Box display="flex">
+          {(typeof(selectedImage) != "undefined") && <Typography style={{margin: 'auto'}}>{images[selectedImage].document_file_name} ({images[selectedImage].page_no})</Typography>}
+          {(typeof(selectedImage) == "undefined") && <Typography style={{margin: 'auto'}}>Select an image....</Typography>}
+        </Box>
         <Box style={{overflowY: 'hidden', overflowX: 'auto'}} display="flex">
           <Box display="flex">
-            {images.map((thumb)=>
-              <Card style={{margin: '0.25rem', whiteSpace: 'nowrap'}}>
+            {images.map((thumb, i)=>
+              <Card className={i==selectedImage ? classes.thumbnailActive : classes.thumbnail}>
                 <CardActionArea onClick={()=>{onThumbnailClick(thumb._id, thumb.page_no)}}>
                   <CardMedia style={{height: 50, width: 50}}
                     // className={}
@@ -303,12 +316,13 @@ export const Annotator = ({
         </Box>
       </Box>
       <Box>
-        <Box>
-          LABEL/ANNOTATION
+        <Box display="flex">
+          <Typography style={{marginTop: 'auto', marginBottom: 'auto'}}>LABEL/ANNOTATION</Typography>
+          <Button style={{marginLeft: 'auto'}} onClick={onAnnotatorClose} startIcon={<CloseOutlinedIcon />}>Close</Button>
         </Box>
         <CommonTabs tabs={
           {
-            "Custom OCR": (activeImage && <LabelValues activeImage={activeImage} labelsData={labelsData} setLabelsData={setLabelsData}/>),
+            "Custom OCR": (activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} />),
             "Optimal OCR": <h4>Under construction</h4>,
           }
         }/>

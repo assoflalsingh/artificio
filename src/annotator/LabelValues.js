@@ -67,28 +67,13 @@ function rectanglesIntersect(
 }
 
 export default function LabelValues({activeImage, labelsData, setLabelsData}) {
-  // useEffect(()=>{
-  //   setLabelsData((prevLabelsData)=>{
-  //     let newLabelsData = {
-  //       ...prevLabelsData,
-  //     };
-
-  //     regions.forEach(region => {
-  //       if(region.cls) newLabelsData[region.cls] = newLabelsData[region.cls] || '';
-  //     });
-  //     return newLabelsData;
-  //   });
-  // }, [regions]);
-
   const onTextChange = useEventCallback((e)=>{
     let {name, value} = e.target;
-    setLabelsData((prevLabelsData)=>({
-      ...prevLabelsData,
+    setLabelsData({
+      ...labelsData,
       [name]: value,
-    }))
+    });
   });
-
-  const [labelsTagged, setLabelsTagged] = useState([]);
 
   useEffect(()=>{
     // setLabelsTagged(regions.map((region)=>region.cls||));
@@ -104,11 +89,11 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
           }
         });
 
-        if(currRegionDims.cls) {
-          setLabelsData((prevLabelsData)=>({
-            ...prevLabelsData,
+        if(currRegionDims.cls && !labelsData[currRegionDims.cls] && labelsData[currRegionDims.cls] != '') {
+          setLabelsData({
+            ...labelsData,
             [currRegionDims.cls]: intersects.join(' '),
-          }));
+          });
         }
       }
     }

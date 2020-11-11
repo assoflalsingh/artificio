@@ -3,6 +3,8 @@ import SaveIcon from '@material-ui/icons/Save';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import { Box, Button, IconButton, ListItemIcon, ListItemText, makeStyles, Menu, MenuItem, withStyles } from '@material-ui/core';
 import useEventCallback from 'react-image-annotate/hooks/use-event-callback';
+import PanToolIcon from '@material-ui/icons/PanTool';
+import FormatShapesIcon from '@material-ui/icons/FormatShapes';
 
 
 
@@ -55,17 +57,17 @@ export function RegionTopToolBar({dispatch}) {
     <Box>
       <ToolBarButton label='Select' icon={<CheckBoxOutlineBlankIcon />}
         data-name='select' onClick={(e)=>onClickIconSidebarItem(e)} />
-      <ToolBarButton label='Drag/Pan' icon={<CheckBoxOutlineBlankIcon />}
+      <ToolBarButton label='Drag/Pan' icon={<PanToolIcon />}
         data-name='pan' onClick={(e)=>onClickIconSidebarItem(e)} />
-      <ToolBarButton label='Shapes' icon={<CheckBoxOutlineBlankIcon />}
+      <ToolBarButton label='Shapes' icon={<FormatShapesIcon />}
         onClick={(e)=>setShapesAnchor(e.target)} />
       <Menu open={Boolean(shapesAnchor)} anchorEl={shapesAnchor} onClose={(e)=>setShapesAnchor(null)}>
         <MenuItem data-name="create-box" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>
-          <ListItemIcon><CheckBoxOutlineBlankIcon /></ListItemIcon>
+          {/* <ListItemIcon><CheckBoxOutlineBlankIcon /></ListItemIcon> */}
           <ListItemText primary="Box" />
         </MenuItem>
         <MenuItem data-name="create-polygon" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>
-          <ListItemIcon ><CheckBoxOutlineBlankIcon /></ListItemIcon>
+          {/* <ListItemIcon ><CheckBoxOutlineBlankIcon /></ListItemIcon> */}
           <ListItemText primary="Polygon" />
         </MenuItem>
       </Menu>
