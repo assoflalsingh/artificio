@@ -83,7 +83,7 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
       if(currRegionDims) {
         let {xmin, ymin, xmax, ymax} = currRegionDims;
         let intersects = [];
-        activeImage.region_values.forEach((region_val)=>{
+        activeImage.model_regions.forEach((region_val)=>{
           if(rectanglesIntersect(region_val.xmin, region_val.ymin, region_val.xmax, region_val.ymax, xmin, ymin, xmax, ymax)) {
             intersects.push(region_val.value);
           }

@@ -21,25 +21,6 @@ import RegionEditLabel from './RegionEditLabel';
 import getActiveImage from "react-image-annotate/Annotator/reducers/get-active-image";
 import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
 
-function getRegionsInPixels(pixelSize, regions) {
-  let {w:iw, h:ih} = pixelSize;
-
-
-  return regions.map((region)=>{
-    let {x, y, w, h} = region;
-    const inner = [
-      [x * iw, y * ih],
-      [x * iw + w * iw, y * ih],
-      [x * iw + w * iw, y * ih + h * ih],
-      [x * iw, y * ih + h * ih],
-    ]
-    return {
-      ...region,
-      pixel: inner
-    }
-  });
-}
-
 const useClasses = makeStyles((theme)=>({
   thumbnail : {
     margin: '0.25rem',
@@ -88,6 +69,7 @@ export const Annotator = ({
   thumbnails,
   onThumbnailClick,
   onAnnotatorClose,
+  onSaveAnnotationDetails,
 }) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
@@ -154,11 +136,11 @@ export const Annotator = ({
 
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
-        console.log(state.selectedImage, activeImage);
+        onSaveAnnotationDetails(selectedImage, activeImage);
       }
+    } else {
+      dispatchToReducer(action)
     }
-
-    dispatchToReducer(action)
   })
 
   const onRegionClassAdded = useEventCallback((cls) => {
@@ -198,7 +180,7 @@ export const Annotator = ({
         imageIndex: selectedImage,
         src: images[selectedImage].src,
         image_labels: images[selectedImage].image_labels,
-        region_values: images[selectedImage].region_values,
+        model_regions: images[selectedImage].model_regions,
         label_values: images[selectedImage].label_values,
       });
     }
@@ -287,48 +269,51 @@ export const Annotator = ({
     />
   );
 
-  return <>
-    <Box display="flex" style={{width: '100%', height: '100%'}}>
-      <RegionLeftToolBar dispatch={dispatch} regions={activeImage ? activeImage.regions : []} />
-      <Box style={{flexGrow: 1, overflow: 'hidden'}}>
-        <RegionTopToolBar dispatch={dispatch} />
-        <Box style={{backgroundColor: 'black'}}>
-          {canvas}
-        </Box>
-        <Box display="flex">
-          {(typeof(selectedImage) != "undefined") && <Typography style={{margin: 'auto'}}>{images[selectedImage].document_file_name} ({images[selectedImage].page_no})</Typography>}
-          {(typeof(selectedImage) == "undefined") && <Typography style={{margin: 'auto'}}>Select an image....</Typography>}
-        </Box>
-        <Box style={{overflowY: 'hidden', overflowX: 'auto'}} display="flex">
+  return (
+      <Box display="flex" style={{height: '100%'}}>
+        <RegionLeftToolBar dispatch={dispatch} regions={activeImage ? activeImage.regions : []} />
+        <Box style={{flexGrow: 1, overflow: 'hidden'}}>
+          <RegionTopToolBar dispatch={dispatch} selectedTool={state.selectedTool}/>
+          <Box style={{backgroundColor: 'black'}}>
+            {canvas}
+          </Box>
           <Box display="flex">
-            {images.map((thumb, i)=>
-              <Card className={i==selectedImage ? classes.thumbnailActive : classes.thumbnail}>
-                <CardActionArea onClick={()=>{onThumbnailClick(thumb._id, thumb.page_no)}}>
-                  <CardMedia style={{height: 50, width: 50}}
-                    // className={}
-                    image={thumb.img_thumb_src}
-                    // title="Contemplative Reptile"
-                  />
-                </CardActionArea>
-              </Card>
-            )}
+            {(typeof(selectedImage) != "undefined") && <Typography style={{margin: 'auto'}}>{images[selectedImage].document_file_name} ({images[selectedImage].page_no})</Typography>}
+            {(typeof(selectedImage) == "undefined") && <Typography style={{margin: 'auto'}}>Select an image....</Typography>}
+          </Box>
+          <Box style={{overflowY: 'hidden', overflowX: 'auto'}} display="flex">
+            <Box display="flex">
+              {images.map((thumb, i)=>
+                <Card className={i==selectedImage ? classes.thumbnailActive : classes.thumbnail}>
+                  <CardActionArea onClick={()=>{onThumbnailClick(thumb._id, thumb.page_no)}}>
+                    <CardMedia style={{height: 50, width: 50}}
+                      // className={}
+                      image={thumb.img_thumb_src}
+                      // title="Contemplative Reptile"
+                    />
+                  </CardActionArea>
+                </Card>
+              )}
+            </Box>
           </Box>
         </Box>
-      </Box>
-      <Box>
-        <Box display="flex">
-          <Typography style={{marginTop: 'auto', marginBottom: 'auto'}}>LABEL/ANNOTATION</Typography>
-          <Button style={{marginLeft: 'auto'}} onClick={onAnnotatorClose} startIcon={<CloseOutlinedIcon />}>Close</Button>
+        <Box style={{width: '300px', display: 'flex', flexDirection: 'column', padding: '0.5rem'}}>
+          <Box display="flex">
+            <Typography style={{marginTop: 'auto', marginBottom: 'auto'}}>LABEL/ANNOTATION</Typography>
+            <Button style={{marginLeft: 'auto'}} onClick={onAnnotatorClose} startIcon={<CloseOutlinedIcon />}>Close</Button>
+          </Box>
+          <Box style={{overflow: 'auto', flexGrow: 1}}>
+            {activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} />}
+          </Box>
+          {/* <CommonTabs tabs={
+            {
+              "Custom OCR": (activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} />),
+              "Optimal OCR": <h4>Under construction</h4>,
+            }
+          }/> */}
         </Box>
-        <CommonTabs tabs={
-          {
-            "Custom OCR": (activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} />),
-            "Optimal OCR": <h4>Under construction</h4>,
-          }
-        }/>
       </Box>
-    </Box>
-  </>
+  );
 }
 
 export default Annotator;

@@ -4,7 +4,7 @@ import { Backdrop, CircularProgress, Dialog, Typography } from "@material-ui/cor
 import Annotator from '../../annotator';
 import { URL_MAP } from '../../others/artificio_api.instance';
 
-function processImageJson(image_json) {
+function processTrainedJson(image_json) {
     let regionValues = [];
     if(typeof(image_json) === 'object') {
         image_json.text_annotations.forEach((one_block)=>{
@@ -28,6 +28,38 @@ function processImageJson(image_json) {
     return regionValues;
 }
 
+function processAnnotatedData({pixelSize, regions, labels_data}) {
+  let {w:iw, h:ih} = pixelSize;
+
+  let retJson = {
+    "image": {
+      w: iw, h: ih
+    },
+    "labels": []
+  }
+
+  regions.map((region)=>{
+    if(typeof(labels_data[region.cls]) === "undefined")
+      return;
+
+    let {x, y, w, h} = region;
+    let label = {
+      label_name: region.cls,
+      label_value: labels_data[region.cls],
+      label_shape: region.type,
+      label_points: [
+        [x * iw, y * ih],
+        [x * iw + w * iw, y * ih],
+        [x * iw + w * iw, y * ih + h * ih],
+        [x * iw, y * ih + h * ih],
+      ]
+    };
+    retJson['labels'].push(label);
+  });
+
+  return retJson;
+}
+
 export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
   const [dataImages, setDataImages] = useState({});
   const [selectedImage, setSelectedImage] = useState(undefined);
@@ -43,7 +75,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
             _id: img._id,
             name: img.img_name,
             regions: [],
-            region_values: null,
+            model_regions: null,
             page_no: img.page_no,
             img_thumb: img.img_thumb,
             img_thumb_src: null,
@@ -194,9 +226,9 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
                 let newDataImages = {
                     ...dataImages
                 };
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].document_file_name = data.document_file_name;
+                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].document_file_name = data.document_file_name || 'Unknown';
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].src = data.image_url;
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].region_values = processImageJson(data.image_json);
+                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].model_regions = processTrainedJson(data.image_json);
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].image_labels = data.image_labels;
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].labels_data = data.labels_data || {};
                 setImageLabels(data.image_labels);
@@ -212,32 +244,29 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
     }
   }
 
+  const onSaveAnnotationDetails = (imageIndex, dataImage) => {
+    try {
+      console.log(processAnnotatedData(dataImage));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <Dialog
-      fullWidth
-      maxWidth='lg'
+      fullScreen
       open={open}
       onClose={onClose}
       disableBackdropClick
       disableEscapeKeyDown
-      PaperProps={{style: {height: '100%'}}}>
+    >
       <Annotator
         regionClsList={imageLabels}
         images={Object.values(dataImages)}
-        // {[
-        //   {
-        //     // "src": "https://images.unsplash.com/photo-1561518776-e76a5e48f731?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-        //     "src": "https://img.techpowerup.org/201029/202010236445-ka119f11o0002-9-page-0001.jpg",
-        //     "name": "car-image-1",
-        //     regions: [],
-        //     region_values: regionValues,
-        //   }
-        // ]}
-        // thumbnails={thumbnails}
         selectedImage={selectedImage}
-        // selectedImageSrc={selectedImage > -1 ? Object.values(dataImages)[selectedImage].src : null}
         onThumbnailClick={onThumbnailClick}
         onAnnotatorClose={onClose}
+        onSaveAnnotationDetails={onSaveAnnotationDetails}
         />
     </Dialog>
   )

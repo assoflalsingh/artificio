@@ -37,16 +37,16 @@ const ToolBarButton = withStyles({
   label: {
     flexDirection: 'column',
   }
-})(({label, icon, classes, ...props})=>{
+})(({label, icon, classes, active, ...props})=>{
   return (
-    <Button classes={{label: classes.label}} {...props}>
+    <Button classes={{label: classes.label}} {...props} color={active ? "primary" : ""}>
       {icon}
       {label}
     </Button>
   );
 });
 
-export function RegionTopToolBar({dispatch}) {
+export function RegionTopToolBar({dispatch, selectedTool}) {
   const [shapesAnchor, setShapesAnchor] = React.useState(null);
 
   const onClickIconSidebarItem = useEventCallback((event) => {
@@ -56,11 +56,11 @@ export function RegionTopToolBar({dispatch}) {
   return(
     <Box>
       <ToolBarButton label='Select' icon={<CheckBoxOutlineBlankIcon />}
-        data-name='select' onClick={(e)=>onClickIconSidebarItem(e)} />
+        data-name='select' active={selectedTool==='select'} onClick={(e)=>onClickIconSidebarItem(e)} />
       <ToolBarButton label='Drag/Pan' icon={<PanToolIcon />}
-        data-name='pan' onClick={(e)=>onClickIconSidebarItem(e)} />
+        data-name='pan' active={selectedTool==='pan'} onClick={(e)=>onClickIconSidebarItem(e)} />
       <ToolBarButton label='Shapes' icon={<FormatShapesIcon />}
-        onClick={(e)=>setShapesAnchor(e.target)} />
+        active={selectedTool.includes("create")} onClick={(e)=>setShapesAnchor(e.target)} />
       <Menu open={Boolean(shapesAnchor)} anchorEl={shapesAnchor} onClose={(e)=>setShapesAnchor(null)}>
         <MenuItem data-name="create-box" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>
           {/* <ListItemIcon><CheckBoxOutlineBlankIcon /></ListItemIcon> */}

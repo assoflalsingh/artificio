@@ -5,7 +5,7 @@ export default (state, action) => {
     let pathToActiveImage = ["images", action.imageIndex]
     let newState = setIn(state, [...pathToActiveImage, "src"], action.src);
     newState = setIn(newState, [...pathToActiveImage, "image_labels"], action.image_labels);
-    newState = setIn(newState, [...pathToActiveImage, "region_values"], action.region_values);
+    newState = setIn(newState, [...pathToActiveImage, "model_regions"], action.model_regions);
     newState = setIn(newState, [...pathToActiveImage, "labels_data"], action.labels_data || {});
 
     return setIn(newState,["selectedImage"], action.imageIndex);

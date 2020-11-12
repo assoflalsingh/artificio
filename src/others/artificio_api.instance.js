@@ -51,4 +51,5 @@ export const URL_MAP = {
   GET_THUMBNAILS: 'label/get-thumbnails/',
   GET_DATA_LIST: 'label/get-data-list/',
   GET_ANNOTATION_DETAILS: 'label/get-image-annotation-details/',
+  POST_ANNOTATION_DETAILS: 'label/post-image-annotation-details/',
 };

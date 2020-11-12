@@ -31,6 +31,7 @@ import { useRafState } from "react-use"
 import PointDistances from "react-image-annotate/ImageCanvas/../PointDistances"
 import RegionTags from "react-image-annotate/ImageCanvas/../RegionTags"
 import RegionLabel from "./RegionEditLabel";
+// import RegionLabel from "react-image-annotate/RegionLabel";
 import ImageMask from "react-image-annotate/ImageCanvas/../ImageMask"
 import RegionSelectAndTransformBoxes from "react-image-annotate/ImageCanvas/../RegionSelectAndTransformBoxes"
 import VideoOrImageCanvasBackground from "react-image-annotate/ImageCanvas/../VideoOrImageCanvasBackground"
@@ -214,11 +215,7 @@ export const ImageCanvas = ({
   const canvas = canvasEl.current
   if (canvas && imageLoaded) {
     const { clientWidth, clientHeight } = canvas
-
-    const fitScale = Math.max(
-      imageDimensions.naturalWidth / (clientWidth - 20),
-      imageDimensions.naturalHeight / (clientHeight - 20)
-    )
+    const fitScale = 1;
 
     const [iw, ih] = [
       imageDimensions.naturalWidth / fitScale,
@@ -386,7 +383,7 @@ export const ImageCanvas = ({
           showHighlightBox={showHighlightBox}
         />
       )}
-      {/* {imageLoaded && showTags && !dragging && (
+      {imageLoaded && !dragging && (
         <PreventScrollToParents key="regionTags">
           <RegionTags
             regions={regions}
@@ -404,8 +401,8 @@ export const ImageCanvas = ({
             onRegionClassAdded={onRegionClassAdded}
           />
         </PreventScrollToParents>
-      )} */}
-      {highlightedRegion && (
+      )}
+      {!showTags && highlightedRegion && (
         <div key="topLeftTag" className={classes.fixedRegionLabel}>
           <RegionLabel
             disableClose

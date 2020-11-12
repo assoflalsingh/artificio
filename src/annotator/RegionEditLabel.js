@@ -3,7 +3,7 @@
 import React, { useState, memo } from "react"
 import Paper from "@material-ui/core/Paper"
 import { makeStyles } from "@material-ui/core/styles"
-// import styles from "./styles"
+import styles from "react-image-annotate/RegionLabel/styles"
 import classnames from "classnames"
 import IconButton from "@material-ui/core/IconButton"
 import Button from "@material-ui/core/Button"
@@ -15,7 +15,7 @@ import CreatableSelect from "react-select/creatable"
 
 import { asMutable } from "seamless-immutable"
 
-const useStyles = makeStyles()
+const useStyles = makeStyles(styles)
 
 const RegionEditLabel = ({
   region,
@@ -90,7 +90,7 @@ const RegionEditLabel = ({
           {(allowedClasses || []).length > 0 && (
             <div style={{ marginTop: 6 }}>
               <CreatableSelect
-                placeholder="Classification"
+                placeholder="Label"
                 onChange={(o, actionMeta) => {
                   if (actionMeta.action == "create-option") {
                     onRegionClassAdded(o.value)
