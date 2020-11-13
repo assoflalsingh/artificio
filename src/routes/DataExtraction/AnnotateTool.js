@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Backdrop, CircularProgress, Dialog, Typography } from "@material-ui/core";
+import { Backdrop, CircularProgress, Dialog, Snackbar, Typography } from "@material-ui/core";
+import Alert from '@material-ui/lab/Alert';
 // import ReactImageAnnotate from "react-image-annotate/ImageCanvas";
 import Annotator from '../../annotator';
 import { URL_MAP } from '../../others/artificio_api.instance';
@@ -65,6 +66,8 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [imageLabels, setImageLabels] = useState([]);
   const [thumbCalled, setThumbCalled] = useState(false);
+  const [processMsg, setProcessMsg] = useState(null);
+  const [ajaxMessage, setAjaxMessage] = useState(null);
   useEffect(()=>{
     if(open) {
         let annotateImages = getAnnotateImages();
@@ -84,6 +87,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
           data_lists[img._id] = data_lists[img._id] || {};
           data_lists[img._id][img.page_no] = img.img_thumb;
         });
+        setSelectedImage(undefined);
         setThumbCalled(false);
         setDataImages(tmpDataImages);
     }
@@ -92,6 +96,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
   useEffect(()=>{
     if(Object.keys(dataImages).length > 0 && !thumbCalled) {
         setThumbCalled(true);
+        setProcessMsg('Preparing the annotation tool...');
         let data_lists = {};
         Object.values(dataImages).forEach((img)=>{
             data_lists[img._id] = data_lists[img._id] || {};
@@ -108,10 +113,16 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
             }
             setDataImages(newDataImages);
             // setThumbnails(tmp_thumbs);
-        }).catch((err)=>{
-            console.error(err);
+        }).catch((error)=>{
+          if(error.response) {
+            setAjaxMessage({
+              error: true, text: error.response.data.message,
+            });
+          } else {
+            console.error(error);
+          }
         }).then(()=>{
-
+          setProcessMsg(null);
         });
     }
   }, [dataImages]);
@@ -219,8 +230,11 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
         let selectedImageData = Object.values(dataImages)[newSelectedImage];
         if(selectedImageData && !selectedImageData.src) {
             /* Get the image src and other data */
-            let url = `${URL_MAP.GET_ANNOTATION_DETAILS}?document_id=${selectedImageData._id}&page=${selectedImageData.page_no}`;
-            api.get(url)
+            setProcessMsg('Fetching image file information...');
+            api.post(URL_MAP.GET_ANNOTATION_DETAILS, {
+              "document_id": selectedImageData._id,
+              "page_no": selectedImageData.page_no,
+            })
             .then((res)=>{
                 let data = res.data.data;
                 let newDataImages = {
@@ -235,8 +249,17 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
                 setDataImages(newDataImages);
                 setSelectedImage(newSelectedImage);
             })
-            .catch((err)=>{
-                console.error(err);
+            .catch((error)=>{
+              if(error.response) {
+                setAjaxMessage({
+                  error: true, text: error.response.data.message,
+                });
+              } else {
+                console.error(error);
+              }
+            })
+            .then(()=>{
+              setProcessMsg(null);
             });
         } else if(selectedImageData && selectedImageData.src && newSelectedImage != selectedImage) {
             setSelectedImage(newSelectedImage);
@@ -245,10 +268,32 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
   }
 
   const onSaveAnnotationDetails = (imageIndex, dataImage) => {
-    try {
-      console.log(processAnnotatedData(dataImage));
-    } catch (error) {
-      console.log(error);
+    if(Object.values(dataImages)[imageIndex]) {
+      let json_data = processAnnotatedData(dataImage);
+      let selectedImageData = Object.values(dataImages)[imageIndex];
+
+      setProcessMsg('Saving annotation details...');
+      api.post(URL_MAP.UPDATE_FILE_STATUS, {
+		  	"document_id": selectedImageData._id,
+        "page_no": selectedImageData.page_no,
+        "json_data": json_data,
+        "status": "in-process"
+		  })
+      .then((res)=>{
+        setAjaxMessage({
+          error: false, text: 'Annotation details saved successfully !!',
+        });
+      }).catch((error)=>{
+        if(error.response) {
+          setAjaxMessage({
+            error: true, text: error.response.data.message,
+          });
+        } else {
+          console.error(error);
+        }
+      }).then(()=>{
+        setProcessMsg(null);
+      });
     }
   }
 
@@ -260,6 +305,15 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
       disableBackdropClick
       disableEscapeKeyDown
     >
+      <Backdrop style={{zIndex: 2000}} open={Boolean(processMsg)}>
+        <CircularProgress color="inherit" />
+        <Typography style={{marginLeft: '0.25rem'}} variant='h5'>{processMsg}</Typography>
+      </Backdrop>
+      <Snackbar open={Boolean(ajaxMessage)} autoHideDuration={6000} >
+        {ajaxMessage && <Alert onClose={()=>{setAjaxMessage(null)}} severity={ajaxMessage.error ? "error" : "success"}>
+          {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
+        </Alert>}
+      </Snackbar>
       <Annotator
         regionClsList={imageLabels}
         images={Object.values(dataImages)}

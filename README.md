@@ -39,6 +39,7 @@ sudo cp -R /home/ec2-user/app/* .
 
 sudo chown -R nginx:nginx *
 
+# If restart required.
 sudo systemctl restart nginx.service
 
 sudo systemctl status nginx.service

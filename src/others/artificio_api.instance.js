@@ -2,8 +2,8 @@ import axios from 'axios';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
-    baseURL: 'https://api.artificio.ai',
-    // baseURL: 'http://localhost:6060',
+    // baseURL: 'https://api.artificio.ai',
+    baseURL: 'http://localhost:6060',
   });
 
   if (token) {
@@ -51,5 +51,5 @@ export const URL_MAP = {
   GET_THUMBNAILS: 'label/get-thumbnails/',
   GET_DATA_LIST: 'label/get-data-list/',
   GET_ANNOTATION_DETAILS: 'label/get-image-annotation-details/',
-  POST_ANNOTATION_DETAILS: 'label/post-image-annotation-details/',
+  UPDATE_FILE_STATUS: 'label/update-file-status/',
 };

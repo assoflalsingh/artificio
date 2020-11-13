@@ -227,6 +227,11 @@ const theme = createMuiTheme({
               padding: '0.75rem 1.5rem',
             }
           }
+        },
+        MuiBackdrop: {
+          root: {
+            color: '#fff'
+          }
         }
     }
 }, globalTheme);
