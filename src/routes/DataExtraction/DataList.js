@@ -5,7 +5,7 @@ import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import SyncIcon from '@material-ui/icons/Sync';
-import SecondaryAddButton from '../../components/SecondaryAddButton';
+import {CompactAddButton, CompactButton} from '../../components/CustomButtons';
 import CreateDataGroup from './CreateDataGroup';
 
 import {Stacked, StackItem} from '../../components/Stacked';
@@ -119,7 +119,7 @@ export default function DataList() {
         filter: true,
         sort: true,
         customBodyRender: (value, tableMeta)=>{
-          return <Chip label={value?.toUpperCase()} variant="outlined" />;
+          return <Chip size="small" label={value?.replace('-', ' ').toUpperCase()} variant="outlined" />;
         }
       },
     },
@@ -265,14 +265,16 @@ export default function DataList() {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.get(URL_MAP.GET_DATA_LIST)
+    api.post(URL_MAP.GET_DATA_LIST, {status: ['new', 'ready']})
       .then((res)=>{
         let data = res.data.data;
         setDatalist(parseGetDataList(data.data_lists));
-        setDatalistMessage(null);
       })
       .catch((err)=>{
         console.error(err);
+      })
+      .then(()=>{
+        setDatalistMessage(null);
       });
   }
 
@@ -305,12 +307,12 @@ export default function DataList() {
             <Tooltip title="Refresh data list">
               <IconButton size="small" onClick={()=>{fetchDataList()}}><SyncIcon /></IconButton>
             </Tooltip>
-            <SecondaryAddButton className={classes.ml1} color="secondary" label="Create label"
+            <CompactAddButton className={classes.ml1} color="secondary" label="Create label"
               onClick={()=>{setStackPath('createlabel')}}
               />
-            <SecondaryAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} />
+            <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} />
             <Box className={classes.rightAlign}>
-              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
+              <CompactButton onClick={()=>{setAnnotateOpen(true)}} startIcon={<PlayCircleFilledIcon color="primary" fontSize='large' />} label='Annotation'/>
               {/* <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>

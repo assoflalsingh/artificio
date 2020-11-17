@@ -5,12 +5,19 @@ import { Box, Button, IconButton, ListItemIcon, ListItemText, makeStyles, Menu, 
 import useEventCallback from 'react-image-annotate/hooks/use-event-callback';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import FormatShapesIcon from '@material-ui/icons/FormatShapes';
+import ZoomInIcon from '@material-ui/icons/ZoomIn';
+import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 
 
 
 const useStyles = makeStyles((theme)=>({
   leftBar: {
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  leftBarButton: {
+    color: theme.palette.primary.contrastText,
   },
   toolbarBtnLabel: {
     flexDirection: 'column',
@@ -27,7 +34,9 @@ export function RegionLeftToolBar({dispatch}) {
 
   return(
     <Box className={classes.leftBar}>
-      <IconButton data-name="save" onClick={onClickItem}><SaveIcon fontSize="large" /></IconButton>
+      <IconButton data-name="save" onClick={onClickItem} className={classes.leftBarButton}><SaveIcon fontSize="large" /></IconButton>
+      {/* <IconButton data-name="zoom-in" onClick={onClickItem} className={classes.leftBarButton}><ZoomInIcon fontSize="large" /></IconButton>
+      <IconButton data-name="zoom-out" onClick={onClickItem} className={classes.leftBarButton}><ZoomOutIcon fontSize="large" /></IconButton> */}
     </Box>
   )
 }

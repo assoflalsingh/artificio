@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, CardContent, makeStyles, Typography } from '@material-ui/core';
 import clsx from 'clsx';
-import ButtonLink from './ButtonLink';
+import {ButtonLink} from './CustomButtons';
 
 const useStyles = makeStyles((theme)=>({
   root: {

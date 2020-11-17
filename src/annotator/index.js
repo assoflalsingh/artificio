@@ -20,6 +20,7 @@ import LabelValues, { RegionLabelValues } from "./LabelValues";
 import RegionEditLabel from './RegionEditLabel';
 import getActiveImage from "react-image-annotate/Annotator/reducers/get-active-image";
 import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
+import { act } from "react-dom/test-utils";
 
 const useClasses = makeStyles((theme)=>({
   thumbnail : {
@@ -78,6 +79,7 @@ export const Annotator = ({
   const annotationType = "image";
   const memoizedActionFns = useRef({});
   const classes = useClasses();
+  const canvasRef = useRef();
 
   const [state, dispatchToReducer] = useReducer(
     historyHandler(
@@ -137,6 +139,11 @@ export const Annotator = ({
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
         onSaveAnnotationDetails(selectedImage, activeImage);
+      }
+      if(action.button === 'zoom-in') {
+        var cEvent = new WheelEvent('wheel', {deltaX: 1, deltaY: 1});
+        console.log(canvasRef);
+        canvasRef.current.dispatchEvent(cEvent);
       }
     } else {
       dispatchToReducer(action)
@@ -210,6 +217,7 @@ export const Annotator = ({
   const { currentImageIndex, activeImage } = getActiveImage(state, images);
   const canvas = (
     <ImageCanvas
+      canvasRef={(canvasEle)=>{canvasRef.current = canvasEle}}
       key={state.selectedImage}
       showMask={state.showMask}
       fullImageSegmentationMode={state.fullImageSegmentationMode}

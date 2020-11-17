@@ -100,6 +100,7 @@ const getDefaultMat = (allowedArea = null, { iw, ih } = {}) => {
 }
 
 export const ImageCanvas = ({
+  canvasRef,
   regions,
   imageSrc,
   videoSrc,
@@ -175,6 +176,7 @@ export const ImageCanvas = ({
   });
 
   mouseEvents.onWheel = (e) => {
+    console.log(e);
     const direction = e.deltaY;
     const point = mousePosition.current;
     const [mx, my] = [point.x, point.y]
@@ -444,6 +446,7 @@ export const ImageCanvas = ({
       <PreventScrollToParents
         style={{ width: "100%", height: "100%" }}
         {...mouseEvents}
+        ref={(ele)=>{canvasRef(ele)}}
       >
         <>
           {fullImageSegmentationMode && (
