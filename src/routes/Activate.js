@@ -39,6 +39,7 @@ export default function Activate({location, history}) {
       if (err.response) {
         // client received an error response (5xx, 4xx)
         if(err.response.data.message) {
+          setActive(true);
           setMessage(err.response.data.message);
         } else {
           setMessage(err.response.statusText + '. Activation failed.');

@@ -242,6 +242,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
                 };
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].document_file_name = data.document_file_name || 'Unknown';
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].src = data.image_url;
+                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].initial_model_data = data.image_json;
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].model_regions = processTrainedJson(data.image_json);
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].image_labels = data.image_labels;
                 newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].labels_data = data.labels_data || {};
@@ -269,14 +270,16 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
 
   const onSaveAnnotationDetails = (imageIndex, dataImage) => {
     if(Object.values(dataImages)[imageIndex]) {
-      let json_data = processAnnotatedData(dataImage);
       let selectedImageData = Object.values(dataImages)[imageIndex];
 
       setProcessMsg('Saving annotation details...');
       api.post(URL_MAP.UPDATE_FILE_STATUS, {
 		  	"document_id": selectedImageData._id,
         "page_no": selectedImageData.page_no,
-        "json_data": json_data,
+        "json_data": {
+          initial_model_data: selectedImageData.initial_model_data,
+          user_annotate_data: processAnnotatedData(dataImage)
+        },
         "status": "in-process"
 		  })
       .then((res)=>{
