@@ -217,7 +217,7 @@ export const ImageCanvas = ({
   const canvas = canvasEl.current
   if (canvas && imageLoaded) {
     const { clientWidth, clientHeight } = canvas
-    const fitScale = 1;
+    const fitScale = imageDimensions.naturalWidth / (clientWidth - 20);
 
     const [iw, ih] = [
       imageDimensions.naturalWidth / fitScale,
