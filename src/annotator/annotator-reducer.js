@@ -7,6 +7,7 @@ export default (state, action) => {
     newState = setIn(newState, [...pathToActiveImage, "image_labels"], action.image_labels);
     newState = setIn(newState, [...pathToActiveImage, "model_regions"], action.model_regions);
     newState = setIn(newState, [...pathToActiveImage, "labels_data"], action.labels_data || {});
+    newState = setIn(newState, [...pathToActiveImage, "regions"], action.regions || {});
 
     return setIn(newState,["selectedImage"], action.imageIndex);
   }

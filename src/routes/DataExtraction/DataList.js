@@ -352,7 +352,8 @@ export default function DataList() {
       </StackItem>
       </Stacked>
     </Box>
-    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} />
+    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}
+      getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>
     </>
   )
 }

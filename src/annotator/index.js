@@ -189,6 +189,7 @@ export const Annotator = ({
         image_labels: images[selectedImage].image_labels,
         model_regions: images[selectedImage].model_regions,
         label_values: images[selectedImage].label_values,
+        regions: images[selectedImage].regions,
       });
     }
   }, [selectedImage]);
