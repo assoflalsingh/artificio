@@ -21,6 +21,7 @@ import RegionEditLabel from './RegionEditLabel';
 import getActiveImage from "react-image-annotate/Annotator/reducers/get-active-image";
 import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
 import { act } from "react-dom/test-utils";
+import KonvaCanvasContainer from "./KonvaCanvasContainer";
 
 const useClasses = makeStyles((theme)=>({
   thumbnail : {
@@ -216,65 +217,66 @@ export const Annotator = ({
 
   const { currentImageIndex, activeImage } = getActiveImage(state, images);
   const canvas = (
-    <ImageCanvas
-      canvasRef={(canvasEle)=>{canvasRef.current = canvasEle}}
-      key={state.selectedImage}
-      showMask={state.showMask}
-      fullImageSegmentationMode={state.fullImageSegmentationMode}
-      autoSegmentationOptions={state.autoSegmentationOptions}
-      showTags={state.showTags}
-      allowedArea={state.allowedArea}
-      modifyingAllowedArea={state.selectedTool === "modify-allowed-area"}
-      regionClsList={activeImage ? activeImage.image_labels : []}
-      regionTagList={state.regionTagList}
-      regions={activeImage ? activeImage.regions || [] : []}
-      realSize={activeImage ? activeImage.realSize : undefined}
-      videoPlaying={state.videoPlaying}
-      imageSrc={activeImage ? activeImage.src : null}
-      pointDistancePrecision={state.pointDistancePrecision}
-      createWithPrimary={state.selectedTool.includes("create")}
-      dragWithPrimary={state.selectedTool === "pan"}
-      zoomWithPrimary={state.selectedTool === "zoom"}
-      showPointDistances={state.showPointDistances}
-      videoTime={
-        state.annotationType === "image"
-          ? state.selectedImageFrameTime
-          : state.currentVideoTime
-      }
-      keypointDefinitions={state.keypointDefinitions}
-      onMouseMove={action("MOUSE_MOVE")}
-      onMouseDown={action("MOUSE_DOWN")}
-      onMouseUp={action("MOUSE_UP")}
-      onChangeRegion={action("CHANGE_REGION", "region")}
-      onBeginRegionEdit={action("OPEN_REGION_EDITOR", "region")}
-      onCloseRegionEdit={action("CLOSE_REGION_EDITOR", "region")}
-      onDeleteRegion={action("DELETE_REGION", "region")}
-      onBeginBoxTransform={action("BEGIN_BOX_TRANSFORM", "box", "directions")}
-      onBeginMovePolygonPoint={action(
-        "BEGIN_MOVE_POLYGON_POINT",
-        "polygon",
-        "pointIndex"
-      )}
-      onBeginMoveKeypoint={action(
-        "BEGIN_MOVE_KEYPOINT",
-        "region",
-        "keypointId"
-      )}
-      onAddPolygonPoint={action(
-        "ADD_POLYGON_POINT",
-        "polygon",
-        "point",
-        "pointIndex"
-      )}
-      onSelectRegion={action("SELECT_REGION", "region")}
-      onBeginMovePoint={action("BEGIN_MOVE_POINT", "point")}
-      onImageLoaded={action("IMAGE_LOADED", "image")}
-      RegionEditLabel={RegionEditLabel}
-      onImageOrVideoLoaded={action("IMAGE_OR_VIDEO_LOADED", "metadata")}
-      onChangeVideoTime={action("CHANGE_VIDEO_TIME", "newTime")}
-      onChangeVideoPlaying={action("CHANGE_VIDEO_PLAYING", "isPlaying")}
-      onRegionClassAdded={onRegionClassAdded}
-    />
+  	<KonvaCanvasContainer/>
+    // <ImageCanvas
+    //   canvasRef={(canvasEle)=>{canvasRef.current = canvasEle}}
+    //   key={state.selectedImage}
+    //   showMask={state.showMask}
+    //   fullImageSegmentationMode={state.fullImageSegmentationMode}
+    //   autoSegmentationOptions={state.autoSegmentationOptions}
+    //   showTags={state.showTags}
+    //   allowedArea={state.allowedArea}
+    //   modifyingAllowedArea={state.selectedTool === "modify-allowed-area"}
+    //   regionClsList={activeImage ? activeImage.image_labels : []}
+    //   regionTagList={state.regionTagList}
+    //   regions={activeImage ? activeImage.regions || [] : []}
+    //   realSize={activeImage ? activeImage.realSize : undefined}
+    //   videoPlaying={state.videoPlaying}
+    //   imageSrc={activeImage ? activeImage.src : null}
+    //   pointDistancePrecision={state.pointDistancePrecision}
+    //   createWithPrimary={state.selectedTool.includes("create")}
+    //   dragWithPrimary={state.selectedTool === "pan"}
+    //   zoomWithPrimary={state.selectedTool === "zoom"}
+    //   showPointDistances={state.showPointDistances}
+    //   videoTime={
+    //     state.annotationType === "image"
+    //       ? state.selectedImageFrameTime
+    //       : state.currentVideoTime
+    //   }
+    //   keypointDefinitions={state.keypointDefinitions}
+    //   onMouseMove={action("MOUSE_MOVE")}
+    //   onMouseDown={action("MOUSE_DOWN")}
+    //   onMouseUp={action("MOUSE_UP")}
+    //   onChangeRegion={action("CHANGE_REGION", "region")}
+    //   onBeginRegionEdit={action("OPEN_REGION_EDITOR", "region")}
+    //   onCloseRegionEdit={action("CLOSE_REGION_EDITOR", "region")}
+    //   onDeleteRegion={action("DELETE_REGION", "region")}
+    //   onBeginBoxTransform={action("BEGIN_BOX_TRANSFORM", "box", "directions")}
+    //   onBeginMovePolygonPoint={action(
+    //     "BEGIN_MOVE_POLYGON_POINT",
+    //     "polygon",
+    //     "pointIndex"
+    //   )}
+    //   onBeginMoveKeypoint={action(
+    //     "BEGIN_MOVE_KEYPOINT",
+    //     "region",
+    //     "keypointId"
+    //   )}
+    //   onAddPolygonPoint={action(
+    //     "ADD_POLYGON_POINT",
+    //     "polygon",
+    //     "point",
+    //     "pointIndex"
+    //   )}
+    //   onSelectRegion={action("SELECT_REGION", "region")}
+    //   onBeginMovePoint={action("BEGIN_MOVE_POINT", "point")}
+    //   onImageLoaded={action("IMAGE_LOADED", "image")}
+    //   RegionEditLabel={RegionEditLabel}
+    //   onImageOrVideoLoaded={action("IMAGE_OR_VIDEO_LOADED", "metadata")}
+    //   onChangeVideoTime={action("CHANGE_VIDEO_TIME", "newTime")}
+    //   onChangeVideoPlaying={action("CHANGE_VIDEO_PLAYING", "isPlaying")}
+    //   onRegionClassAdded={onRegionClassAdded}
+    // />
   );
 
   return (
