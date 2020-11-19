@@ -9102,6 +9102,11 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+konva@^7.1.8:
+  version "7.1.8"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-7.1.8.tgz#e6ee77c98ff8a5e037b2f9f6a9e5b8a15a0d0874"
+  integrity sha512-vSjGzfjEfJ/6PBwH3WwVi0YdogGW6etfxEO3UUedVa6XrtiY4ht7gO/eUHQ2Auh+h+Z0VRP1uv7P+Ny+Pm9IPQ==
+
 last-call-webpack-plugin@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/last-call-webpack-plugin/-/last-call-webpack-plugin-3.0.0.tgz#9742df0e10e3cf46e5c0381c2de90d3a7a2d7555"
