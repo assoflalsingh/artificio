@@ -5,7 +5,7 @@ import {RectangleAnnotation} from "./annotations/RectangleAnnotation";
 export class CanvasManager extends CanvasScene {
 	annotations = [];
 
-	// ApplicationConfig is of type {appId: string;}
+	// ApplicationConfig is of type {appId: string}
 	constructor(appConfig) {
 		super(appConfig.appId);
 	}
@@ -69,13 +69,13 @@ export class CanvasManager extends CanvasScene {
 	focusAnnotation(id) {
 		this.blurAllAnnotations();
 		const annotation = this.getAnnotationById(id);
-		annotation?.focus();
+		annotation && annotation.focus();
 		this.annotationLayer.batchDraw();
 	}
 
 	blurAnnotation(id) {
 		const annotation = this.getAnnotationById(id);
-		annotation?.blur();
+		annotation && annotation.blur();
 		this.annotationLayer.batchDraw();
 	}
 

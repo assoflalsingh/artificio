@@ -14,6 +14,7 @@ import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
+import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -352,7 +353,8 @@ export default function DataList() {
       </StackItem>
       </Stacked>
     </Box>
-    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} />
+		<ImageAnnotationDialog open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getImages={()=>rowsSelected.map((i)=>datalist[i])}/>
+		{/*<AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} />*/}
     </>
   )
 }
