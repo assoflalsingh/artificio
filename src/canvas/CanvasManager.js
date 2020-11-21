@@ -34,19 +34,18 @@ export class CanvasManager extends CanvasScene {
 	}
 
 	/**
-	 * @param annotationData
 	 * {
 			points: number[];
 			id: string;
 			color: string;
 			label: string;
 		}
+	 * @param annotation
 	 */
-	addAnnotation(annotationData) {
-		const annotation = new RectangleAnnotation(annotationData);
-		this.annotationLayer.add(annotation.getShape());
-		this.annotations.push(annotation);
-		this.focusAnnotation(annotationData.id);
+	addAnnotation(annotation) {
+		this.annotationLayer.add(annotation.getShape())
+		this.annotationLayerDraw()
+		this.annotations.push(annotation)
 	}
 
 	deleteAnnotation(id) {
@@ -144,12 +143,12 @@ export class CanvasManager extends CanvasScene {
 		})
 	}
 
-	addToolFigure = figure => {
+	addToolShape = figure => {
 		this.toolLayer.add(figure)
 		figure.draw()
 	}
 
-	removeToolFigure = (figure) => {
+	removeToolShape = (figure) => {
 		figure.destroy()
 		this.toolLayer.batchDraw()
 	}
@@ -175,5 +174,16 @@ export class CanvasManager extends CanvasScene {
 
 	annotationLayerDraw() {
 		this.annotationLayer.batchDraw()
+	}
+
+	resizeCanvasStroke(scale) {
+		if(this.activeTool) {
+			this.activeTool.resizeCanvasStroke(scale)
+			this.toolLayerDraw()
+		}
+		this.annotations.forEach(ann => {
+			ann.resizeCanvasStroke(this.stage.scaleX())
+		})
+		this.annotationLayerDraw()
 	}
 }

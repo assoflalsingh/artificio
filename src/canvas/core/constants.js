@@ -8,6 +8,10 @@ export const ToolType = {
 	Rectangle: 'Rectangle'
 }
 
+export const AnnotationType = {
+	Rectangle: 'rectangle'
+}
+
 export const KeyMappings = {
 	Escape: 27
 }

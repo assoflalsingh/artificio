@@ -1,9 +1,12 @@
+import * as uuid from 'uuid'
 import {Tool} from "./tool";
 import {ToolType} from "../core/constants";
-import {CursorPointerCrossHair} from "../core/utilities";
+import {CursorPointerCrossHair, generateRandomColor, TempRectangle} from "../core/utilities";
+import RectangleAnnotation from "../annotations/RectangleAnnotation";
 
 export class RectangleTool extends Tool {
 	tempCrossHairCursor
+	tempRectangle
 
 	constructor(canvasManager) {
 		super(canvasManager);
@@ -28,10 +31,15 @@ export class RectangleTool extends Tool {
 			},
 			this.canvasManager.stage.scaleX()
 		)
-		this.canvasManager.addToolFigure(this.tempCrossHairCursor)
+		this.canvasManager.addToolShape(this.tempCrossHairCursor)
 	}
 
-	onMouseMove(pointer) {
+	addTempRectangle() {
+		this.tempRectangle = TempRectangle(this.canvasManager.stage.scaleX())
+		this.canvasManager.addToolShape(this.tempRectangle)
+	}
+
+	redrawCrossHair(pointer) {
 		if (this.tempCrossHairCursor) {
 			const upperLeftPoint = this.canvasManager.annotationLayer.position()
 			this.tempCrossHairCursor
@@ -55,20 +63,72 @@ export class RectangleTool extends Tool {
 		}
 	}
 
+	getRectangleCoordinates() {
+		let x = this.tempRectangle.x(),
+			y = this.tempRectangle.y(),
+			w = this.tempRectangle.width(),
+			h = this.tempRectangle.height()
+		if (w < 0) {
+			x += w
+			w = Math.abs(w)
+		}
+		if (h < 0) {
+			y += h
+			h = Math.abs(h)
+		}
+		return {x, y, w, h}
+	}
+
+	onMouseMove(pointer) {
+		if (this.tempRectangle) {
+			const height = pointer.y - this.tempRectangle.y()
+			const width = pointer.x - this.tempRectangle.x()
+			this.tempRectangle.height(height)
+			this.tempRectangle.width(width)
+		}
+		this.redrawCrossHair(pointer)
+	}
+
 	onDragEnd() {
+		const dimensions = this.getRectangleCoordinates()
+		const annotationData = {
+			dimensions,
+			id: uuid.v4(),
+			color: generateRandomColor(),
+			label: 'Test Label'
+		}
+		const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
+		this.canvasManager.addAnnotation(rectangle)
+		this.canvasManager.setStageDraggable(true)
+		this.exit()
+	}
+
+	onDragStart(pointer) {
+		this.canvasManager.setStageDraggable(false)
+		this.addTempRectangle()
+		this.tempRectangle.position({
+			x: pointer.x,
+			y: pointer.y
+		})
+	}
+
+	onMouseOut(pointer) {
 
 	}
 
-	onDragStart() {
-
-	}
-
-	onMouseOut() {
-
+	resizeCanvasStroke(scale) {
+		if(this.tempCrossHairCursor) {
+			this.tempCrossHairCursor.getChildren().forEach(child => {
+				child.strokeWidth(1/scale)
+				child.dash([5 / scale, 5 / scale])
+			})
+		}
 	}
 
 	exitTool() {
-		this.canvasManager.removeToolFigure(this.tempCrossHairCursor)
+		this.changeMouseBehaviour('default')
+		this.canvasManager.removeToolShape(this.tempCrossHairCursor)
+		this.tempRectangle && this.canvasManager.removeToolShape(this.tempRectangle)
 	}
 
 	eventListeners = [

@@ -28,7 +28,8 @@
     "redux-thunk": "^2.3.0",
     "seedrandom": "^3.0.5",
     "styled-components": "^5.1.1",
-	"konva": "^7.1.8"
+	"konva": "^7.1.8",
+	"uuid": "^8.3.1"
   },
   "scripts": {
     "start": "react-scripts start --no-cache",

@@ -1,5 +1,4 @@
 import Konva from "konva";
-import {paddingFactor} from "../CanvasScene";
 
 export function getScaledImageCoordinates(
 	containerWidth,
@@ -36,13 +35,13 @@ export const CursorPointerCrossHair = (
 	const group = new Konva.Group({})
 	const horizontalLine = new Konva.Line({
 		points: [0, 0, dimensions.width, 0],
-		stroke: 'yellow',
+		stroke: '#0e61a2',
 		strokeWidth: 1 / scale,
 		dash: [5 / scale, 5 / scale]
 	})
 	const verticalLine = new Konva.Line({
 		points: [0, 0, 0, dimensions.height],
-		stroke: 'yellow',
+		stroke: '#0e61a2',
 		strokeWidth: 1 / scale,
 		dash: [5 / scale, 5 / scale]
 	})
@@ -55,9 +54,43 @@ export function getScaledCoordinates(
 	stage
 ) {
 	const imgCords = stage.position()
-	let paddingX = stage.width() * paddingFactor
-	let paddingY = stage.height() * paddingFactor
-	const x = (point.x - imgCords.x) / stage.scale().x - paddingX
-	const y = (point.y - imgCords.y) / stage.scale().y - paddingY
+	const x = (point.x - imgCords.x) / stage.scale().x
+	const y = (point.y - imgCords.y) / stage.scale().y
 	return {x, y}
+}
+
+
+export const TempRectangle = (scale) => {
+	return new Konva.Rect({
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+		stroke: '#000000',
+		dash: [5 / scale, 5 / scale],
+		strokeWidth: 2 / scale
+	})
+}
+
+export function generateRandomColor() {
+	return (
+		'rgb(' +
+		Math.floor(Math.random() * 256) +
+		',' +
+		Math.floor(Math.random() * 256) +
+		',' +
+		Math.floor(Math.random() * 256) +
+		')'
+	)
+}
+
+export function createCircle(params) {
+	const circle = new Konva.Circle(params)
+	circle.on('mouseover', () => {
+		document.body.style.cursor = 'pointer'
+	})
+	circle.on('mouseout', () => {
+		document.body.style.cursor = 'default'
+	})
+	return circle
 }

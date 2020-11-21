@@ -143,11 +143,17 @@ export class CanvasScene {
 		this.scrollLayer.isVisible() && this.scrollLayer.hide()
 	}
 
+	// This method will be overriden by child class
+	resizeCanvasStroke(scale) {
+
+	}
+
 	handleStopZoom() {
 		this.zoomAnime.stop()
 		this.stage.batchDraw()
 		this.repositionStageAsPerScale()
 		this.repositionScrollBars()
+		this.resizeCanvasStroke(this.stage.scaleX())
 	}
 
 	attachEventListeners () {
