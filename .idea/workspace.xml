@@ -20,15 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f52ffda-4571-4fff-b773-1f1e28dc6eb4" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/canvas/annotations/Annotation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/canvas/CanvasManager.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/CanvasManager.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/canvas/CanvasScene.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/CanvasScene.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/canvas/annotations/RectangleAnnotation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/annotations/RectangleAnnotation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/canvas/core/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/core/constants.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/canvas/core/utilities.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/core/utilities.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/canvas/tools/RectangleTool.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/tools/RectangleTool.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/canvas/annotations/Annotation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas/annotations/Annotation.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +58,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1605806485746</updated>
-      <workItem from="1605806490455" duration="52599000" />
+      <workItem from="1605806490455" duration="52681000" />
     </task>
     <servers />
   </component>

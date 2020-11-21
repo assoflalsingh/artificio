@@ -46,9 +46,9 @@ export default class Annotation {
 		this.label.add(
 			new Konva.Text({
 				text: this.annotationData.label || 'annotation',
-				fontSize: 12 / this.scale,
+				fontSize: 15 / this.scale,
 				fontStyle: 'bold',
-				padding: 5 / this.scale,
+				padding: 6 / this.scale,
 				fill: 'white'
 			})
 		);
