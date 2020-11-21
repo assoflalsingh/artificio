@@ -1,8 +1,10 @@
 import {CanvasScene} from "./CanvasScene";
-import {CustomEventType} from "./core/constants";
+import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
 import {RectangleAnnotation} from "./annotations/RectangleAnnotation";
+import {getScaledCoordinates} from "./core/utilities";
 
 export class CanvasManager extends CanvasScene {
+	activeTool
 	annotations = [];
 
 	// ApplicationConfig is of type {appId: string}
@@ -93,5 +95,85 @@ export class CanvasManager extends CanvasScene {
 		this.annotationLayer.destroyChildren();
 		this.annotations = [];
 		this.annotationLayer.batchDraw();
+	}
+
+	transformEventDataForTool = (event, eventData) => {
+		switch (event) {
+			case 'click':
+			case 'mousemove':
+			case 'mousedown':
+			case 'mouseup':
+				let cord = this.stage.getPointerPosition()
+				cord = getScaledCoordinates(cord, this.stage)
+				return cord
+			default:
+				return eventData
+		}
+	}
+
+	on = (eventType, callback) => {
+		if (this.activeTool) {
+			eventType += '.' + this.activeTool.toolType || 'default'
+		}
+		this.stage.on(eventType, callback)
+	}
+
+	addEventListeners(eventListenerObjects) {
+		eventListenerObjects.forEach(el => {
+			if (el.element) {
+				el.element.addEventListener(el.event, el.func)
+			} else {
+				this.on(el.event, (evt) => {
+					el.func(this.transformEventDataForTool(el.event, evt))
+				})
+			}
+		})
+	}
+
+	removeEventListeners(eventListenerObjects) {
+		eventListenerObjects.forEach(el => {
+			if (el.element) {
+				el.element.removeEventListener(el.event, el.func)
+			} else {
+				let eventType = el.event
+				if (this.activeTool) {
+					eventType += '.' + this.activeTool.toolType
+				}
+				this.stage && this.stage.off(eventType)
+			}
+		})
+	}
+
+	addToolFigure = figure => {
+		this.toolLayer.add(figure)
+		figure.draw()
+	}
+
+	removeToolFigure = (figure) => {
+		figure.destroy()
+		this.toolLayer.batchDraw()
+	}
+
+	getActiveTool() {
+		return this.activeTool
+	}
+
+	setActiveTool = (toolType) => {
+		const tool = ToolTypeClassNameMap[toolType]
+		this.activeTool = new tool(this)
+		this.addEventListeners(this.activeTool.eventListeners)
+	}
+
+	unsetActiveTool() {
+		this.removeEventListeners(this.activeTool.eventListeners)
+		this.activeTool = null
+	}
+
+	toolLayerDraw() {
+		this.toolLayer.batchDraw()
+	}
+
+	annotationLayerDraw() {
+		this.annotationLayer.batchDraw()
 	}
 }

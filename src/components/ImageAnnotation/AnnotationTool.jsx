@@ -1,12 +1,13 @@
 import * as React from "react";
-import {RegionLeftToolBar, RegionTopToolBar} from "../../annotator/defaults";
-import {Box, Button, CircularProgress, Typography} from "@material-ui/core";
+import {RegionLeftToolBar} from "../../annotator/defaults";
+import {Box, Button, Typography} from "@material-ui/core";
 import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
 import CanvasWrapper from "./CanvasWrapper";
 import {CanvasManager} from "../../canvas/CanvasManager";
 import {URL_MAP} from "../../others/artificio_api.instance";
 import Thumbnails from "./Thumbnails";
 import Loader from "./Loader";
+import {ToolBar} from "./ToolBar";
 
 const appId = 'canvas-annotation-tool'
 
@@ -87,7 +88,7 @@ export default class AnnotationTool extends React.Component {
 				<Box display="flex" style={{height: '100%'}}>
 					<RegionLeftToolBar dispatch={undefined} regions={activeImage ? activeImage.regions : []} />
 					<Box style={{flexGrow: 1, overflow: 'hidden'}}>
-						<RegionTopToolBar dispatch={undefined} selectedTool={''}/>
+						<ToolBar setActiveTool={this.canvasManager && this.canvasManager.setActiveTool}/>
 						<Box style={{backgroundColor: 'black', height: '78%'}}>
 							{this.state.loading && <Loader/>}
 							<CanvasWrapper id={appId}/>

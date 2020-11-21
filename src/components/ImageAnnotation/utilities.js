@@ -1,5 +1,7 @@
 import Konva from "konva";
-const scrollPadding = 5;
+export const scrollPadding = 5;
+export const scrollBarWidth = 10;
+export const scrollBarHeight = 10;
 
 export function generateImagesData(images) {
 	const tmpDataImages = {};
@@ -70,19 +72,23 @@ export function getStageBounds(
 		: getStageScaleCoordinates(scale, pos, containerWidth, containerHeight, initialScale)
 }
 
-export function getVerticalScrollBar(stageWidth, stageHeight) {
+export function getVerticalScrollBar(stage) {
+	const stageWidth = stage.width(),
+		stageHeight = stage.height()
 	return new Konva.Rect({
-		width: 10,
-		height: 100,
+		width: 0,
+		height: 0,
 		fill: 'grey',
 		opacity: 0.8,
 		x: stageWidth - scrollPadding - 10,
 		y: scrollPadding,
+		cornerRadius: 4,
 		draggable: true,
 		dragBoundFunc: function (pos) {
+			const scaleY = stage.scale().y
 			pos.x = stageWidth - scrollPadding - 10;
 			pos.y = Math.max(
-				Math.min(pos.y, stageHeight - this.height() - scrollPadding),
+				Math.min(pos.y, stageHeight - scrollPadding - this.height() * scaleY),
 				scrollPadding
 			);
 			return pos;
@@ -90,18 +96,22 @@ export function getVerticalScrollBar(stageWidth, stageHeight) {
 	})
 }
 
-export function getHorizontalScrollbar(stageWidth, stageHeight) {
+export function getHorizontalScrollbar(stage) {
+	const stageWidth = stage.width(),
+		stageHeight = stage.height()
 	return new Konva.Rect({
-		width: 100,
-		height: 10,
+		width: 0,
+		height: 0,
 		fill: 'grey',
 		opacity: 0.8,
 		x: scrollPadding,
 		y: stageHeight - scrollPadding - 10,
 		draggable: true,
+		cornerRadius: 4,
 		dragBoundFunc: function (pos) {
+			const scaleX = stage.scale().x
 			pos.x = Math.max(
-				Math.min(pos.x, stageWidth - this.width() - scrollPadding),
+				Math.min(pos.x, stageWidth - this.width() * scaleX  - scrollPadding),
 				scrollPadding
 			);
 			pos.y = stageHeight - scrollPadding - 10;
