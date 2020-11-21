@@ -1,7 +1,8 @@
 import Konva from "konva";
 import {CanvasImage} from "./core/CanvasImage";
 import {getScaledImageCoordinates} from "./core/utilities";
-import {getStageBounds} from "../components/ImageAnnotation/utilities";
+import {getHorizontalScrollbar, getStageBounds, getVerticalScrollBar} from "../components/ImageAnnotation/utilities";
+
 const paddingFactor = 0.02
 
 export class CanvasScene {
@@ -10,10 +11,13 @@ export class CanvasScene {
 	stage
 	// Konva.Layer
 	imageLayer = new Konva.Layer()
+	annotationLayer = new Konva.Layer()
+	scrollLayer = new Konva.Layer()
+
 	containerElementId
 	// Konva.Image
 	konvaImage
-	annotationLayer = new Konva.Layer();
+
 	// { width: number; height: number };
 	imageDimensions
 	// { width: number; height: number };
@@ -53,11 +57,13 @@ export class CanvasScene {
 					element.clientHeight
 				)
 		});
-		this.stage.add(this.imageLayer);
-		this.stage.add(this.annotationLayer);
+		this.stage.add(this.imageLayer)
+		this.stage.add(this.annotationLayer)
+		this.stage.add(this.scrollLayer)
 		this.stageDimensions = { width: this.stage.width(), height: this.stage.height() };
 		this.container = { width: element.clientWidth, height: element.clientHeight}
 		this.attachZoomEventListeners()
+		this.addScrollbars()
 	}
 
 	// ------------- Zoom Methods ------------ //
@@ -138,6 +144,16 @@ export class CanvasScene {
 	}
 
 	// ------------- End Zoom Methods ------------ //
+
+	// ------------- Scrollbar methods ------------- //
+	addScrollbars() {
+		const stage = this.stage
+		const verticalBar = getVerticalScrollBar(stage.width(), stage.height());
+		const horizontalScrollBar = getHorizontalScrollbar(stage.width(), stage.height())
+		this.scrollLayer.add(verticalBar, horizontalScrollBar);
+		this.scrollLayer.draw();
+	}
+	// ------------- End Scrollbar methods ------------- //
 
 	setLoader(show) {}
 

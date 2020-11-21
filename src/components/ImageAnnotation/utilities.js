@@ -1,3 +1,6 @@
+import Konva from "konva";
+const scrollPadding = 5;
+
 export function generateImagesData(images) {
 	const tmpDataImages = {};
 	const data_lists = {};
@@ -65,4 +68,45 @@ export function getStageBounds(
 					: pos.y
 		}
 		: getStageScaleCoordinates(scale, pos, containerWidth, containerHeight, initialScale)
+}
+
+export function getVerticalScrollBar(stageWidth, stageHeight) {
+	return new Konva.Rect({
+		width: 10,
+		height: 100,
+		fill: 'grey',
+		opacity: 0.8,
+		x: stageWidth - scrollPadding - 10,
+		y: scrollPadding,
+		draggable: true,
+		dragBoundFunc: function (pos) {
+			pos.x = stageWidth - scrollPadding - 10;
+			pos.y = Math.max(
+				Math.min(pos.y, stageHeight - this.height() - scrollPadding),
+				scrollPadding
+			);
+			return pos;
+		},
+	})
+}
+
+export function getHorizontalScrollbar(stageWidth, stageHeight) {
+	return new Konva.Rect({
+		width: 100,
+		height: 10,
+		fill: 'grey',
+		opacity: 0.8,
+		x: scrollPadding,
+		y: stageHeight - scrollPadding - 10,
+		draggable: true,
+		dragBoundFunc: function (pos) {
+			pos.x = Math.max(
+				Math.min(pos.x, stageWidth - this.width() - scrollPadding),
+				scrollPadding
+			);
+			pos.y = stageHeight - scrollPadding - 10;
+
+			return pos;
+		},
+	})
 }
