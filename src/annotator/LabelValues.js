@@ -67,6 +67,7 @@ function rectanglesIntersect(
 }
 
 export default function LabelValues({activeImage, labelsData, setLabelsData}) {
+  const [regionDims, setRegionDims] = useState({});
   const onTextChange = useEventCallback((e)=>{
     let {name, value} = e.target;
     setLabelsData({
@@ -79,6 +80,7 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
     // setLabelsTagged(regions.map((region)=>region.cls||));
 
     if(activeImage.pixelSize) {
+
       let currRegionDims = getCurrRegionMinMax(activeImage.pixelSize, activeImage.regions);
       if(currRegionDims) {
         let {xmin, ymin, xmax, ymax} = currRegionDims;
@@ -89,11 +91,16 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
           }
         });
 
-        if(currRegionDims.cls && !labelsData[currRegionDims.cls] && labelsData[currRegionDims.cls] != '') {
+        let existRegionDims = regionDims[currRegionDims.cls];
+        if(currRegionDims.cls && (existRegionDims ? (existRegionDims.xmin != xmin || existRegionDims.ymin != ymin || existRegionDims.xmax != xmax || existRegionDims.ymax != ymax) : true)) {
           setLabelsData({
             ...labelsData,
             [currRegionDims.cls]: intersects.join(' '),
           });
+          setRegionDims({
+            ...regionDims,
+            [currRegionDims.cls]: {xmin, ymin, xmax, ymax}
+          })
         }
       }
     }

@@ -49,10 +49,10 @@ function processAnnotatedData({pixelSize, regions, labels_data}) {
       label_value: labels_data[region.cls],
       label_shape: region.type,
       label_points: [
-        [x * iw, y * ih],
-        [x * iw + w * iw, y * ih],
-        [x * iw + w * iw, y * ih + h * ih],
-        [x * iw, y * ih + h * ih],
+        [Math.round(x * iw), Math.round(y * ih)],
+        [Math.round(x * iw + w * iw), Math.round(y * ih)],
+        [Math.round(x * iw + w * iw), Math.round(y * ih + h * ih)],
+        [Math.round(x * iw), Math.round(y * ih + h * ih)],
       ]
     };
     retJson['labels'].push(label);
