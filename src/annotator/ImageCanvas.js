@@ -33,7 +33,8 @@ import RegionTags from "react-image-annotate/ImageCanvas/../RegionTags"
 import RegionLabel from "./RegionEditLabel";
 // import RegionLabel from "react-image-annotate/RegionLabel";
 import ImageMask from "react-image-annotate/ImageCanvas/../ImageMask"
-import RegionSelectAndTransformBoxes from "react-image-annotate/ImageCanvas/../RegionSelectAndTransformBoxes"
+// import RegionSelectAndTransformBoxes from "react-image-annotate/ImageCanvas/../RegionSelectAndTransformBoxes"
+import RegionSelectAndTransformBoxes from './RegionSelectAndTransformBox';
 import VideoOrImageCanvasBackground from "react-image-annotate/ImageCanvas/../VideoOrImageCanvasBackground"
 import useEventCallback from "use-event-callback"
 import RegionShapes from "react-image-annotate/ImageCanvas/../RegionShapes"

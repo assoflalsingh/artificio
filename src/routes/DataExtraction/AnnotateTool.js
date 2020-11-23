@@ -262,6 +262,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages, inReview}) 
             api.post(URL_MAP.GET_ANNOTATION_DETAILS, {
               "document_id": selectedImageData._id,
               "page_no": selectedImageData.page_no,
+              "status": inReview ? ["in-process"]:["ready"]
             })
             .then((res)=>{
                 let data = res.data.data;
@@ -307,7 +308,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages, inReview}) 
     }
   }
 
-  const onSaveAnnotationDetails = (imageIndex, dataImage) => {
+  const onSaveAnnotationDetails = (imageIndex, dataImage, isDone, doneCallback) => {
     if(Object.values(dataImages)[imageIndex]) {
       let selectedImageData = Object.values(dataImages)[imageIndex];
 
@@ -319,12 +320,13 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages, inReview}) 
           initial_model_data: selectedImageData.initial_model_data,
           user_annotate_data: processAnnotatedData(dataImage)
         },
-        "status": "in-process"
+        "status": isDone ? "completed" : "in-process"
 		  })
       .then((res)=>{
         setAjaxMessage({
           error: false, text: 'Annotation details saved successfully !!',
         });
+        isDone && doneCallback && doneCallback();
       }).catch((error)=>{
         if(error.response) {
           setAjaxMessage({
@@ -363,6 +365,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages, inReview}) 
         onThumbnailClick={onThumbnailClick}
         onAnnotatorClose={onClose}
         onSaveAnnotationDetails={onSaveAnnotationDetails}
+        inReview={inReview}
         />
     </Dialog>
   )
