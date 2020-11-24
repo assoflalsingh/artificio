@@ -137,7 +137,6 @@ export default function DataList() {
       options: {
         filter: false,
         sort: true,
-        sortDirection: "desc",
         customBodyRender: (value, tableMeta)=>{
           let d = new Date(`${value}+00:00`);
           return d.toLocaleString();
@@ -155,6 +154,10 @@ export default function DataList() {
     print: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
+    sortOrder: {
+      name: 'timestamp',
+      direction: 'desc'
+    },
     setTableProps: () => {
       return {
         size: 'small',

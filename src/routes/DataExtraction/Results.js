@@ -114,6 +114,10 @@ export default function Results() {
     print: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
+    sortOrder: {
+      name: 'timestamp',
+      direction: 'desc'
+    },
     setTableProps: () => {
       return {
         size: 'small',
