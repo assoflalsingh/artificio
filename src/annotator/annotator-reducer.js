@@ -22,6 +22,20 @@ export default (state, action) => {
     let pathToImageLabelData = ["images", action.imageIndex, "labels_data"];
     return setIn(state, pathToImageLabelData, action.data);
   }
+  if(action.type === 'REMOVE_LABEL') {
+    let pathToActiveImage = ["images", action.imageIndex];
+    let labelsData = getIn(state, pathToActiveImage).labels_data;
+    let activeImage = getIn(state, pathToActiveImage);
+    if(labelsData[action.labelName]) {
+      let newState = setIn(state, [...pathToActiveImage, "labels_data"], labelsData.without([action.labelName]));
+      return setIn(
+        newState,
+        [...pathToActiveImage, "regions"],
+        (activeImage.regions || []).filter((r) => r.cls !== action.labelName)
+      );
+    }
+    return state;
+  }
   if(action.type === "SET_LABEL_VALUE") {
     let pathToImageLabelData = ["images", action.imageIndex, "labels_data", action.name];
     return setIn(state, pathToImageLabelData, action.value);

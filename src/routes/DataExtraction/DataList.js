@@ -137,6 +137,7 @@ export default function DataList() {
       options: {
         filter: false,
         sort: true,
+        sortDirection: "desc",
         customBodyRender: (value, tableMeta)=>{
           let d = new Date(`${value}+00:00`);
           return d.toLocaleString();

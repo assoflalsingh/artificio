@@ -47,7 +47,6 @@ function UserBar({className, userDispName, history}) {
   };
 
   const [globalContext, globalContextDispatch] = useContext(Context);
-  console.log(globalContext);
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}

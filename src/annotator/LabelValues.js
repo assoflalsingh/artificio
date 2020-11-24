@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, makeStyles, useEventCallback } from "@material-ui/core";
 import CommonTabs from '../components/CommonTabs';
 import { FormInputText } from '../components/FormElements';
+import { Link } from '@material-ui/core'
 
 
 function getRegionsInPixels(pixelSize, regions) {
@@ -66,7 +67,7 @@ function rectanglesIntersect(
   return !( aLeftOfB || aRightOfB || aAboveB || aBelowB );
 }
 
-export default function LabelValues({activeImage, labelsData, setLabelsData}) {
+export default function LabelValues({activeImage, labelsData, setLabelsData, removeLabel}) {
   const [regionDims, setRegionDims] = useState({});
   const onTextChange = useEventCallback((e)=>{
     let {name, value} = e.target;
@@ -110,10 +111,12 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
     <>
       {labelsData && Object.keys(labelsData).map((labelName, i)=>{
         return <>
+          <Box style={{height: '0.75rem'}}></Box>
           <FormInputText name={labelName} label={labelName} value={labelsData[labelName]}
             onChange={onTextChange}
             // disabled={labelsTagged.indexOf(labelName) < 0}
             />
+          <Link href="#" onClick={(e)=>{e.preventDefault();removeLabel(labelName);}}>Remove</Link>
         </>
       })}
     </>

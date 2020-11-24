@@ -2,9 +2,8 @@
 
 import React, { useReducer, useEffect, useRef, useState } from "react"
 
-import CommonTabs from '../components/CommonTabs';
 import combineReducers from "react-image-annotate/Annotator/reducers/combine-reducers.js";
-import generalReducer from "react-image-annotate/Annotator/reducers/general-reducer.js";
+import generalReducer from "./general-reducer.js";
 import imageReducer from "react-image-annotate/Annotator/reducers/image-reducer.js";
 import videoReducer from "react-image-annotate/Annotator/reducers/video-reducer.js";
 import historyHandler from "react-image-annotate/Annotator/reducers/history-handler.js";
@@ -20,7 +19,6 @@ import LabelValues, { RegionLabelValues } from "./LabelValues";
 import RegionEditLabel from './RegionEditLabel';
 import getActiveImage from "react-image-annotate/Annotator/reducers/get-active-image";
 import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
-import { act } from "react-dom/test-utils";
 
 const useClasses = makeStyles((theme)=>({
   thumbnail : {
@@ -128,16 +126,6 @@ export const Annotator = ({
   )
 
   const dispatch = useEventCallback((action) => {
-    // if (action.type === "HEADER_BUTTON_CLICKED") {
-    //   if (["Exit", "Done", "Save", "Complete"].includes(action.buttonName)) {
-    //     return onExit(without(state, "history"))
-    //   } else if (action.buttonName === "Next" && onNextImage) {
-    //     return onNextImage(without(state, "history"))
-    //   } else if (action.buttonName === "Prev" && onPrevImage) {
-    //     return onPrevImage(without(state, "history"))
-    //   }
-    // }
-
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
         onSaveAnnotationDetails(selectedImage, activeImage);
@@ -170,12 +158,13 @@ export const Annotator = ({
     });
   }
 
-  // useEffect(()=>{
-  //   dispatchToReducer({
-  //     type: "SELECT_IMAGE",
-  //     imageIndex: 0,
-  //   });
-  // }, [])
+  const removeLabel = (labelName) => {
+    dispatchToReducer({
+      type: "REMOVE_LABEL",
+      imageIndex: selectedImage,
+      labelName: labelName
+    });
+  }
 
   useEffect(() => {
     if (selectedImage === undefined) return
@@ -335,7 +324,7 @@ export const Annotator = ({
             <Button style={{marginLeft: 'auto'}} onClick={onAnnotatorClose} startIcon={<CloseOutlinedIcon />}>Close</Button>
           </Box>
           <Box style={{overflow: 'auto', flexGrow: 1}}>
-            {activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} />}
+            {activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} removeLabel={removeLabel} />}
           </Box>
           {/* <CommonTabs tabs={
             {
