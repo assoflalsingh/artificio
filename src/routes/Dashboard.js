@@ -5,6 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { connect } from "react-redux";
 import {setUser} from "../store/reducers/user";
 
+import { getInstance, URL_MAP } from '../others/artificio_api.instance';
 import Logo from '../assets/images/Logo-final.png';
 import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
@@ -54,9 +55,16 @@ const Dashboard = (props) => {
   const classes = useStyles();
 
   useEffect(()=>{
-    props.setUser({
-      displayName: 'Artificio User',
-    });
+    const api = getInstance(localStorage.getItem('token'));
+
+    api.get(URL_MAP.USER_INFO)
+      .then((res)=>{
+        let data = res.data.data;
+        props.setUser(data);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
   }, []);
 
   return (

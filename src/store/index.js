@@ -9,6 +9,6 @@ import logger from "redux-logger";
 import userReducer from "./reducers/user";
 
 export default function configureStore(initialState) {
-  const store = createStore(userReducer, initialState, applyMiddleware(logger));
+  const store = createStore(userReducer, initialState);//, applyMiddleware(logger));
   return store;
 }

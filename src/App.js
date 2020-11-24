@@ -11,11 +11,7 @@ import Dashboard from './routes/Dashboard';
 import SignUp from './routes/SignUp';
 import Activate from './routes/Activate';
 
-const reduxStore = configureStore({
-  user: {
-    displayName: 'Aditya Toshniwal',
-  }
-});
+const reduxStore = configureStore();
 
 export default function App() {
   return (

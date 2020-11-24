@@ -2,8 +2,8 @@ import axios from 'axios';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
-    // baseURL: 'https://api.artificio.ai',
-    baseURL: 'http://localhost:6060',
+    baseURL: 'https://api.artificio.ai',
+    // baseURL: 'http://localhost:6060',
   });
 
   if (token) {
@@ -37,6 +37,7 @@ export const URL_MAP = {
   AUTH: 'login/',
   ACTIVATE: 'auth/activate-user/',
   SIGN_UP: 'auth/signup/',
+  USER_INFO: 'auth/user-info/',
   /* annotation */
   UPLOAD_TO_S3: 'upload-to-s3/',
 
