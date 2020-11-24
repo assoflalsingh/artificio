@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover } from '@material-ui/core';
 import TextFieldRounded from './TextFieldRounded';
 import SearchIcon from '@material-ui/icons/Search';
@@ -7,7 +7,7 @@ import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import SettingsIcon from '@material-ui/icons/Settings';
 import clsx from 'clsx';
 import { withRouter } from 'react-router-dom';
-import { Context } from '../store';
+import { connect } from "react-redux";
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {
@@ -30,7 +30,7 @@ const useStylesUserBar = makeStyles((theme)=>({
   }
 }));
 
-function UserBar({className, userDispName, history}) {
+function UserBar({className, user, history}) {
   const classes = useStylesUserBar();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const onSettingsClick = (event) => {
@@ -46,7 +46,6 @@ function UserBar({className, userDispName, history}) {
     window.location.reload();
   };
 
-  const [globalContext, globalContextDispatch] = useContext(Context);
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}
@@ -71,7 +70,7 @@ function UserBar({className, userDispName, history}) {
             <NotificationsNoneIcon />
           </Badge>
         </IconButton>
-        <Typography color="textSecondary" className={classes.rightItem}>Hi, {userDispName}</Typography>
+        <Typography color="textSecondary" className={classes.rightItem}>Hi, {user.displayName}</Typography>
         <IconButton onClick={onSettingsClick}>
           <SettingsIcon />
         </IconButton>
@@ -97,4 +96,4 @@ function UserBar({className, userDispName, history}) {
   );
 }
 
-export default withRouter(UserBar);
+export default connect((state)=>({user: state.user}))(withRouter(UserBar));

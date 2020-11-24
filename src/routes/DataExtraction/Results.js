@@ -126,6 +126,9 @@ export default function Results() {
     rowsSelected: rowsSelected,
     onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelectedNow)=>{
       setRowsSelected(rowsSelectedNow)
+    },
+    isRowSelectable: (dataIndex)=>{
+      return datalist[dataIndex].img_status == "completed" ? false : true;
     }
   };
 
@@ -136,41 +139,6 @@ export default function Results() {
   const handleClose = () => {
     setMassAnchorEl(null);
   };
-
-  // const onAssignDatagroup = (id, name) => {
-  //   handleClose();
-  //   setPageMessage('Assigning data group...');
-  //   let data_lists = {};
-  //   rowsSelected.map((i)=>{
-  //     let row = datalist[i];
-  //     data_lists[row._id] = data_lists[row._id] || [];
-  //     data_lists[row._id].push(row.page_no);
-  //   });
-
-  //   api.post(URL_MAP.ASSIGN_DATAGROUP, {
-  //     datagroup_id: id,
-  //     data_lists: data_lists
-  //   }).then((res)=>{
-  //     setAjaxMessage({
-  //       error: false, text: 'Data group assigned successfully !!',
-  //     });
-  //     let newDatalist = datalist;
-  //     rowsSelected.forEach((i)=>{
-  //       newDatalist[i].datagroup_name = name;
-  //     });
-  //     setDatalist(newDatalist);
-  //   }).catch((error)=>{
-  //     if(error.response) {
-  //       setAjaxMessage({
-  //         error: true, text: error.response.data.message,
-  //       });
-  //     } else {
-  //       console.error(error);
-  //     }
-  //   }).then(()=>{
-  //     setPageMessage(null);
-  //   })
-  // }
 
   const parseGetDataList = (data) => {
   //   {
@@ -229,7 +197,7 @@ export default function Results() {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process']})
+    api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process', 'completed']})
       .then((res)=>{
         let data = res.data.data;
         setDatalist(parseGetDataList(data.data_lists));

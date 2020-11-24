@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Box, Paper, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { BrowserRouter as Router } from 'react-router-dom';
-import {withStore} from 'react-context-hook';
-import Store from '../store';
+import { connect } from "react-redux";
+import {setUser} from "../store/reducers/user";
 
 import Logo from '../assets/images/Logo-final.png';
 import UserBar from '../components/UserBar';
@@ -50,30 +50,37 @@ const useStyles = makeStyles((theme)=>({
   },
 }));
 
-const Dashboard = () => {
+const Dashboard = (props) => {
   const classes = useStyles();
+
+  useEffect(()=>{
+    props.setUser({
+      displayName: 'Artificio User',
+    });
+  }, []);
+
   return (
-    <Store>
-      <Router basename='/dashboard'>
-        <Box className={classes.root}>
-          <Container maxWidth="lg" className={classes.container}>
-            <Box display="flex" flexDirection="column" className={classes.container}>
-              <Box display="flex">
-                  <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
-                    <img src={Logo} className={classes.logoImg}></img>
-                  </Paper>
-                  <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
-              </Box>
-              <Box display="flex" className={classes.bottomSide}>
-                  <Paper item className={classes.leftSide}><SideMenuBar /></Paper>
-                  <MainContent className={classes.rightSide} />
-              </Box>
+    <Router basename='/dashboard'>
+      <Box className={classes.root}>
+        <Container maxWidth="lg" className={classes.container}>
+          <Box display="flex" flexDirection="column" className={classes.container}>
+            <Box display="flex">
+                <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
+                  <img src={Logo} className={classes.logoImg}></img>
+                </Paper>
+                <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
             </Box>
-          </Container>
-        </Box>
-      </Router>
-    </Store>
+            <Box display="flex" className={classes.bottomSide}>
+                <Paper item className={classes.leftSide}><SideMenuBar /></Paper>
+                <MainContent className={classes.rightSide} />
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+    </Router>
   )
 }
 
-export default Dashboard;
+export default connect(()=>{}, (dispatch)=>({
+  setUser: (user)=>dispatch(setUser(user))
+}))(Dashboard);
