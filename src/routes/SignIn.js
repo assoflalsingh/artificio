@@ -130,7 +130,7 @@ export default function SignIn({history, location}) {
         'password': fields.password,
       }).then((resp)=>{
         localStorage.setItem('token', resp.data.data);
-        if(location.state && location.state.from === 'login') {
+        if(location.state && location.state.from === 'signin') {
           history.push(location.state.from);
         } else {
           history.push('/dashboard');
