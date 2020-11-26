@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {setUser} from "../store/reducers/user";
 
 import { getInstance, URL_MAP } from '../others/artificio_api.instance';
-import Logo from '../assets/images/Logo-final.png';
+import Logo from '../assets/images/Logo-final.svg';
 import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
 import SideMenuBar from '../components/SideMenuBar';
@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme)=>({
 
   },
   logoContainer: {
-    display: 'flex',
     borderBottomWidth: '1px',
     borderBottomStyle: 'solid',
     borderBottomColor: theme.palette.grey[200]
@@ -74,7 +73,9 @@ const Dashboard = (props) => {
           <Box display="flex" flexDirection="column" className={classes.container}>
             <Box display="flex">
                 <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
-                  <img src={Logo} className={classes.logoImg}></img>
+                  <Box style={{padding: '0.25rem 0.5rem'}}>
+                    <img src={Logo} className={classes.logoImg}></img>
+                  </Box>
                 </Paper>
                 <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
             </Box>

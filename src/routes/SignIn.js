@@ -6,7 +6,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import BusinessIcon from '@material-ui/icons/Business';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Logo from '../assets/images/Logo-final.png';
+import Logo from '../assets/images/Logo-final.svg';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     padding: '1rem'
   },
   formRoot: {
-    padding: '1rem'
+    padding: '2rem 1rem'
   },
   formRow: {
     paddingTop: '1rem',
@@ -35,10 +35,14 @@ const useStyles = makeStyles((theme) => ({
   img: {
     maxWidth: '100%',
     height: '100%',
-    paddingRight: '0.5rem'
+    padding: '0.5rem'
   },
   root: {
     marginTop: '1rem'
+  },
+  page: {
+    minHeight: '100%',
+    backgroundColor: theme.palette.common.white
   }
 }));
 
@@ -155,72 +159,72 @@ export default function SignIn({history, location}) {
   }
 
   return (
-    <>
-    <Paper display="flex" square>
+    <Box className={classes.page}>
+      <Paper display="flex" square>
+        <Container maxWidth='lg'>
+          <Link href={APP_WEBSITE}>
+            <img style={{marginTop: '0.5rem', height: '2.5rem'}} src={Logo} className={classes.logoImg}></img>
+          </Link>
+        </Container>
+      </Paper>
       <Container maxWidth='lg'>
-        <Link href={APP_WEBSITE}>
-          <img style={{marginTop: '0.5rem', marginBottom: '0.5rem'}} src={Logo} className={classes.logoImg}></img>
-        </Link>
+        <Grid container>
+          <Grid item lg={7} md={6} sm={12} xs={12}>
+            <img src={SigninImg} className={classes.img} />
+          </Grid>
+          <Grid item item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
+            <Paper className={classes.formRoot} style={{margin: 'auto'}} elevation={3}>
+              <Typography variant="h4" color="primary">Welcome to <strong>Artificio</strong></Typography>
+              <Typography variant="h7">To keep connected with us, please log in</Typography>
+              <form className={classes.root} noValidate autoComplete="off">
+                <Box className={classes.formRow}>
+                  <FormInputText name="username" value={fields.username} label="Username"
+                    InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.username} required/>
+                </Box>
+                <Box className={classes.formRow}>
+                  <FormInputText name="password" value={fields.password} label="Password"
+                    InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
+                </Box>
+                <Grid container spacing={2} className={classes.formRow}>
+                  <Grid item md={6} xs={12}>
+                    <FormControlLabel
+                      control={<Checkbox name="remember" color='primary' checked={fields.remember} onChange={onChange} />}
+                      label={'Remember me'}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12} style={{display: 'flex'}}>
+                    <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={onForgotClick}>Forgot password ?</Link>
+                  </Grid>
+                </Grid>
+                {formSuccess &&
+                <Box className={classes.formRow}>
+                  <Alert severity="success">{formSuccess}</Alert>
+                </Box>}
+                {formError &&
+                <Box className={classes.formRow}>
+                  <Alert severity="error">{formError}</Alert>
+                </Box>}
+                <Box className={classes.formRow}>
+                  <Button onClick={onSubmitClick} variant="contained" color="primary" disabled={authorizing}>{authorizing ? 'Authorizing...' : 'Login'}</Button>
+                </Box>
+                <Box className={classes.formRow}>
+                  <Typography><Link href="#" onClick={onRegisterClick}>Register</Link> if you don't have an account ?</Typography>
+                </Box>
+              </form>
+              <Divider variant="middle" style={{marginTop: '1rem'}}/>
+              <Box style={{marginTop: '1rem'}}>
+                <Typography color="primary" variant="h6">
+                  Intelligent Enterprise AI/ML platform
+                </Typography>
+                <Typography variant="subtitle2" color="textSecondary">
+                  <strong>Artificio</strong> is an AI/ML platform for extracting the data intelligently and accurately from any type of
+                    document (PDF, JPG, tif, Fax, emails) using OCR AI/ML and Speech AI/ML techniques for various industries
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
       </Container>
-    </Paper>
-    <Container maxWidth='lg'>
-      <Grid container>
-        <Grid item lg={7} md={6} sm={12} xs={12}>
-          <img src={SigninImg} className={classes.img} />
-        </Grid>
-        <Grid item item lg={5} md={6} sm={12} xs={12}>
-          <Paper className={classes.formRoot} style={{marginTop: '0.5rem'}}>
-            <Typography variant="h4" color="primary">Welcome to <strong>Artificio</strong></Typography>
-            <Typography variant="h7">To keep connected with us, please log in</Typography>
-            <form className={classes.root} noValidate autoComplete="off">
-              <Box className={classes.formRow}>
-                <FormInputText name="username" value={fields.username} label="Username"
-                  InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.username} required/>
-              </Box>
-              <Box className={classes.formRow}>
-                <FormInputText name="password" value={fields.password} label="Password"
-                  InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
-              </Box>
-              <Grid container spacing={2} className={classes.formRow}>
-                <Grid item md={6} xs={12}>
-                  <FormControlLabel
-                    control={<Checkbox name="remember" color='primary' checked={fields.remember} onChange={onChange} />}
-                    label={'Remember me'}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12} style={{display: 'flex'}}>
-                  <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={onForgotClick}>Forgot password ?</Link>
-                </Grid>
-              </Grid>
-              {formSuccess &&
-              <Box className={classes.formRow}>
-                <Alert severity="success">{formSuccess}</Alert>
-              </Box>}
-              {formError &&
-              <Box className={classes.formRow}>
-                <Alert severity="error">{formError}</Alert>
-              </Box>}
-              <Box className={classes.formRow}>
-                <Button onClick={onSubmitClick} variant="contained" color="primary" disabled={authorizing}>{authorizing ? 'Authorizing...' : 'Login'}</Button>
-              </Box>
-              <Box className={classes.formRow}>
-                <Typography><Link href="#" onClick={onRegisterClick}>Register</Link> if you don't have an account ?</Typography>
-              </Box>
-            </form>
-            <Divider variant="middle" style={{marginTop: '1rem'}}/>
-            <Box style={{marginTop: '1rem'}}>
-              <Typography color="primary" variant="h6">
-                Intelligent Enterprise AI/ML platform
-              </Typography>
-              <Typography variant="subtitle2" color="textSecondary">
-                <strong>Artificio</strong> is an AI/ML platform for extracting the data intelligently and accurately from any type of
-                  document (PDF, JPG, tif, Fax, emails) using OCR AI/ML and Speech AI/ML techniques for various industries
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
-    </>
+    </Box>
   );
 }

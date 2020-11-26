@@ -10,7 +10,7 @@ import SignUpImg from '../assets/images/signup.png';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
-import Logo from '../assets/images/Logo-final.png';
+import Logo from '../assets/images/Logo-final.svg';
 
 const api = getInstance();
 
@@ -35,7 +35,11 @@ const useStyles = makeStyles((theme) => ({
   img: {
     maxWidth: '100%',
     height: '100%',
-    paddingRight: '0.5rem'
+    padding: '0.5rem'
+  },
+  page: {
+    minHeight: '100%',
+    backgroundColor: theme.palette.common.white
   }
 }));
 
@@ -163,78 +167,78 @@ export default function SignUp({match, history}) {
   }
 
   return (
-    <>
-    <Paper display="flex" square>
+    <Box className={classes.page}>
+      <Paper display="flex" square>
+        <Container maxWidth='lg'>
+          <Link href={APP_WEBSITE}>
+            <img style={{marginTop: '0.5rem', height: '2.5rem'}} src={Logo} className={classes.logoImg}></img>
+          </Link>
+        </Container>
+      </Paper>
       <Container maxWidth='lg'>
-        <Link href={APP_WEBSITE}>
-          <img style={{marginTop: '0.5rem', marginBottom: '0.5rem'}} src={Logo} className={classes.logoImg}></img>
-        </Link>
+        <Grid container>
+          <Grid item lg={7} md={6} sm={12} xs={12}>
+            <img src={SignUpImg} className={classes.img} />
+          </Grid>
+          <Grid item item lg={5} md={6} sm={12} xs={12}>
+            <Paper className={classes.formRoot} style={{marginTop: '0.5rem'}} elevation={3}>
+              <Typography variant="h6">Sign up</Typography>
+              <form className={classes.root} noValidate autoComplete="off">
+                <Grid container spacing={2} className={classes.formRow}>
+                  <Grid item md={6} xs={12}>
+                    <FormInputText name="first_name" value={fields.first_name} label="First name"
+                      InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.first_name} required/>
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <FormInputText name="last_name" value={fields.last_name} label="Last name"
+                      InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.last_name} required/>
+                  </Grid>
+                </Grid>
+                <Box className={classes.formRow}>
+                  <FormInputText name="email" value={fields.email} label="Email id"
+                    InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.email} required/>
+                </Box>
+                <Box className={classes.formRow}>
+                  <FormInputText name="org" value={fields.org} label="Organisation"
+                    InputIcon={BusinessIcon} onChange={onChange} errorMsg={errors.org} />
+                </Box>
+                <Box className={classes.formRow}>
+                  <FormInputPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
+                    defaultCountry={'us'} onChange={(value)=>{console.log(value); fieldChanged('phone_no', value)}} errorMsg={errors.phone_no} />
+                </Box>
+                <Box className={classes.formRow}>
+                  <FormInputText name="password" value={fields.password} label="Password"
+                    InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
+                </Box>
+                <Box className={classes.formRow}>
+                  <FormInputText name="confirm_pass" value={fields.confirm_pass} label="Confirm password"
+                    InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.confirm_pass} required />
+                </Box>
+                {formSuccess &&
+                <Box className={classes.formRow}>
+                  <Alert severity="success">{formSuccess}</Alert>
+                </Box>}
+                {formError &&
+                <Box className={classes.formRow}>
+                  <Alert severity="error">{formError}</Alert>
+                </Box>}
+                <Box className={classes.formRow}>
+                  <FormControlLabel
+                    control={<Checkbox name="accept" color='primary' checked={fields.accept} onChange={onChange} />}
+                    label={'I accept Terms and Conditions'}
+                  />
+                </Box>
+                <Box className={classes.formRow}>
+                  <Button onClick={onRegisterClick} variant="contained" color="primary" fullWidth disabled={!fields.accept || saving}>{saving ? 'Registering...' : 'Register'}</Button>
+                </Box>
+                <Box display="flex" className={classes.formRow}>
+                  <Typography style={{margin: 'auto'}}>Already have an account ? <Link href="#" onClick={onSigninClick}>Sign in</Link></Typography>
+                </Box>
+              </form>
+            </Paper>
+          </Grid>
+        </Grid>
       </Container>
-    </Paper>
-    <Container maxWidth='lg'>
-      <Grid container>
-        <Grid item lg={7} md={6} sm={12} xs={12}>
-          <img src={SignUpImg} className={classes.img} />
-        </Grid>
-        <Grid item item lg={5} md={6} sm={12} xs={12}>
-          <Paper className={classes.formRoot} style={{marginTop: '0.5rem'}}>
-            <Typography variant="h6">Sign up</Typography>
-            <form className={classes.root} noValidate autoComplete="off">
-              <Grid container spacing={2} className={classes.formRow}>
-                <Grid item md={6} xs={12}>
-                  <FormInputText name="first_name" value={fields.first_name} label="First name"
-                    InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.first_name} required/>
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <FormInputText name="last_name" value={fields.last_name} label="Last name"
-                    InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.last_name} required/>
-                </Grid>
-              </Grid>
-              <Box className={classes.formRow}>
-                <FormInputText name="email" value={fields.email} label="Email id"
-                  InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.email} required/>
-              </Box>
-              <Box className={classes.formRow}>
-                <FormInputText name="org" value={fields.org} label="Organisation"
-                  InputIcon={BusinessIcon} onChange={onChange} errorMsg={errors.org} />
-              </Box>
-              <Box className={classes.formRow}>
-                <FormInputPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
-                  defaultCountry={'us'} onChange={(value)=>{console.log(value); fieldChanged('phone_no', value)}} errorMsg={errors.phone_no} />
-              </Box>
-              <Box className={classes.formRow}>
-                <FormInputText name="password" value={fields.password} label="Password"
-                  InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
-              </Box>
-              <Box className={classes.formRow}>
-                <FormInputText name="confirm_pass" value={fields.confirm_pass} label="Confirm password"
-                  InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.confirm_pass} required />
-              </Box>
-              {formSuccess &&
-              <Box className={classes.formRow}>
-                <Alert severity="success">{formSuccess}</Alert>
-              </Box>}
-              {formError &&
-              <Box className={classes.formRow}>
-                <Alert severity="error">{formError}</Alert>
-              </Box>}
-              <Box className={classes.formRow}>
-                <FormControlLabel
-                  control={<Checkbox name="accept" color='primary' checked={fields.accept} onChange={onChange} />}
-                  label={'I accept Terms and Conditions'}
-                />
-              </Box>
-              <Box className={classes.formRow}>
-                <Button onClick={onRegisterClick} variant="contained" color="primary" fullWidth disabled={!fields.accept || saving}>{saving ? 'Registering...' : 'Register'}</Button>
-              </Box>
-              <Box display="flex" className={classes.formRow}>
-                <Typography style={{margin: 'auto'}}>Already have an account ? <Link href="#" onClick={onSigninClick}>Sign in</Link></Typography>
-              </Box>
-            </form>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
-    </>
+    </Box>
   );
 }

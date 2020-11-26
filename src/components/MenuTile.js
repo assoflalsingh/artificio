@@ -6,7 +6,7 @@ import {ButtonLink} from './CustomButtons';
 const useStyles = makeStyles((theme)=>({
   root: {
     padding: '0',
-    width: '175px',
+    width: '200px',
   },
   content: {
     padding: '2rem 1rem'

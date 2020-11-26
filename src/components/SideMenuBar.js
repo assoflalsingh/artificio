@@ -3,7 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
+import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
+import SettingsIcon from '@material-ui/icons/Settings';
 import ListItemLink from './ListItemLink';
+import { Divider, ListItem } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,7 +36,9 @@ export default function SideMenuBar() {
   };
 
   return (
+    <>
       <List component="nav" className={classes.root}>
+        <ListItem><strong>Dashboard</strong></ListItem>
         <ListItemLink icon={<DraftsIcon />} primary='Create Model' to='/createModel'/>
         <ListItemLink icon={<InboxIcon />} primary='Annotation' to='/annotation'/>
         {/* <MenuItem button onClick={handleClick}>
@@ -53,6 +58,10 @@ export default function SideMenuBar() {
             </MenuItem>
           </List>
         </Collapse> */}
+        <Divider />
+          <ListItemLink icon={<SettingsIcon />} primary='Admin portal' to='/admin'/>
+        <Divider />
       </List>
+    </>
   );
 }
