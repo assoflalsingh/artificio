@@ -31,11 +31,14 @@ export const getInstance = (token) => {
   return artificioApi;
 };
 
+export const APP_WEBSITE = 'https://www.artificio.ai';
+
 export const URL_MAP = {
   /* auth */
   VALID: 'valid/',
   AUTH: 'login/',
   ACTIVATE: 'auth/activate-user/',
+  SIGN_IN: 'auth/login/',
   SIGN_UP: 'auth/signup/',
   USER_INFO: 'auth/user-info/',
   /* annotation */

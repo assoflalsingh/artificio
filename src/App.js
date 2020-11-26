@@ -22,7 +22,7 @@ export default function App() {
         <ReduxProvider store={reduxStore}>
           <Router>
             <PrivateRoute path='/dashboard' component={Dashboard} />
-            <Route path='/login' component={SignIn} />
+            <Route path='/signin' component={SignIn} />
             <Route path='/signup' component={SignUp} />
             <Route path='/activate' component={Activate} />
           </Router>

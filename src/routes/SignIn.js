@@ -1,241 +1,226 @@
-import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import Typography from '@material-ui/core/Typography';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-
-import IconButton from '@material-ui/core/IconButton';
-import Divider from '@material-ui/core/Divider';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputLabel from '@material-ui/core/InputLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
-
-import FormControl from '@material-ui/core/FormControl';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-
-import {Link as LinkRouter, useHistory} from 'react-router-dom';
-import axios from 'axios';
-import {getInstance, URL_MAP} from '../others/artificio_api.instance';
+import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography, Divider } from '@material-ui/core';
+import HomeIcon from '@material-ui/icons/Home';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import BusinessIcon from '@material-ui/icons/Business';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Logo from '../assets/images/Logo-final.png';
+import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
+import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
+import SigninImg from '../assets/images/signin.png';
 
 const api = getInstance();
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+  home: {
+    marginLeft: 'auto',
+    padding: '1rem'
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+  formRoot: {
+    padding: '1rem'
   },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
+  formRow: {
+    paddingTop: '1rem',
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
+  formLabel: {
+    fontWeight: theme.typography.fontWeightBold,
+    color: theme.palette.text.primary
   },
-  marginTop: {
-    marginTop: theme.spacing(3),
+  FormInputText: {
+    marginTop: '0.5rem'
   },
-  marginTopSmall: {
-    marginTop: theme.spacing(1),
+  img: {
+    maxWidth: '100%',
+    height: '100%',
+    paddingRight: '0.5rem'
   },
-  divider: {
-  marginTop: theme.spacing(3),
-  borderTop: 'solid #bbb',
-  borderRadius: '2px',
+  root: {
+    marginTop: '1rem'
   }
 }));
 
+
 export default function SignIn({history, location}) {
   const classes = useStyles();
-  const [values, setValues] = React.useState({
+  const defaults = {
+    username: '',
     password: '',
-    username:'',
-    showPassword: false,
-    authorizing: false,
+    remember: false,
+  };
+  const [fields, setFields] = useState({
+    ...defaults,
   });
-  const [formError, setFormError] = React.useState('');
+  const [errors, setErrors] = useState({
+    username: '',
+    password: '',
+  });
+  const [authorizing, setAuthorizing] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+  const reqFields = ['username', 'password'];
 
-  const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
-
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleSubmit = async event => {
-    setFormError('');
-    api.post('/auth/login/', {
-      'email': values.username,
-      'password': values.password,
-    },{
-      headers :{
-        'Access-Control-Allow-Origin': '*',
-      },
-    }).then((resp)=>{
-      localStorage.setItem('token', resp.data.data);
-      if(location.state && location.state.from === 'login') {
-        history.push(location.state.from);
+  const validateForm = ()=>{
+    let allValid = true;
+    reqFields.forEach((fieldName)=>{
+      let value = fields[fieldName];
+      let err = '';
+      if(value === '' || value === null) {
+        err = 'This field is required.';
+        allValid = false;
       } else {
-        history.push('/dashboard');
+        err = '';
       }
-    })
-    .catch((err) => {
-      if (err.response) {
-        // client received an error response (5xx, 4xx)
-        if(err.response.data.message) {
-          setFormError(err.response.data.message);
-        } else {
-          setFormError(err.response.statusText + '. Contact administrator.');
-        }
-      } else if (err.request) {
-        // client never received a response, or request never left
-      } else {
-        // anything else
-      }
+      setErrors((prevErrors)=>({
+        ...prevErrors,
+        [fieldName]: err
+      }));
     });
+    return allValid;
+  }
+
+  const fieldChanged = (name, value) => {
+    setFields((prevFields)=>({
+      ...prevFields,
+      [name]: value
+    }));
+  }
+
+  const onChange = (e)=>{
+    let name = e.target.name,
+      value = null;
+
+    if(name == 'remember') {
+      value = e.target.checked;
+    } else {
+      value = e.target.value;
+    }
+
+    let err = '';
+    if((value === '' || value === null) && reqFields.indexOf(name) > -1) {
+      err = 'This field is required.';
+    }
+
+    setErrors((prevErrors)=>({
+      ...prevErrors,
+      [name]: err
+    }));
+
+    fieldChanged(name, value);
+  }
+
+  const onRegisterClick = (e)=>{
+    e.preventDefault();
+    history.push('/signup');
+  }
+
+  const onForgotClick = (e)=>{
+    e.preventDefault();
+  }
+
+  const onSubmitClick = (e)=>{
+    setFormError('');
+    setFormSuccess('');
+    if(validateForm()) {
+      setAuthorizing(true);
+      api.post(URL_MAP.SIGN_IN, {
+        'email': fields.username,
+        'password': fields.password,
+      }).then((resp)=>{
+        localStorage.setItem('token', resp.data.data);
+        if(location.state && location.state.from === 'login') {
+          history.push(location.state.from);
+        } else {
+          history.push('/dashboard');
+        }
+      }).catch((err)=>{
+        if (err.response) {
+          // client received an error response (5xx, 4xx)
+          if(err.response.data.message) {
+            setFormError(err.response.data.message);
+          } else {
+            setFormError(err.response.statusText + '. Contact administrator.');
+          }
+        } else if (err.request) {
+          // client never received a response, or request never left
+        } else {
+          // anything else
+        }
+      }).then(()=>{
+        setAuthorizing(false);
+      });
+    }
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
+    <>
+    <Paper display="flex" square>
+      <Container maxWidth='lg'>
+        <Link href={APP_WEBSITE}>
+          <img style={{marginTop: '0.5rem', marginBottom: '0.5rem'}} src={Logo} className={classes.logoImg}></img>
+        </Link>
+      </Container>
+    </Paper>
+    <Container maxWidth='lg'>
       <Grid container>
-            <Grid item xs>
-            <Typography style={{color:'#2a9fd8'}} component="h1" variant="h5">
-                  Welcome to Artificio
-             </Typography>
-             <Typography className={classes.marginTopSmall} style={{color:'grey'}} variant="subtitle2" gutterBottom>
-              To keep connected with us please login with your personal information by email address and password
-            </Typography>
-            </Grid>
-          </Grid>
-
-          <form className={classes.form} noValidate>
-
-          <FormControl className={classes.marginTop} fullWidth variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-amount">Email</InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-email"
-            value={values.amount}
-            onChange={handleChange('username')}
-            startAdornment={<InputAdornment position="start"><ExitToAppIcon/></InputAdornment>}
-            labelWidth={60}
-          />
-        </FormControl>
-          <FormControl className={classes.marginTop}  fullWidth variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-password"
-            type={values.showPassword ? 'text' : 'password'}
-            value={values.password}
-            onChange={handleChange('password')}
-            startAdornment={<InputAdornment position="start"><LockOutlinedIcon /></InputAdornment>}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            }
-            labelWidth={70}
-          />
-        </FormControl>
-        {formError &&
-          <Box className={classes.formRow}>
-            <Alert severity="error">{formError}</Alert>
-          </Box>}
-
-           <Grid container>
-            <Grid item xs>
-             <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-            />
-            </Grid>
-            <Grid className={classes.marginTopSmall} item>
-              <Link href="#" variant="body2" >
-                Forgot password?
-              </Link>
-            </Grid>
-          </Grid>
-        <br/>
-
-
-        {/* <LinkRouter to='/dashboard'> */}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            >
-            Submit
-          </Button>
-          {/* </LinkRouter> */}
-          <br/>
-          <div className={classes.marginTop}>
-          <Link  href="#" variant="body2" >
-                {"Don't have an account? Register"}
-          </Link>
-          </div>
-          <div className={classes.marginTop}>
-          <a href="#" className="fa fa-facebook"></a>
-          <a href="#" className="fa fa-twitter"></a>
-          <a href="#" className="fa fa-google"></a>
-          </div>
-          <div>
-          <Divider className={classes.divider} variant="middle" />
-          </div>
-          <Grid container className={classes.marginTop}>
-            <Grid item xs>
-            <Typography style={{color:'#2a9fd8'}} component="h2" variant="h5">
-                  Intelligent Enterprise AI/ML platform
-             </Typography>
-             <Typography className={classes.marginTopSmall} style={{color:'grey'}} variant="subtitle2" gutterBottom>
-               Artificio is an AI/ML platform for extracting the data intelligently and accurately from any type of document (PDF,JPG,tif,Fax,emails) using OCR AI/ML and Speech AI/ML techniques for various industries
-            </Typography>
-            </Grid>
-          </Grid>
-
-        </form>
-      </div>
+        <Grid item lg={7} md={6} sm={12} xs={12}>
+          <img src={SigninImg} className={classes.img} />
+        </Grid>
+        <Grid item item lg={5} md={6} sm={12} xs={12}>
+          <Paper className={classes.formRoot} style={{marginTop: '0.5rem'}}>
+            <Typography variant="h4" color="primary">Welcome to <strong>Artificio</strong></Typography>
+            <Typography variant="h7">To keep connected with us, please log in</Typography>
+            <form className={classes.root} noValidate autoComplete="off">
+              <Box className={classes.formRow}>
+                <FormInputText name="username" value={fields.username} label="Username"
+                  InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.username} required/>
+              </Box>
+              <Box className={classes.formRow}>
+                <FormInputText name="password" value={fields.password} label="Password"
+                  InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
+              </Box>
+              <Grid container spacing={2} className={classes.formRow}>
+                <Grid item md={6} xs={12}>
+                  <FormControlLabel
+                    control={<Checkbox name="remember" color='primary' checked={fields.remember} onChange={onChange} />}
+                    label={'Remember me'}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12} style={{display: 'flex'}}>
+                  <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={onForgotClick}>Forgot password ?</Link>
+                </Grid>
+              </Grid>
+              {formSuccess &&
+              <Box className={classes.formRow}>
+                <Alert severity="success">{formSuccess}</Alert>
+              </Box>}
+              {formError &&
+              <Box className={classes.formRow}>
+                <Alert severity="error">{formError}</Alert>
+              </Box>}
+              <Box className={classes.formRow}>
+                <Button onClick={onSubmitClick} variant="contained" color="primary" disabled={authorizing}>{authorizing ? 'Authorizing...' : 'Login'}</Button>
+              </Box>
+              <Box className={classes.formRow}>
+                <Typography><Link href="#" onClick={onRegisterClick}>Register</Link> if you don't have an account ?</Typography>
+              </Box>
+            </form>
+            <Divider variant="middle" style={{marginTop: '1rem'}}/>
+            <Box style={{marginTop: '1rem'}}>
+              <Typography color="primary" variant="h6">
+                Intelligent Enterprise AI/ML platform
+              </Typography>
+              <Typography variant="subtitle2" color="textSecondary">
+                <strong>Artificio</strong> is an AI/ML platform for extracting the data intelligently and accurately from any type of
+                  document (PDF, JPG, tif, Fax, emails) using OCR AI/ML and Speech AI/ML techniques for various industries
+              </Typography>
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
+    </>
   );
 }

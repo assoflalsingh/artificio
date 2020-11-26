@@ -6,10 +6,11 @@ import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import BusinessIcon from '@material-ui/icons/Business';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import SignUpImg from '../assets/images/office-workspace.png';
-import {getInstance, URL_MAP} from '../others/artificio_api.instance';
+import SignUpImg from '../assets/images/signup.png';
+import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
+import Logo from '../assets/images/Logo-final.png';
 
 const api = getInstance();
 
@@ -33,7 +34,8 @@ const useStyles = makeStyles((theme) => ({
   },
   img: {
     maxWidth: '100%',
-    height: 'auto'
+    height: '100%',
+    paddingRight: '0.5rem'
   }
 }));
 
@@ -69,9 +71,9 @@ export default function SignUp({match, history}) {
   const reqFields = ['first_name', 'last_name', 'email', 'password', 'confirm_pass'];
 
 
-  const onLoginClick = (e)=>{
+  const onSigninClick = (e)=>{
     e.preventDefault();
-    history.push('/login');
+    history.push('/signin');
   }
 
   const validateForm = ()=>{
@@ -162,16 +164,20 @@ export default function SignUp({match, history}) {
 
   return (
     <>
-    <Box display="flex">
-      <IconButton className={classes.home}><HomeIcon /></IconButton>
-    </Box>
+    <Paper display="flex" square>
+      <Container maxWidth='lg'>
+        <Link href={APP_WEBSITE}>
+          <img style={{marginTop: '0.5rem', marginBottom: '0.5rem'}} src={Logo} className={classes.logoImg}></img>
+        </Link>
+      </Container>
+    </Paper>
     <Container maxWidth='lg'>
       <Grid container>
-        <Grid item lg={8} md={6} sm={12} xs={12}>
+        <Grid item lg={7} md={6} sm={12} xs={12}>
           <img src={SignUpImg} className={classes.img} />
         </Grid>
-        <Grid item item lg={4} md={6} sm={12} xs={12}>
-          <Paper className={classes.formRoot}>
+        <Grid item item lg={5} md={6} sm={12} xs={12}>
+          <Paper className={classes.formRoot} style={{marginTop: '0.5rem'}}>
             <Typography variant="h6">Sign up</Typography>
             <form className={classes.root} noValidate autoComplete="off">
               <Grid container spacing={2} className={classes.formRow}>
@@ -222,7 +228,7 @@ export default function SignUp({match, history}) {
                 <Button onClick={onRegisterClick} variant="contained" color="primary" fullWidth disabled={!fields.accept || saving}>{saving ? 'Registering...' : 'Register'}</Button>
               </Box>
               <Box display="flex" className={classes.formRow}>
-                <Typography style={{margin: 'auto'}}>Already have an account ? <Link href="#" onClick={onLoginClick}>Log in</Link></Typography>
+                <Typography style={{margin: 'auto'}}>Already have an account ? <Link href="#" onClick={onSigninClick}>Sign in</Link></Typography>
               </Box>
             </form>
           </Paper>
