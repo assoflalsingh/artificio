@@ -55,4 +55,8 @@ export default class Annotation {
 		this.label.x(this.label.x() - this.label.width())
 		this.group.add(this.label);
 	}
+
+	draw() {
+		this.group.draw()
+	}
 }

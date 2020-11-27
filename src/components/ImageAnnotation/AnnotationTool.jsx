@@ -8,8 +8,9 @@ import {URL_MAP} from "../../others/artificio_api.instance";
 import Thumbnails from "./Thumbnails";
 import Loader from "./Loader";
 import {ToolBar} from "./ToolBar";
+import {LabelSelector} from "./LabelSelector";
 
-const appId = 'canvas-annotation-tool'
+export const appId = 'canvas-annotation-tool'
 
 async function getImageData(api, imageId, pageNo) {
 	// setProcessMsg('Fetching image file information...');
@@ -36,7 +37,8 @@ export default class AnnotationTool extends React.Component {
 	canvasManager
 	state = {
 		activeImageIndex: 0,
-		loading: false
+		loading: false,
+		imageLabels: []
 	}
 
 	async fetchImageData(index) {
@@ -45,6 +47,8 @@ export default class AnnotationTool extends React.Component {
 		const selectedImage = this.props.images[index]
 		if(selectedImage) {
 			const imageData = await getImageData(this.props.api, selectedImage._id, selectedImage.page_no);
+			this.setState({imageLabels: imageData.image_labels})
+			this.canvasManager.clearAnnotations()
 			this.canvasManager.setImage(imageData.image_url, () => {
 				this.setLoader(false)
 			})
@@ -84,7 +88,6 @@ export default class AnnotationTool extends React.Component {
 		const {images, onAnnotationToolClose} = this.props
 		const activeImage = images && images[this.state.activeImageIndex]
 		return (
-			(
 				<Box display="flex" style={{height: '100%'}}>
 					<RegionLeftToolBar dispatch={undefined} regions={activeImage ? activeImage.regions : []} />
 					<Box style={{flexGrow: 1, overflow: 'hidden'}}>
@@ -126,8 +129,11 @@ export default class AnnotationTool extends React.Component {
 						{/*		/>}*/}
 						{/*</Box>*/}
 					</Box>
+					{
+						this.canvasManager &&
+							<LabelSelector deSelectActiveAnnotation={this.canvasManager.deSelectActiveAnnotation}/>
+					}
 				</Box>
-			)
 		)
 	}
 }

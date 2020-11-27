@@ -87,7 +87,7 @@ export function generateRandomColor() {
 export function createCircle(params) {
 	const circle = new Konva.Circle(params)
 	circle.on('mouseover', () => {
-		document.body.style.cursor = 'pointer'
+		document.body.style.cursor = 'crosshair'
 	})
 	circle.on('mouseout', () => {
 		document.body.style.cursor = 'default'

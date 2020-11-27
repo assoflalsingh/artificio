@@ -7,6 +7,7 @@ import {
 	getVerticalScrollBar, scrollBarHeight, scrollBarWidth,
 	scrollPadding
 } from "../components/ImageAnnotation/utilities";
+import {CustomEventType} from "./core/constants";
 
 export const paddingFactor = 0.02
 const callBackTimeout = 100
@@ -160,10 +161,20 @@ export class CanvasScene {
 		let wheeling
 		this.stage.on('wheel', (e) => {
 			e.evt.preventDefault()
+			if (!wheeling) {
+
+				// Hide label selector dropdown
+				this.getSelectedAnnotation() && this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
+			}
 			this.handleScrollZoom(this.stage.getPointerPosition(), -e.evt.deltaY)
 			clearTimeout(wheeling)
 			wheeling = setTimeout(() => {
 				this.handleStopZoom()
+
+				// Show label selector dropdown
+				this.getSelectedAnnotation() && this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+					position: this.getLabelSelectorPosition()
+				})
 				wheeling = undefined
 			}, wheelingTimeout)
 		})
@@ -314,4 +325,10 @@ export class CanvasScene {
 			}, callBackTimeout)
 		});
 	}
+
+	getSelectedAnnotation = () => {}
+
+	getLabelSelectorPosition = () => {}
+
+	dispatch = (eventType, payload) => {}
 }

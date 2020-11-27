@@ -8,8 +8,8 @@ import FormatShapesIcon from '@material-ui/icons/FormatShapes';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
-
-
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const useStyles = makeStyles((theme)=>({
   leftBar: {
@@ -17,6 +17,9 @@ const useStyles = makeStyles((theme)=>({
     display: 'flex',
     flexDirection: 'column'
   },
+	icon: {
+  	color: "white"
+	},
   leftBarButton: {
     color: theme.palette.primary.contrastText,
   },
@@ -36,8 +39,21 @@ export function RegionLeftToolBar({dispatch, inReview}) {
   return(
     <Box className={classes.leftBar}>
       <Tooltip title="Save progress">
-        <IconButton data-name="save" onClick={onClickItem} className={classes.leftBarButton}><SaveIcon fontSize="large" /></IconButton>
+        <IconButton data-name="save" onClick={onClickItem} className={classes.leftBarButton}><SaveIcon/></IconButton>
       </Tooltip>
+			<Tooltip title="Zoom In">
+				<IconButton data-name="zoom in" className={classes.leftBarButton}><ZoomInIcon/></IconButton>
+			</Tooltip>
+			<Tooltip title="Zoom Out">
+				<IconButton data-name="zoom out" className={classes.leftBarButton}><ZoomOutIcon/></IconButton>
+			</Tooltip>
+			<Tooltip title="Next Image">
+				<IconButton data-name="next image" className={classes.leftBarButton}><ArrowForwardIcon/></IconButton>
+			</Tooltip>
+			<Tooltip title="Previous Image">
+				<IconButton data-name="previous Image" className={classes.leftBarButton}><ArrowBackIcon/></IconButton>
+			</Tooltip>
+
       {/* <IconButton data-name="zoom-in" onClick={onClickItem} className={classes.leftBarButton}><ZoomInIcon fontSize="large" /></IconButton>
       <IconButton data-name="zoom-out" onClick={onClickItem} className={classes.leftBarButton}><ZoomOutIcon fontSize="large" /></IconButton> */}
       {inReview &&

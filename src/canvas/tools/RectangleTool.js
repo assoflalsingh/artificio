@@ -1,6 +1,6 @@
 import * as uuid from 'uuid'
 import {Tool} from "./tool";
-import {ToolType} from "../core/constants";
+import {CustomEventType, ToolType} from "../core/constants";
 import {CursorPointerCrossHair, generateRandomColor, TempRectangle} from "../core/utilities";
 import RectangleAnnotation from "../annotations/RectangleAnnotation";
 
@@ -99,6 +99,9 @@ export class RectangleTool extends Tool {
 		}
 		const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
 		this.canvasManager.addAnnotation(rectangle)
+		this.canvasManager.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+			position: this.canvasManager.getLabelSelectorPosition()
+		})
 		this.canvasManager.setStageDraggable(true)
 		this.exit()
 	}

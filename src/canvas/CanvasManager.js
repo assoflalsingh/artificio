@@ -1,36 +1,64 @@
 import {CanvasScene} from "./CanvasScene";
 import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
-import {RectangleAnnotation} from "./annotations/RectangleAnnotation";
 import {getScaledCoordinates} from "./core/utilities";
 
 export class CanvasManager extends CanvasScene {
 	activeTool
-	annotations = [];
+	annotations = []
+	selectedAnnotation
 
 	// ApplicationConfig is of type {appId: string}
 	constructor(appConfig) {
 		super(appConfig.appId);
 	}
 
-	/**
-	 * @param eventType -> type string
-	 * @param payload -> type any
-	 */
-	dispatch = (eventType, payload) => {
-		const data = { detail: payload },
-		event = new CustomEvent(eventType, data),
-		element = document.getElementById(this.appId);
-		element.dispatchEvent(event);
-	};
-
 	// Show is of type boolean
 	setLoader(show) {
-		this.dispatch(CustomEventType.SHOW_LOADER, { loading: show });
+		this.dispatch(CustomEventType.SHOW_LOADER, { loading: show })
 	}
 
 	// Return type RectangleAnnotation
 	getAnnotationById(id) {
-		return this.annotations.find((ann) => ann.getId() === id);
+		return this.annotations.find((ann) => ann.getId() === id)
+	}
+
+	selectAnnotation(annotation) {
+		if(this.selectedAnnotation) {
+			this.deSelectActiveAnnotation()
+		}
+		this.annotations.forEach(ann => ann.deSelect())
+		this.selectedAnnotation = annotation
+		annotation.select()
+		this.addAnnotationEventListeners()
+		this.annotationLayerDraw()
+	}
+
+	addAnnotationEventListeners() {
+		this.selectedAnnotation.getShape().on('dragstart.select', () => {
+			// Hide label selector dropdown
+			this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
+		})
+		this.selectedAnnotation.getShape().on('dragend.select', () => {
+			// Show label selector dropdown
+			const position = this.getLabelSelectorPosition();
+		  this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+				position
+			})
+		})
+	}
+
+	removeAnnotationEventListeners() {
+		this.selectedAnnotation.getShape().off('dragstart.select')
+		this.selectedAnnotation.getShape().off('dragend.select')
+	}
+
+	deSelectActiveAnnotation = () => {
+		if(this.selectedAnnotation) {
+			this.selectedAnnotation.deSelect()
+			this.removeAnnotationEventListeners()
+			this.selectedAnnotation = undefined
+			this.annotationLayerDraw()
+		}
 	}
 
 	/**
@@ -42,10 +70,11 @@ export class CanvasManager extends CanvasScene {
 		}
 	 * @param annotation
 	 */
-	addAnnotation(annotation) {
+	addAnnotation = (annotation) => {
 		this.annotationLayer.add(annotation.getShape())
 		this.annotationLayerDraw()
 		this.annotations.push(annotation)
+		this.selectAnnotation(annotation)
 	}
 
 	deleteAnnotation(id) {
@@ -165,6 +194,7 @@ export class CanvasManager extends CanvasScene {
 
 	unsetActiveTool() {
 		this.removeEventListeners(this.activeTool.eventListeners)
+		// this.deselectAnnotation()
 		this.activeTool = null
 	}
 
@@ -186,4 +216,45 @@ export class CanvasManager extends CanvasScene {
 		})
 		this.annotationLayerDraw()
 	}
+
+	getLabelSelectorPosition = () => {
+		const annotation = this.selectedAnnotation
+		if(annotation) {
+			const canvas = document.getElementById(this.appId)
+			const canvasBoundingRect = canvas.getBoundingClientRect()
+			const args = annotation.getLabelSelectorPosition()
+			args.x *= this.stage.scale().x
+			args.y *= this.stage.scale().y
+			const stage = {
+				x: this.annotationLayer.x() * this.stage.scale().x + this.stage.x(),
+				y: this.annotationLayer.y() * this.stage.scale().y + this.stage.y()
+			}
+			const position = {
+				x: args.x + stage.x,
+				y: args.y + stage.y
+			}
+
+			const padding = 20
+
+			return {
+				x: canvasBoundingRect.x + position.x,
+				y: canvasBoundingRect.y + position.y + padding
+			}
+		}
+	}
+
+	getSelectedAnnotation = () => {
+		return this.selectedAnnotation
+	}
+
+	/**
+	 * @param eventType -> type string
+	 * @param payload -> type any
+	 */
+	dispatch = (eventType, payload) => {
+		const data = { detail: payload },
+			event = new CustomEvent(eventType, data),
+			element = document.getElementById(this.appId);
+		element.dispatchEvent(event);
+	};
 }

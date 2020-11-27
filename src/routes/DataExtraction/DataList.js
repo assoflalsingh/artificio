@@ -76,6 +76,7 @@ export default function DataList() {
   const classes = useStyles();
   const [stackPath, setStackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
+	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -318,6 +319,7 @@ export default function DataList() {
             <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} />
             <Box className={classes.rightAlign}>
               <CompactButton onClick={()=>{setAnnotateOpen(true)}} startIcon={<PlayCircleFilledIcon color="primary" fontSize='large' />} label='Annotation'/>
+							<CompactButton onClick={()=>{setAnnotateOpenV2(true)}} startIcon={<PlayCircleFilledIcon color="primary" fontSize='large' />} label='Annotation V2'/>
               {/* <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>
@@ -357,9 +359,15 @@ export default function DataList() {
       </StackItem>
       </Stacked>
     </Box>
-		<ImageAnnotationDialog open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getImages={()=>rowsSelected.map((i)=>datalist[i])}/>
-		{/*<AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}*/}
-		{/*					getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>*/}
+		<AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}
+							getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>
+
+		<ImageAnnotationDialog
+			open={annotateOpenV2}
+			onClose={()=>{setAnnotateOpenV2(false)}}
+			api={api}
+			getImages={()=>rowsSelected.map((i)=>datalist[i])}
+		/>
     </>
   )
 }
