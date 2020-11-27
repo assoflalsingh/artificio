@@ -11,7 +11,8 @@ import {Stacked, StackItem} from '../../components/Stacked';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
-import CreateUsers from './CreateUsers';
+import CreateUser from './CreateUser';
+import {titleCase} from '../../others/utils';
 
 const useStyles = makeStyles((theme) => ({
 }));
@@ -27,15 +28,6 @@ export default function Users({match}) {
   const [ajaxMessage, setAjaxMessage] = useState(null);
 
   const columns = [
-    {
-      name: "email",
-      label: "Email",
-      options: {
-        filter: true,
-        sort: true,
-        draggable: true
-      }
-    },
     {
       name: "first_name",
       label: "First Name",
@@ -55,12 +47,24 @@ export default function Users({match}) {
       }
     },
     {
+      name: "email",
+      label: "Email",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true
+      }
+    },
+    {
       name: "role_name",
       label: "Role",
       options: {
         filter: true,
         sort: true,
-        draggable: true
+        draggable: true,
+        customBodyRender: (value)=>{
+          return titleCase(value.replace('_', ' '));
+        }
       }
     },
     {
@@ -125,7 +129,7 @@ export default function Users({match}) {
     <Box className={classes.root}>
       <Stacked to={stackPath}>
         <StackItem path='adduser' hasBack onBack={()=>{setStackPath('home')}}>
-          <CreateUsers onCancel={()=>{setStackPath('home')}}/>
+          <CreateUser onCancel={()=>{setStackPath('home')}}/>
         </StackItem>
         <StackItem main path='home'>
           <Backdrop className={classes.backdrop} open={Boolean(pageMessage)}>

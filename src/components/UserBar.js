@@ -1,10 +1,11 @@
 import React from 'react';
-import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover, CircularProgress } from '@material-ui/core';
+import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover, CircularProgress, Tooltip } from '@material-ui/core';
 import TextFieldRounded from './TextFieldRounded';
 import SearchIcon from '@material-ui/icons/Search';
 import MailOutline from '@material-ui/icons/MailOutline';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import SettingsIcon from '@material-ui/icons/Settings';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import { withRouter } from 'react-router-dom';
 import { connect } from "react-redux";
@@ -32,14 +33,6 @@ const useStylesUserBar = makeStyles((theme)=>({
 
 function UserBar({className, user, history}) {
   const classes = useStylesUserBar();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const onSettingsClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const onLogoutClick = () => {
     localStorage.removeItem('token', null);
@@ -71,29 +64,14 @@ function UserBar({className, user, history}) {
           </Badge>
         </IconButton>
         {user &&
-          <Typography color="textSecondary" className={classes.rightItem}>Hi, {user.first_name} {user.last_name}</Typography>}
+          <Typography className={classes.rightItem}>Hi, {user.first_name} {user.last_name}</Typography>}
         {!user &&
           <CircularProgress size="1.5rem" />}
-        <IconButton onClick={onSettingsClick}>
-          <SettingsIcon />
-        </IconButton>
-        <Popover
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-        >
-          <MenuItem onClick={handleClose}>My account</MenuItem>
-          <MenuItem onClick={onLogoutClick}>Logout</MenuItem>
-        </Popover>
+        <Tooltip title="Logout">
+          <IconButton onClick={onLogoutClick}>
+            <ExitToAppIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Box>
   );
