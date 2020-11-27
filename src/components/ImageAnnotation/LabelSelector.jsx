@@ -11,6 +11,12 @@ import {CustomEventType} from "../../canvas/core/constants";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 
+const DefaultLabels = [{
+	label_name: 'arto_others'
+}, {
+	label_name: 'Create Label'
+}]
+
 const styles = {
 	regionInfo: {
 		fontSize: 12,
@@ -97,7 +103,9 @@ export class LabelSelector extends CanvasEventAttacher {
 				}}>
 					<Label
 						showLabelSelector={this.showLabelSelector}
-						deSelectActiveAnnotation={this.props.deSelectActiveAnnotation}/>
+						deSelectActiveAnnotation={this.props.deSelectActiveAnnotation}
+						imageLabels={this.props.imageLabels}
+					/>
 				</div>
 			}
 			</>
@@ -105,9 +113,20 @@ export class LabelSelector extends CanvasEventAttacher {
 	}
 }
 
-const Label = ({showLabelSelector, deSelectActiveAnnotation}) => {
-	const classes = useStyles()
+/**
+ *
+ * imageLabels: {
+  "label_name": string,
+  "label_shape": string",
+  "label_datatype": string",
+  "label_color": string
+	}
+ */
 
+const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
+	const classes = useStyles()
+	let labels = Object.assign([], imageLabels)
+	labels = labels.concat(DefaultLabels)
 	return (
 		<Paper className={classnames(classes.regionInfo)}>
 			<div style={{width: 200}}>
@@ -144,11 +163,12 @@ const Label = ({showLabelSelector, deSelectActiveAnnotation}) => {
 					onChange={(newTags) => {}}
 					placeholder="Tags"
 					value={''}
-					options={[
-						{ value: 'chocolate', label: 'Chocolate' },
-						{ value: 'strawberry', label: 'Strawberry' },
-						{ value: 'vanilla', label: 'Vanilla' }
-					]}
+					options={
+						labels.map(label => ({
+							value: label.label_name,
+							label: label.label_name
+						}))
+					}
 				/>
 				<div style={{ marginTop: 4, display: "flex" }}>
 					<div style={{ flexGrow: 1 }} />

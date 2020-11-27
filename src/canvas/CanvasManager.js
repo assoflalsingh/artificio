@@ -29,20 +29,19 @@ export class CanvasManager extends CanvasScene {
 		this.annotations.forEach(ann => ann.deSelect())
 		this.selectedAnnotation = annotation
 		annotation.select()
-		this.addAnnotationEventListeners()
+		this.addSelectedAnnotationEventListeners()
 		this.annotationLayerDraw()
 	}
 
-	addAnnotationEventListeners() {
+	addSelectedAnnotationEventListeners() {
 		this.selectedAnnotation.getShape().on('dragstart.select', () => {
 			// Hide label selector dropdown
 			this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
 		})
 		this.selectedAnnotation.getShape().on('dragend.select', () => {
 			// Show label selector dropdown
-			const position = this.getLabelSelectorPosition();
 		  this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-				position
+				position: this.getLabelSelectorPosition()
 			})
 		})
 	}
@@ -52,12 +51,22 @@ export class CanvasManager extends CanvasScene {
 		this.selectedAnnotation.getShape().off('dragend.select')
 	}
 
+	addAnnotationEventListeners(annotation) {
+		annotation.getShape().on('click', () => {
+			this.selectAnnotation(annotation)
+			this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+				position: this.getLabelSelectorPosition()
+			})
+		})
+	}
+
 	deSelectActiveAnnotation = () => {
 		if(this.selectedAnnotation) {
 			this.selectedAnnotation.deSelect()
 			this.removeAnnotationEventListeners()
 			this.selectedAnnotation = undefined
 			this.annotationLayerDraw()
+			this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
 		}
 	}
 
@@ -75,6 +84,7 @@ export class CanvasManager extends CanvasScene {
 		this.annotationLayerDraw()
 		this.annotations.push(annotation)
 		this.selectAnnotation(annotation)
+		this.addAnnotationEventListeners(annotation)
 	}
 
 	deleteAnnotation(id) {
@@ -190,11 +200,11 @@ export class CanvasManager extends CanvasScene {
 		const tool = ToolTypeClassNameMap[toolType]
 		this.activeTool = new tool(this)
 		this.addEventListeners(this.activeTool.eventListeners)
+		this.deSelectActiveAnnotation()
 	}
 
 	unsetActiveTool() {
 		this.removeEventListeners(this.activeTool.eventListeners)
-		// this.deselectAnnotation()
 		this.activeTool = null
 	}
 

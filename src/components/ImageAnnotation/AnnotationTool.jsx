@@ -131,7 +131,10 @@ export default class AnnotationTool extends React.Component {
 					</Box>
 					{
 						this.canvasManager &&
-							<LabelSelector deSelectActiveAnnotation={this.canvasManager.deSelectActiveAnnotation}/>
+							<LabelSelector
+								imageLabels={this.state.imageLabels}
+								deSelectActiveAnnotation={this.canvasManager.deSelectActiveAnnotation}
+							/>
 					}
 				</Box>
 		)
