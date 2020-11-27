@@ -160,9 +160,11 @@ const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
 				</div>
 				<br/>
 				<Select
-					onChange={(newTags) => {}}
 					placeholder="Tags"
 					value={''}
+					onChange={(val) => {
+						debugger
+					}}
 					options={
 						labels.map(label => ({
 							value: label.label_name,
