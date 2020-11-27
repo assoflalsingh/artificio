@@ -49,10 +49,10 @@ function processAnnotatedData({pixelSize, regions, labels_data}) {
       label_value: labels_data[region.cls],
       label_shape: region.type,
       label_points: [
-        [x * iw, y * ih],
-        [x * iw + w * iw, y * ih],
-        [x * iw + w * iw, y * ih + h * ih],
-        [x * iw, y * ih + h * ih],
+        [Math.round(x * iw), Math.round(y * ih)],
+        [Math.round(x * iw + w * iw), Math.round(y * ih)],
+        [Math.round(x * iw + w * iw), Math.round(y * ih + h * ih)],
+        [Math.round(x * iw), Math.round(y * ih + h * ih)],
       ]
     };
     retJson['labels'].push(label);
@@ -61,7 +61,35 @@ function processAnnotatedData({pixelSize, regions, labels_data}) {
   return retJson;
 }
 
-export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
+function annotateDataToRegions({image, labels}) {
+  let regions = [];
+  let labels_data = {};
+
+  let {w, h} = image;
+
+  labels.map((label, i)=>{
+    let min = label.label_points[0];
+    let max = label.label_points[2];
+    let region = {
+      id: i.toString(),
+      cls: label.label_name,
+      type: label.label_shape,
+      x: min[0]/w,
+      y: min[1]/h,
+      w: (max[0]-min[0])/w,
+      h: (max[1]-min[1])/h,
+      visible: true,
+      color: "#ff0",
+    };
+
+    regions.push(region);
+    labels_data[label.label_name] = label.label_value;
+  });
+
+  return [regions, labels_data];
+}
+
+export function AnnotateTool({open, onClose, api, getAnnotateImages, inReview}) {
   const [dataImages, setDataImages] = useState({});
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [imageLabels, setImageLabels] = useState([]);
@@ -234,18 +262,30 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
             api.post(URL_MAP.GET_ANNOTATION_DETAILS, {
               "document_id": selectedImageData._id,
               "page_no": selectedImageData.page_no,
+              "status": inReview ? ["in-process"]:["ready"]
             })
             .then((res)=>{
                 let data = res.data.data;
                 let newDataImages = {
                     ...dataImages
                 };
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].document_file_name = data.document_file_name || 'Unknown';
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].src = data.image_url;
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].initial_model_data = data.image_json;
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].model_regions = processTrainedJson(data.image_json);
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].image_labels = data.image_labels;
-                newDataImages[`${selectedImageData._id}:${selectedImageData.page_no}`].labels_data = data.labels_data || {};
+                let imgKey = `${selectedImageData._id}:${selectedImageData.page_no}`;
+                newDataImages[imgKey].document_file_name = data.document_file_name || 'Unknown';
+                newDataImages[imgKey].src = data.image_url;
+
+                if(inReview) {
+                  newDataImages[imgKey].initial_model_data = data.image_json.initial_model_data;
+                  newDataImages[imgKey].model_regions = processTrainedJson(data.image_json.initial_model_data);
+                  newDataImages[imgKey].image_labels = data.image_labels;
+                  let [regions, labels_data] = annotateDataToRegions(data.image_json.user_annotate_data);
+                  newDataImages[imgKey].regions = regions;
+                  newDataImages[imgKey].labels_data = labels_data || {};
+                } else {
+                  newDataImages[imgKey].initial_model_data = data.image_json;
+                  newDataImages[imgKey].model_regions = processTrainedJson(data.image_json);
+                  newDataImages[imgKey].image_labels = data.image_labels;
+                  newDataImages[imgKey].labels_data = data.labels_data || {};
+                }
                 setImageLabels(data.image_labels);
                 setDataImages(newDataImages);
                 setSelectedImage(newSelectedImage);
@@ -268,7 +308,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
     }
   }
 
-  const onSaveAnnotationDetails = (imageIndex, dataImage) => {
+  const onSaveAnnotationDetails = (imageIndex, dataImage, isDone, doneCallback) => {
     if(Object.values(dataImages)[imageIndex]) {
       let selectedImageData = Object.values(dataImages)[imageIndex];
 
@@ -280,12 +320,13 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
           initial_model_data: selectedImageData.initial_model_data,
           user_annotate_data: processAnnotatedData(dataImage)
         },
-        "status": "in-process"
+        "status": isDone ? "completed" : "in-process"
 		  })
       .then((res)=>{
         setAjaxMessage({
           error: false, text: 'Annotation details saved successfully !!',
         });
+        isDone && doneCallback && doneCallback();
       }).catch((error)=>{
         if(error.response) {
           setAjaxMessage({
@@ -324,6 +365,7 @@ export function AnnotateTool({open, onClose, api, getAnnotateImages}) {
         onThumbnailClick={onThumbnailClick}
         onAnnotatorClose={onClose}
         onSaveAnnotationDetails={onSaveAnnotationDetails}
+        inReview={inReview}
         />
     </Dialog>
   )

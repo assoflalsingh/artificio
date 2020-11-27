@@ -56,7 +56,7 @@ export default function Activate({location, history}) {
 
   const onLoginClick = (e)=>{
     e.preventDefault();
-    history.replace('/login');
+    history.replace('/signin');
   }
 
   return (

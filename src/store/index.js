@@ -1,22 +1,14 @@
 /**
  * Redux store setup.
- * Includes the axios config.
  */
-import React, {createContext, useReducer} from "react";
-import rootReducer from './reducers';
 
-const initialState = {
-    user:{}
-};
+import { createStore, applyMiddleware } from "redux";
 
-const Store = ({children}) => {
-    const [state, dispatch] = useReducer(rootReducer, initialState);
-    return (
-        <Context.Provider value={[state, dispatch]}>
-            {children}
-        </Context.Provider>
-    )
-};
+// Logger with default options
+import logger from "redux-logger";
+import userReducer from "./reducers/user";
 
-export const Context = createContext(initialState);
-export default Store;
+export default function configureStore(initialState) {
+  const store = createStore(userReducer, initialState);//, applyMiddleware(logger));
+  return store;
+}

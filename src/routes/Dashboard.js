@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Box, Paper, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { BrowserRouter as Router } from 'react-router-dom';
-import {withStore} from 'react-context-hook';
-import Store from '../store';
+import { connect } from "react-redux";
+import {setUser} from "../store/reducers/user";
 
-import Logo from '../assets/images/Logo-final.png';
+import { getInstance, URL_MAP } from '../others/artificio_api.instance';
+import Logo from '../assets/images/Logo-final.svg';
 import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
 import SideMenuBar from '../components/SideMenuBar';
@@ -37,7 +38,6 @@ const useStyles = makeStyles((theme)=>({
 
   },
   logoContainer: {
-    display: 'flex',
     borderBottomWidth: '1px',
     borderBottomStyle: 'solid',
     borderBottomColor: theme.palette.grey[200]
@@ -50,30 +50,46 @@ const useStyles = makeStyles((theme)=>({
   },
 }));
 
-const Dashboard = () => {
+const Dashboard = (props) => {
   const classes = useStyles();
+
+  useEffect(()=>{
+    const api = getInstance(localStorage.getItem('token'));
+
+    api.get(URL_MAP.USER_INFO)
+      .then((res)=>{
+        let data = res.data.data;
+        props.setUser(data);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+  }, []);
+
   return (
-    <Store>
-      <Router basename='/dashboard'>
-        <Box className={classes.root}>
-          <Container maxWidth="lg" className={classes.container}>
-            <Box display="flex" flexDirection="column" className={classes.container}>
-              <Box display="flex">
-                  <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
+    <Router basename='/dashboard'>
+      <Box className={classes.root}>
+        <Container maxWidth="lg" className={classes.container}>
+          <Box display="flex" flexDirection="column" className={classes.container}>
+            <Box display="flex">
+                <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
+                  <Box style={{padding: '0.25rem 0.5rem'}}>
                     <img src={Logo} className={classes.logoImg}></img>
-                  </Paper>
-                  <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
-              </Box>
-              <Box display="flex" className={classes.bottomSide}>
-                  <Paper item className={classes.leftSide}><SideMenuBar /></Paper>
-                  <MainContent className={classes.rightSide} />
-              </Box>
+                  </Box>
+                </Paper>
+                <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
             </Box>
-          </Container>
-        </Box>
-      </Router>
-    </Store>
+            <Box display="flex" className={classes.bottomSide}>
+                <Paper item className={classes.leftSide}><SideMenuBar /></Paper>
+                <MainContent className={classes.rightSide} />
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+    </Router>
   )
 }
 
-export default Dashboard;
+export default connect(()=>{}, (dispatch)=>({
+  setUser: (user)=>dispatch(setUser(user))
+}))(Dashboard);

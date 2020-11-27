@@ -2,9 +2,8 @@
 
 import React, { useReducer, useEffect, useRef, useState } from "react"
 
-import CommonTabs from '../components/CommonTabs';
 import combineReducers from "react-image-annotate/Annotator/reducers/combine-reducers.js";
-import generalReducer from "react-image-annotate/Annotator/reducers/general-reducer.js";
+import generalReducer from "./general-reducer.js";
 import imageReducer from "react-image-annotate/Annotator/reducers/image-reducer.js";
 import videoReducer from "react-image-annotate/Annotator/reducers/video-reducer.js";
 import historyHandler from "react-image-annotate/Annotator/reducers/history-handler.js";
@@ -20,7 +19,6 @@ import LabelValues, { RegionLabelValues } from "./LabelValues";
 import RegionEditLabel from './RegionEditLabel';
 import getActiveImage from "react-image-annotate/Annotator/reducers/get-active-image";
 import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
-import { act } from "react-dom/test-utils";
 
 const useClasses = makeStyles((theme)=>({
   thumbnail : {
@@ -71,6 +69,7 @@ export const Annotator = ({
   onThumbnailClick,
   onAnnotatorClose,
   onSaveAnnotationDetails,
+  inReview
 }) => {
   if (typeof selectedImage === "string") {
     selectedImage = (images || []).findIndex((img) => img.src === selectedImage)
@@ -93,7 +92,7 @@ export const Annotator = ({
       annotationType,
       showTags,
       allowedArea,
-      showPointDistances,
+      showPointDistances:true,
       pointDistancePrecision,
       selectedTool,
       fullImageSegmentationMode: fullImageSegmentationMode,
@@ -122,28 +121,22 @@ export const Annotator = ({
             videoSrc,
             keyframes,
           }),
+      panKeyPressed: false,
     })
   )
 
   const dispatch = useEventCallback((action) => {
-    // if (action.type === "HEADER_BUTTON_CLICKED") {
-    //   if (["Exit", "Done", "Save", "Complete"].includes(action.buttonName)) {
-    //     return onExit(without(state, "history"))
-    //   } else if (action.buttonName === "Next" && onNextImage) {
-    //     return onNextImage(without(state, "history"))
-    //   } else if (action.buttonName === "Prev" && onPrevImage) {
-    //     return onPrevImage(without(state, "history"))
-    //   }
-    // }
-
     if(action.type === "LEFT_TOOLBAR") {
       if(action.button === 'save') {
         onSaveAnnotationDetails(selectedImage, activeImage);
       }
-      if(action.button === 'zoom-in') {
-        var cEvent = new WheelEvent('wheel', {deltaX: 1, deltaY: 1});
-        console.log(canvasRef);
-        canvasRef.current.dispatchEvent(cEvent);
+      if(action.button === 'done-save') {
+        onSaveAnnotationDetails(selectedImage, activeImage, true, ()=>{
+          dispatchToReducer({
+            type: "SET_IMAGE_DONE",
+            imageIndex: selectedImage,
+          });
+        });
       }
     } else {
       dispatchToReducer(action)
@@ -151,7 +144,6 @@ export const Annotator = ({
   })
 
   const onRegionClassAdded = useEventCallback((cls) => {
-    console.log('region class added', cls);
     dispatchToReducer({
       type: "ON_CLS_ADDED",
       cls: cls,
@@ -166,12 +158,13 @@ export const Annotator = ({
     });
   }
 
-  // useEffect(()=>{
-  //   dispatchToReducer({
-  //     type: "SELECT_IMAGE",
-  //     imageIndex: 0,
-  //   });
-  // }, [])
+  const removeLabel = (labelName) => {
+    dispatchToReducer({
+      type: "REMOVE_LABEL",
+      imageIndex: selectedImage,
+      labelName: labelName
+    });
+  }
 
   useEffect(() => {
     if (selectedImage === undefined) return
@@ -188,7 +181,8 @@ export const Annotator = ({
         src: images[selectedImage].src,
         image_labels: images[selectedImage].image_labels,
         model_regions: images[selectedImage].model_regions,
-        label_values: images[selectedImage].label_values,
+        labels_data: images[selectedImage].labels_data,
+        regions: images[selectedImage].regions,
       });
     }
   }, [selectedImage]);
@@ -232,8 +226,8 @@ export const Annotator = ({
       videoPlaying={state.videoPlaying}
       imageSrc={activeImage ? activeImage.src : null}
       pointDistancePrecision={state.pointDistancePrecision}
-      createWithPrimary={state.selectedTool.includes("create")}
-      dragWithPrimary={state.selectedTool === "pan"}
+      createWithPrimary={state.selectedTool.includes("create") && !state.panKeyPressed}
+      dragWithPrimary={state.selectedTool === "pan" || state.panKeyPressed}
       zoomWithPrimary={state.selectedTool === "zoom"}
       showPointDistances={state.showPointDistances}
       videoTime={
@@ -277,30 +271,49 @@ export const Annotator = ({
     />
   );
 
+  const onCanvasKeyDown = (e)=>{
+    if(e.shiftKey) {
+      dispatchToReducer({
+        type: "SET_PAN_KEY_PRESSED",
+        value: true,
+      });
+    }
+  }
+
+  const onCanvasKeyUp = (e)=>{
+    dispatchToReducer({
+      type: "SET_PAN_KEY_PRESSED",
+      value: false,
+    });
+  }
+
   return (
-      <Box display="flex" style={{height: '100%'}}>
-        <RegionLeftToolBar dispatch={dispatch} regions={activeImage ? activeImage.regions : []} />
+      <Box display="flex" style={{height: '100%'}} tabIndex="0" onKeyDown={onCanvasKeyDown} onKeyUp={onCanvasKeyUp}>
+        <RegionLeftToolBar dispatch={dispatch} regions={activeImage ? activeImage.regions : []} inReview={inReview} />
         <Box style={{flexGrow: 1, overflow: 'hidden'}}>
           <RegionTopToolBar dispatch={dispatch} selectedTool={state.selectedTool}/>
           <Box style={{backgroundColor: 'black'}}>
             {canvas}
           </Box>
           <Box display="flex">
-            {(typeof(selectedImage) != "undefined") && <Typography style={{margin: 'auto'}}>{images[selectedImage].document_file_name} ({images[selectedImage].page_no})</Typography>}
-            {(typeof(selectedImage) == "undefined") && <Typography style={{margin: 'auto'}}>Select an image....</Typography>}
+            {(typeof(state.selectedImage) != "undefined") && <Typography style={{margin: 'auto'}}>{images[state.selectedImage].document_file_name} ({images[state.selectedImage].page_no})</Typography>}
+            {(typeof(state.selectedImage) == "undefined") && <Typography style={{margin: 'auto'}}>Select an image....</Typography>}
           </Box>
           <Box style={{overflowY: 'hidden', overflowX: 'auto'}} display="flex">
             <Box display="flex">
-              {images.map((thumb, i)=>
-                <Card className={i==selectedImage ? classes.thumbnailActive : classes.thumbnail}>
-                  <CardActionArea onClick={()=>{onThumbnailClick(thumb._id, thumb.page_no)}}>
-                    <CardMedia style={{height: 50, width: 50}}
-                      // className={}
-                      image={thumb.img_thumb_src}
-                      // title="Contemplative Reptile"
-                    />
-                  </CardActionArea>
-                </Card>
+              {images.map((thumb, i)=>{
+                  if(state.images[i].is_done) return null;
+
+                  return <Card className={i==selectedImage ? classes.thumbnailActive : classes.thumbnail}>
+                    <CardActionArea onClick={()=>{onThumbnailClick(thumb._id, thumb.page_no)}}>
+                      <CardMedia style={{height: 50, width: 50}}
+                        // className={}
+                        image={thumb.img_thumb_src}
+                        // title="Contemplative Reptile"
+                      />
+                    </CardActionArea>
+                  </Card>
+                }
               )}
             </Box>
           </Box>
@@ -311,7 +324,7 @@ export const Annotator = ({
             <Button style={{marginLeft: 'auto'}} onClick={onAnnotatorClose} startIcon={<CloseOutlinedIcon />}>Close</Button>
           </Box>
           <Box style={{overflow: 'auto', flexGrow: 1}}>
-            {activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} />}
+            {activeImage && <LabelValues activeImage={activeImage} labelsData={state.images[selectedImage].labels_data} setLabelsData={setLabelsData} removeLabel={removeLabel} />}
           </Box>
           {/* <CommonTabs tabs={
             {

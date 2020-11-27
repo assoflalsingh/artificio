@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, makeStyles, useEventCallback } from "@material-ui/core";
 import CommonTabs from '../components/CommonTabs';
 import { FormInputText } from '../components/FormElements';
+import { Link } from '@material-ui/core'
 
 
 function getRegionsInPixels(pixelSize, regions) {
@@ -66,7 +67,8 @@ function rectanglesIntersect(
   return !( aLeftOfB || aRightOfB || aAboveB || aBelowB );
 }
 
-export default function LabelValues({activeImage, labelsData, setLabelsData}) {
+export default function LabelValues({activeImage, labelsData, setLabelsData, removeLabel}) {
+  const [regionDims, setRegionDims] = useState({});
   const onTextChange = useEventCallback((e)=>{
     let {name, value} = e.target;
     setLabelsData({
@@ -79,6 +81,7 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
     // setLabelsTagged(regions.map((region)=>region.cls||));
 
     if(activeImage.pixelSize) {
+
       let currRegionDims = getCurrRegionMinMax(activeImage.pixelSize, activeImage.regions);
       if(currRegionDims) {
         let {xmin, ymin, xmax, ymax} = currRegionDims;
@@ -89,11 +92,16 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
           }
         });
 
-        if(currRegionDims.cls && !labelsData[currRegionDims.cls] && labelsData[currRegionDims.cls] != '') {
+        let existRegionDims = regionDims[currRegionDims.cls];
+        if(currRegionDims.cls && (existRegionDims ? (existRegionDims.xmin != xmin || existRegionDims.ymin != ymin || existRegionDims.xmax != xmax || existRegionDims.ymax != ymax) : true)) {
           setLabelsData({
             ...labelsData,
             [currRegionDims.cls]: intersects.join(' '),
           });
+          setRegionDims({
+            ...regionDims,
+            [currRegionDims.cls]: {xmin, ymin, xmax, ymax}
+          })
         }
       }
     }
@@ -103,10 +111,12 @@ export default function LabelValues({activeImage, labelsData, setLabelsData}) {
     <>
       {labelsData && Object.keys(labelsData).map((labelName, i)=>{
         return <>
+          <Box style={{height: '0.75rem'}}></Box>
           <FormInputText name={labelName} label={labelName} value={labelsData[labelName]}
             onChange={onTextChange}
             // disabled={labelsTagged.indexOf(labelName) < 0}
             />
+          <Link href="#" onClick={(e)=>{e.preventDefault();removeLabel(labelName);}}>Remove</Link>
         </>
       })}
     </>

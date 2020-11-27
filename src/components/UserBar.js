@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover } from '@material-ui/core';
+import React from 'react';
+import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover, CircularProgress } from '@material-ui/core';
 import TextFieldRounded from './TextFieldRounded';
 import SearchIcon from '@material-ui/icons/Search';
 import MailOutline from '@material-ui/icons/MailOutline';
@@ -7,7 +7,7 @@ import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import SettingsIcon from '@material-ui/icons/Settings';
 import clsx from 'clsx';
 import { withRouter } from 'react-router-dom';
-import { Context } from '../store';
+import { connect } from "react-redux";
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {
@@ -30,7 +30,7 @@ const useStylesUserBar = makeStyles((theme)=>({
   }
 }));
 
-function UserBar({className, userDispName, history}) {
+function UserBar({className, user, history}) {
   const classes = useStylesUserBar();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const onSettingsClick = (event) => {
@@ -46,8 +46,6 @@ function UserBar({className, userDispName, history}) {
     window.location.reload();
   };
 
-  const [globalContext, globalContextDispatch] = useContext(Context);
-  console.log(globalContext);
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}
@@ -63,16 +61,19 @@ function UserBar({className, userDispName, history}) {
           />
         </Box>
         <IconButton>
-          <Badge badgeContent={9} max={99} color="primary">
+          <Badge badgeContent={0} max={99} color="primary">
             <MailOutline />
           </Badge>
         </IconButton>
         <IconButton>
-          <Badge badgeContent={3} max={99} color="error">
+          <Badge badgeContent={0} max={99} color="error">
             <NotificationsNoneIcon />
           </Badge>
         </IconButton>
-        <Typography color="textSecondary" className={classes.rightItem}>Hi, {userDispName}</Typography>
+        {user &&
+          <Typography color="textSecondary" className={classes.rightItem}>Hi, {user.first_name} {user.last_name}</Typography>}
+        {!user &&
+          <CircularProgress size="1.5rem" />}
         <IconButton onClick={onSettingsClick}>
           <SettingsIcon />
         </IconButton>
@@ -98,4 +99,4 @@ function UserBar({className, userDispName, history}) {
   );
 }
 
-export default withRouter(UserBar);
+export default connect((state)=>({user: state.user}))(withRouter(UserBar));

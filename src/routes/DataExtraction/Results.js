@@ -114,6 +114,10 @@ export default function Results() {
     print: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
+    sortOrder: {
+      name: 'timestamp',
+      direction: 'desc'
+    },
     setTableProps: () => {
       return {
         size: 'small',
@@ -122,6 +126,9 @@ export default function Results() {
     rowsSelected: rowsSelected,
     onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelectedNow)=>{
       setRowsSelected(rowsSelectedNow)
+    },
+    isRowSelectable: (dataIndex)=>{
+      return datalist[dataIndex].img_status == "completed" ? false : true;
     }
   };
 
@@ -132,41 +139,6 @@ export default function Results() {
   const handleClose = () => {
     setMassAnchorEl(null);
   };
-
-  // const onAssignDatagroup = (id, name) => {
-  //   handleClose();
-  //   setPageMessage('Assigning data group...');
-  //   let data_lists = {};
-  //   rowsSelected.map((i)=>{
-  //     let row = datalist[i];
-  //     data_lists[row._id] = data_lists[row._id] || [];
-  //     data_lists[row._id].push(row.page_no);
-  //   });
-
-  //   api.post(URL_MAP.ASSIGN_DATAGROUP, {
-  //     datagroup_id: id,
-  //     data_lists: data_lists
-  //   }).then((res)=>{
-  //     setAjaxMessage({
-  //       error: false, text: 'Data group assigned successfully !!',
-  //     });
-  //     let newDatalist = datalist;
-  //     rowsSelected.forEach((i)=>{
-  //       newDatalist[i].datagroup_name = name;
-  //     });
-  //     setDatalist(newDatalist);
-  //   }).catch((error)=>{
-  //     if(error.response) {
-  //       setAjaxMessage({
-  //         error: true, text: error.response.data.message,
-  //       });
-  //     } else {
-  //       console.error(error);
-  //     }
-  //   }).then(()=>{
-  //     setPageMessage(null);
-  //   })
-  // }
 
   const parseGetDataList = (data) => {
   //   {
@@ -225,7 +197,7 @@ export default function Results() {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process']})
+    api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process', 'completed']})
       .then((res)=>{
         let data = res.data.data;
         setDatalist(parseGetDataList(data.data_lists));
@@ -272,7 +244,7 @@ export default function Results() {
               />
             <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} /> */}
             <Box className={classes.rightAlign}>
-              {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button> */}
+              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
               {/* <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>
@@ -312,7 +284,7 @@ export default function Results() {
       </StackItem>
       </Stacked>
     </Box>
-    {/* <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} /> */}
+    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={true} />
     </>
   )
 }

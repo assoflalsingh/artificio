@@ -53,6 +53,7 @@
     ]
   },
   "devDependencies": {
-    "mui-datatables": "^3.4.1"
+    "mui-datatables": "^3.4.1",
+    "redux-logger": "^3.0.6"
   }
 }

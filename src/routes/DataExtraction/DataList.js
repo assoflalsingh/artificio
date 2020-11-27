@@ -155,6 +155,10 @@ export default function DataList() {
     print: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
+    sortOrder: {
+      name: 'timestamp',
+      direction: 'desc'
+    },
     setTableProps: () => {
       return {
         size: 'small',
@@ -354,7 +358,8 @@ export default function DataList() {
       </Stacked>
     </Box>
 		<ImageAnnotationDialog open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getImages={()=>rowsSelected.map((i)=>datalist[i])}/>
-		{/*<AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} />*/}
+		{/*<AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}*/}
+		{/*					getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>*/}
     </>
   )
 }

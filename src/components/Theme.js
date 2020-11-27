@@ -1,16 +1,19 @@
 import React from 'react';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import HelveticaRegular from '../assets/fonts/HelveticaNowDisplay-Regular.ttf';
+import NunitoRegular from '../assets/fonts/Nunito-Regular.ttf';
 
-const helvetica = {
-  fontFamily: 'Helvetica',
+const nunito = {
+  fontFamily: 'Nunito',
   fontStyle: 'normal',
   fontDisplay: 'swap',
   fontWeight: 400,
   src: `
-    url(${HelveticaRegular}) format('truetype')
+    local('Nunito'),
+    local('Nunito-Regular'),
+    url(${NunitoRegular}) format('truetype')
   `,
 };
+
 
 const defaultTheme = createMuiTheme();
 defaultTheme.shadows[1] = '0px 2px 1px -1px rgba(57, 63, 77,0.2),0px 1px 1px 0px rgba(57, 63, 77,0.14),0px 1px 3px 0px rgba(57, 63, 77,0.12)';
@@ -62,12 +65,13 @@ const globalTheme = createMuiTheme({
 
 const theme = createMuiTheme({
     typography: {
-      // fontFamily: ['Helvetica', 'Arial'].join(','),
+      fontFamily: ["Nunito", "Arial", "sans-serif"].join(','),
       fontSize: 14,
     },
     overrides: {
         MuiCssBaseline: {
           '@global': {
+            '@font-face': [nunito],
             html: {
               margin: 0,
             },

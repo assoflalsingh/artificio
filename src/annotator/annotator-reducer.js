@@ -7,16 +7,41 @@ export default (state, action) => {
     newState = setIn(newState, [...pathToActiveImage, "image_labels"], action.image_labels);
     newState = setIn(newState, [...pathToActiveImage, "model_regions"], action.model_regions);
     newState = setIn(newState, [...pathToActiveImage, "labels_data"], action.labels_data || {});
+    newState = setIn(newState, [...pathToActiveImage, "regions"], action.regions || {});
+    newState = setIn(newState, [...pathToActiveImage, "is_done"], false);
 
     return setIn(newState,["selectedImage"], action.imageIndex);
+  }
+  if(action.type === 'SET_IMAGE_DONE') {
+    let pathToActiveImage = ["images", action.imageIndex]
+    let newState = setIn(state, [...pathToActiveImage, "is_done"], true);
+    let newSelected = undefined;
+    return setIn(newState,["selectedImage"], newSelected);
   }
   if(action.type === 'SET_LABELS_DATA') {
     let pathToImageLabelData = ["images", action.imageIndex, "labels_data"];
     return setIn(state, pathToImageLabelData, action.data);
   }
+  if(action.type === 'REMOVE_LABEL') {
+    let pathToActiveImage = ["images", action.imageIndex];
+    let labelsData = getIn(state, pathToActiveImage).labels_data;
+    let activeImage = getIn(state, pathToActiveImage);
+    if(labelsData[action.labelName]) {
+      let newState = setIn(state, [...pathToActiveImage, "labels_data"], labelsData.without([action.labelName]));
+      return setIn(
+        newState,
+        [...pathToActiveImage, "regions"],
+        (activeImage.regions || []).filter((r) => r.cls !== action.labelName)
+      );
+    }
+    return state;
+  }
   if(action.type === "SET_LABEL_VALUE") {
     let pathToImageLabelData = ["images", action.imageIndex, "labels_data", action.name];
     return setIn(state, pathToImageLabelData, action.value);
+  }
+  if(action.type === "SET_PAN_KEY_PRESSED") {
+    return setIn(state, ['panKeyPressed'], action.value);
   }
   return state;
 }
