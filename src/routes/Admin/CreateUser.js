@@ -176,11 +176,11 @@ export default function CreateUser({onCancel, ...props}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Password" required name='password'
+          <FormInputText label="Password" required name='password' type='password'
             value={formData.password} errorMsg={formDataErr.password} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="Confirm password" required name='confirm_pass'
+          <FormInputText label="Confirm password" required name='confirm_pass' type='password'
             value={formData.confirm_pass} errorMsg={formDataErr.confirm_pass} onChange={onTextChange}/>
         </FormRowItem>
       </FormRow>

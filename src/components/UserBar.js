@@ -9,6 +9,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import { withRouter } from 'react-router-dom';
 import { connect } from "react-redux";
+import { titleCase } from '../others/utils';
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {
@@ -42,6 +43,9 @@ function UserBar({className, user, history}) {
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}
+      {user && <Typography>
+        Role: <strong>{titleCase(user.role_name.replace('_', ' '))} </strong>
+        | Account: <strong>{user.account_number}</strong></Typography>}
       <Box className={classes.right}>
         <Box className={classes.rightItem}>
           <TextFieldRounded
