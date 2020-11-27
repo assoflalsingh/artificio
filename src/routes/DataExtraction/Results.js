@@ -244,7 +244,7 @@ export default function Results() {
               />
             <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} /> */}
             <Box className={classes.rightAlign}>
-              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
+              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
               {/* <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>

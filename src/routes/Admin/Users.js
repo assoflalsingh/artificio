@@ -5,7 +5,8 @@ import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton, CompactButton} from '../../components/CustomButtons';
+import RefreshIcon from '@material-ui/icons/Refresh';
+import {CompactAddButton, CompactButton, RefreshIconButton} from '../../components/CustomButtons';
 
 import {Stacked, StackItem} from '../../components/Stacked';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
@@ -15,6 +16,9 @@ import CreateUser from './CreateUser';
 import {titleCase} from '../../others/utils';
 
 const useStyles = makeStyles((theme) => ({
+  ml1: {
+    marginLeft: '1rem',
+  },
 }));
 
 export default function Users({match}) {
@@ -143,9 +147,7 @@ export default function Users({match}) {
           </Snackbar>
           <Box display="flex">
             <Typography color="primary" variant="h6">Users</Typography>
-            <Tooltip title="Refresh data list">
-              <IconButton size="small" onClick={()=>{fetchUsersList()}}><SyncIcon /></IconButton>
-            </Tooltip>
+            <RefreshIconButton className={classes.ml1} onClick={()=>{fetchUsersList()}}/>
             <CompactAddButton className={classes.ml1} color="secondary" label="Add user"
               onClick={()=>{setStackPath('adduser')}}
               />

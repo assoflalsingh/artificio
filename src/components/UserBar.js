@@ -68,7 +68,7 @@ function UserBar({className, user, history}) {
           </Badge>
         </IconButton>
         {user &&
-          <Typography className={classes.rightItem}>Hi, {user.first_name} {user.last_name}</Typography>}
+          <Typography className={classes.rightItem}>Hi, <strong>{user.first_name} {user.last_name}</strong></Typography>}
         {!user &&
           <CircularProgress size="1.5rem" />}
         <Tooltip title="Logout">

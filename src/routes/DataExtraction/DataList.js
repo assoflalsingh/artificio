@@ -5,7 +5,7 @@ import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton, CompactButton} from '../../components/CustomButtons';
+import {CompactAddButton, CompactButton, RefreshIconButton} from '../../components/CustomButtons';
 import CreateDataGroup from './CreateDataGroup';
 
 import {Stacked, StackItem} from '../../components/Stacked';
@@ -308,15 +308,13 @@ export default function DataList() {
           </Snackbar>
           <Box display="flex">
             <Typography color="primary" variant="h6">Data List</Typography>
-            <Tooltip title="Refresh data list">
-              <IconButton size="small" onClick={()=>{fetchDataList()}}><SyncIcon /></IconButton>
-            </Tooltip>
+            <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDataList()}}/>
             <CompactAddButton className={classes.ml1} color="secondary" label="Create label"
               onClick={()=>{setStackPath('createlabel')}}
               />
             <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} />
             <Box className={classes.rightAlign}>
-              <CompactButton onClick={()=>{setAnnotateOpen(true)}} startIcon={<PlayCircleFilledIcon color="primary" fontSize='large' />} label='Annotation'/>
+              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
               {/* <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>
