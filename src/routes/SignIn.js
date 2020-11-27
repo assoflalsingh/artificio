@@ -178,7 +178,7 @@ export default function SignIn({history, location}) {
               <Typography variant="h7">To keep connected with us, please log in</Typography>
               <form className={classes.root} noValidate autoComplete="off">
                 <Box className={classes.formRow}>
-                  <FormInputText name="username" value={fields.username} label="Username"
+                  <FormInputText name="username" value={fields.username} label="Email/Username"
                     InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.username} required/>
                 </Box>
                 <Box className={classes.formRow}>

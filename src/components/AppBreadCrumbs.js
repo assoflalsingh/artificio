@@ -33,6 +33,7 @@ const breadcrumbNameMap = {
   'dataManager': 'Data Manager',
   'annotation': 'Annotation',
   'dataExtraction': 'Data extraction',
+  'admin': 'Admin'
 }
 
 function AppBreadCrumbs({children, className, ...props}) {

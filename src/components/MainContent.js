@@ -6,6 +6,7 @@ import Annotation from '../routes/Annotation';
 import clsx from 'clsx';
 import CopyrightIcon from '@material-ui/icons/Copyright';
 import AppBreadCrumbs from './AppBreadCrumbs';
+import Admin from '../routes/Admin';
 
 const useStylesContent = makeStyles((theme)=>({
   root: {
@@ -36,6 +37,7 @@ export default function MainContent({children, className, ...props}) {
       <Box className={classes.content}>
         <Route path="/createModel" component={CreateModel} />
         <Route path="/annotation" component={Annotation} />
+        <Route path="/admin" component={Admin} />
       </Box>
       <Box className={classes.copyrights}>
         <CopyrightIcon />&nbsp;<Typography>2020 Copyrights - Artificio</Typography>

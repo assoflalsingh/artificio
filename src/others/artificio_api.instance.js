@@ -41,6 +41,7 @@ export const URL_MAP = {
   SIGN_IN: 'auth/login/',
   SIGN_UP: 'auth/signup/',
   USER_INFO: 'auth/user-info/',
+  USERS_LIST: 'auth/users-list/',
   /* annotation */
   UPLOAD_TO_S3: 'upload-to-s3/',
 
