@@ -8,13 +8,28 @@ const TextPadding = 8
 export default class Annotation {
 	annotationData
 	scale
+	id
+	label
+	color
 	group = new Konva.Group({
 		draggable: true
 	})
+	type
 
+	/**
+	 * @param data
+	 * {
+			dimensions: {x: number, y: number, w: number, h: number};
+			id: string;
+			color: string;
+			label: string;
+		}
+	 */
 	constructor(data, scale) {
 		this.annotationData = data
+		this.id = data.id
 		this.scale = scale
+		this.color = data.color
 	}
 
 	// Method will be overriden by child class
@@ -54,6 +69,22 @@ export default class Annotation {
 		this.label.add(text);
 		this.label.x(this.label.x() - this.label.width())
 		this.group.add(this.label);
+	}
+
+	reCreateLabel() {
+		// Recreate Label
+		this.label.destroy()
+		this.label.destroyChildren()
+		this.addLabel()
+	}
+
+	getLabel() {
+		return this.annotationData.label
+	}
+
+	setLabel(label) {
+		this.annotationData.label = label
+		this.reCreateLabel()
 	}
 
 	draw() {

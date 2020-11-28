@@ -9,6 +9,7 @@ import Thumbnails from "./Thumbnails";
 import Loader from "./Loader";
 import {ToolBar} from "./ToolBar";
 import {LabelSelector} from "./LabelSelector";
+import {LabelsContainer} from "./LabelsContainer";
 
 export const appId = 'canvas-annotation-tool'
 
@@ -38,7 +39,23 @@ export default class AnnotationTool extends React.Component {
 	state = {
 		activeImageIndex: 0,
 		loading: false,
-		imageLabels: []
+		imageLabels: [],
+		/**
+		 * @param textAnnotations
+		 {
+				word_details: {
+					word_description: string;
+					entity_label: string;
+					bounding_box: {
+						vertices: {
+							x: number;
+							y: number
+						}[]
+					}
+				}
+			}
+		 */
+		textAnnotations: []
 	}
 
 	async fetchImageData(index) {
@@ -47,7 +64,10 @@ export default class AnnotationTool extends React.Component {
 		const selectedImage = this.props.images[index]
 		if(selectedImage) {
 			const imageData = await getImageData(this.props.api, selectedImage._id, selectedImage.page_no);
-			this.setState({imageLabels: imageData.image_labels})
+			this.setState({
+				imageLabels: imageData.image_labels,
+				textAnnotations: imageData.image_json ? imageData.image_json.text_annotations : []
+			})
 			this.canvasManager.clearAnnotations()
 			this.canvasManager.setImage(imageData.image_url, () => {
 				this.setLoader(false)
@@ -90,9 +110,12 @@ export default class AnnotationTool extends React.Component {
 		return (
 				<Box display="flex" style={{height: '100%'}}>
 					<RegionLeftToolBar dispatch={undefined} regions={activeImage ? activeImage.regions : []} />
-					<Box style={{flexGrow: 1, overflow: 'hidden'}}>
-						<ToolBar setActiveTool={this.canvasManager && this.canvasManager.setActiveTool}/>
-						<Box style={{backgroundColor: 'black', height: '78%'}}>
+					<Box style={{flexGrow: 1, overflow: 'hidden', width: '75%'}}>
+						<ToolBar
+							setActiveTool={this.canvasManager && this.canvasManager.setActiveTool}
+							onAnnotationToolClose={onAnnotationToolClose}
+						/>
+						<Box style={{backgroundColor: '#383838', height: '78%'}}>
 							{this.state.loading && <Loader/>}
 							<CanvasWrapper id={appId}/>
 						</Box>
@@ -110,16 +133,15 @@ export default class AnnotationTool extends React.Component {
 							fetchImageData={this.fetchImageData.bind(this)}
 						/>
 					</Box>
-					<Box style={{width: '300px', display: 'flex', flexDirection: 'column', padding: '0.5rem'}}>
-						<Box display="flex">
-							<Typography style={{marginTop: 'auto', marginBottom: 'auto'}}>LABEL/ANNOTATION</Typography>
-							<Button
-								style={{marginLeft: 'auto'}}
-								onClick={onAnnotationToolClose}
-								startIcon={<CloseOutlinedIcon />}>
-								Close
-							</Button>
-						</Box>
+					<Box style={{width: '25%', display: 'flex', flexDirection: 'column'}}>
+						{
+							this.canvasManager &&
+								<LabelsContainer
+									getAnnotations={this.canvasManager.getAnnotations}
+									imageLabels={this.state.imageLabels}
+									textAnnotations={this.state.textAnnotations}
+								/>
+						}
 						{/*<Box style={{overflow: 'auto', flexGrow: 1}}>*/}
 						{/*	{activeImage && */}
 						{/*		<LabelValues */}
@@ -134,9 +156,20 @@ export default class AnnotationTool extends React.Component {
 							<LabelSelector
 								imageLabels={this.state.imageLabels}
 								deSelectActiveAnnotation={this.canvasManager.deSelectActiveAnnotation}
+								deleteAnnotation={() =>
+									this.canvasManager.deleteAnnotation(this.canvasManager.getSelectedAnnotation().id)
+								}
+								getSelectedAnnotation={this.canvasManager.getSelectedAnnotation}
+								setAnnotationLabel={this.canvasManager.setAnnotationLabel}
 							/>
 					}
 				</Box>
 		)
+	}
+}
+
+const styles = {
+	labelsHeader: {
+		color: 'green'
 	}
 }

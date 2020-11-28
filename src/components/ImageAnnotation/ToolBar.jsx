@@ -4,6 +4,7 @@ import {Box, Button, ListItemText, Menu, MenuItem, withStyles} from '@material-u
 import useEventCallback from 'react-image-annotate/hooks/use-event-callback';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import FormatShapesIcon from '@material-ui/icons/FormatShapes';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import {ToolType} from "../../canvas/core/constants";
 
 const ToolBarButton = withStyles({
@@ -44,6 +45,7 @@ export function ToolBar(props) {
 				{/*	<ListItemText primary="Polygon" />*/}
 				{/*</MenuItem>*/}
 			</Menu>
+			<ToolBarButton style={{float: 'right'}} label='Exit' icon={<ExitToAppIcon />} onClick={props.onAnnotationToolClose} />
 		</Box>
 	)
 }

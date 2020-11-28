@@ -19,7 +19,7 @@ export class CanvasManager extends CanvasScene {
 
 	// Return type RectangleAnnotation
 	getAnnotationById(id) {
-		return this.annotations.find((ann) => ann.getId() === id)
+		return this.annotations.find((ann) => ann.id === id)
 	}
 
 	selectAnnotation(annotation) {
@@ -31,6 +31,10 @@ export class CanvasManager extends CanvasScene {
 		annotation.select()
 		this.addSelectedAnnotationEventListeners()
 		this.annotationLayerDraw()
+	}
+
+	getSelectedAnnotation = () => {
+		return this.selectedAnnotation
 	}
 
 	addSelectedAnnotationEventListeners() {
@@ -88,12 +92,13 @@ export class CanvasManager extends CanvasScene {
 	}
 
 	deleteAnnotation(id) {
-		const index = this.annotations.findIndex((ann) => ann.getId() === id);
+		const index = this.annotations.findIndex((ann) => ann.id === id);
 		const annotation = this.annotations[index];
-		annotation.getShape().destroy();
-		this.annotationLayer.batchDraw();
+		this.selectedAnnotation && this.deSelectActiveAnnotation()
+		annotation.getShape().destroy()
+		this.annotationLayer.batchDraw()
 		this.annotations.splice(index, 1);
-		this.focusAllAnnotations();
+		this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
 	}
 
 	/**
@@ -255,6 +260,16 @@ export class CanvasManager extends CanvasScene {
 
 	getSelectedAnnotation = () => {
 		return this.selectedAnnotation
+	}
+
+	setAnnotationLabel = (label) => {
+		this.selectedAnnotation.setLabel(label)
+		this.selectedAnnotation.draw()
+		this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
+	}
+
+	getAnnotations = () => {
+		return this.annotations
 	}
 
 	/**

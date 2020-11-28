@@ -3,9 +3,9 @@ import * as React from "react";
 
 const useClasses = makeStyles(() => ({
 	container : {
-		width: '73%',
+		width: '71%',
 		height: '78%',
-		background: 'black',
+		background: '#383838',
 		opacity: '0.8',
 		display: 'flex',
 		justifyContent: 'center',

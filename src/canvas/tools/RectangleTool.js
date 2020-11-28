@@ -3,6 +3,7 @@ import {Tool} from "./tool";
 import {CustomEventType, ToolType} from "../core/constants";
 import {CursorPointerCrossHair, generateRandomColor, TempRectangle} from "../core/utilities";
 import RectangleAnnotation from "../annotations/RectangleAnnotation";
+import {DefaultLabel} from "../../components/ImageAnnotation/LabelSelector";
 
 export class RectangleTool extends Tool {
 	tempCrossHairCursor
@@ -95,7 +96,7 @@ export class RectangleTool extends Tool {
 			dimensions,
 			id: uuid.v4(),
 			color: generateRandomColor(),
-			label: 'Test Label'
+			label: DefaultLabel.label_name
 		}
 		const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
 		this.canvasManager.addAnnotation(rectangle)

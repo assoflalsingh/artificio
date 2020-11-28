@@ -1,6 +1,7 @@
 import Konva from "konva";
 import Annotation, {AnnotationCircleRadius, AnnotationCircleStrokeWidth, AnnotationStrokeWidth} from "./Annotation";
 import {createCircle} from "../core/utilities";
+import {AnnotationType} from "../core/constants";
 
 export default class RectangleAnnotation extends Annotation {
 	rectangle
@@ -18,6 +19,7 @@ export default class RectangleAnnotation extends Annotation {
 	 */
 	constructor(annotationData, scale) {
 		super(annotationData, scale)
+		this.type = AnnotationType.Rectangle
 		this.initialize()
 	}
 
@@ -141,14 +143,7 @@ export default class RectangleAnnotation extends Annotation {
 			circle.strokeWidth(AnnotationCircleStrokeWidth / this.scale)
 		})
 
-		this.recreateLabel()
-	}
-
-	recreateLabel() {
-		// Recreate Label
-		this.label.destroy()
-		this.label.destroyChildren()
-		this.addLabel()
+		this.reCreateLabel()
 	}
 
 	getTopLeftCoordinates() {

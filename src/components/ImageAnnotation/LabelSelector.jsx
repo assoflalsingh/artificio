@@ -10,12 +10,12 @@ import {CanvasEventAttacher} from "./CanvasEventAttacher";
 import {CustomEventType} from "../../canvas/core/constants";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
+import Box from "@material-ui/core/Box";
+import {CreateModalDialog} from "./CreateModalDialog";
 
-const DefaultLabels = [{
+export const DefaultLabel = {
 	label_name: 'arto_others'
-}, {
-	label_name: 'Create Label'
-}]
+}
 
 const styles = {
 	regionInfo: {
@@ -105,6 +105,9 @@ export class LabelSelector extends CanvasEventAttacher {
 						showLabelSelector={this.showLabelSelector}
 						deSelectActiveAnnotation={this.props.deSelectActiveAnnotation}
 						imageLabels={this.props.imageLabels}
+						deleteAnnotation={this.props.deleteAnnotation}
+						getSelectedAnnotation={this.props.getSelectedAnnotation}
+						setAnnotationLabel={this.props.setAnnotationLabel}
 					/>
 				</div>
 			}
@@ -123,10 +126,23 @@ export class LabelSelector extends CanvasEventAttacher {
 	}
  */
 
-const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
+const Label = ({
+								 showLabelSelector,
+								 deSelectActiveAnnotation,
+								 imageLabels,
+								 deleteAnnotation,
+								 getSelectedAnnotation,
+								 setAnnotationLabel
+	}) => {
 	const classes = useStyles()
-	let labels = Object.assign([], imageLabels)
-	labels = labels.concat(DefaultLabels)
+	const annotation = getSelectedAnnotation()
+	const labels = Object.assign([], imageLabels)
+	labels.push(DefaultLabel)
+	const [labelValue, setLabelValue] = React.useState({
+		value: annotation.getLabel(),
+		label: annotation.getLabel()
+	})
+	const [modalOpen, setModalOpen] = React.useState(false)
 	return (
 		<Paper className={classnames(classes.regionInfo)}>
 			<div style={{width: 200}}>
@@ -134,7 +150,7 @@ const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
 					<div
 						style={{
 							display: "flex",
-							backgroundColor: "#888",
+							backgroundColor: annotation.color || "#888",
 							color: "#fff",
 							padding: 4,
 							paddingLeft: 8,
@@ -144,12 +160,11 @@ const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
 							textShadow: "0px 0px 5px rgba(0,0,0,0.4)",
 						}}
 					>
-						BOX
+						{annotation.type}
 					</div>
 					<div style={{flexGrow: 1}}/>
 					<IconButton
-						onClick={() => {
-						}}
+						onClick={deleteAnnotation}
 						tabIndex={-1}
 						style={{width: 22, height: 22}}
 						size="small"
@@ -161,9 +176,10 @@ const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
 				<br/>
 				<Select
 					placeholder="Tags"
-					value={''}
-					onChange={(val) => {
-						debugger
+					value={labelValue}
+					onChange={(label) => {
+						setAnnotationLabel(label.value)
+						setLabelValue(label)
 					}}
 					options={
 						labels.map(label => ({
@@ -172,21 +188,35 @@ const Label = ({showLabelSelector, deSelectActiveAnnotation, imageLabels}) => {
 						}))
 					}
 				/>
-				<div style={{ marginTop: 4, display: "flex" }}>
-					<div style={{ flexGrow: 1 }} />
-					<Button
-						onClick={() => {
-							deSelectActiveAnnotation()
-							showLabelSelector(false)
-						}}
-						size="small"
-						variant="contained"
-						color="primary"
-					>
-						<CheckIcon />
-					</Button>
-				</div>
+				<Box style={{ marginTop: 4, display: "flex" }}>
+						<Button
+							onClick={() => setModalOpen(true)}
+							size="small"
+							variant="contained"
+							color="primary"
+						>
+							Create Label
+						</Button>
+						<Box style={{ flexGrow: 1 }} />
+						<Button
+							onClick={() => {
+								deSelectActiveAnnotation()
+								showLabelSelector(false)
+							}}
+							size="small"
+							variant="contained"
+							color="primary"
+						>
+							<CheckIcon />
+						</Button>
+				</Box>
 			</div>
+
+			<CreateModalDialog
+				modalOpen={modalOpen}
+				onClose={() => setModalOpen(false)}
+				createLabel={() => {}}
+			/>
 		</Paper>
 	)
 }
