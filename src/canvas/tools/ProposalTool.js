@@ -31,8 +31,7 @@ export class ProposalTool extends Tool {
 		this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
 	}
 
-	createAnnotation(e) {
-		e.evt.preventDefault();
+	createAnnotation = () => {
 		const proposals = this.canvasManager.proposals.filter(p => p.isSelected)
 		let minX = Infinity
 		let minY = Infinity
@@ -77,8 +76,7 @@ export class ProposalTool extends Tool {
 		this.exitTool()
 	}
 
-	showLabelDropDown(e) {
-		e.evt.preventDefault();
+	showLabelDropDown = () => {
 		this.canvasManager.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
 			position: {
 				x: this.canvasManager.stage.width()/2,
@@ -124,10 +122,6 @@ export class ProposalTool extends Tool {
 		{
 			event: 'click',
 			func: this.findAndSelectProposal.bind(this),
-		},
-		{
-			event: 'contentContextmenu',
-			func: this.showLabelDropDown.bind(this)
 		}
 	]
 }

@@ -5,6 +5,7 @@ import {makeStyles} from "@material-ui/core/styles"
 import classnames from "classnames"
 import IconButton from "@material-ui/core/IconButton"
 import TrashIcon from "@material-ui/icons/Delete"
+import {Select as MaterialSelect}  from '@material-ui/core';
 import {grey} from "@material-ui/core/colors";
 import {CanvasEventAttacher} from "./CanvasEventAttacher";
 import {CustomEventType} from "../../canvas/core/constants";
@@ -12,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import Box from "@material-ui/core/Box";
 import {CreateModalDialog} from "./CreateModalDialog";
+import MenuItem from "@material-ui/core/MenuItem";
 
 export const DefaultLabel = {
 	label_name: 'arto_others'
@@ -62,7 +64,9 @@ export class LabelSelector extends CanvasEventAttacher {
 	state = {
 		show: false,
 		position: {x: 0, y: 0},
-		proposalMode: false
+		proposalMode: false,
+		showProposalOptionSelection: false,
+		proposalOptionSelectionPosition: {x: 0, y: 0},
 	}
 
 	showLabelSelector = (value) => {
@@ -88,6 +92,22 @@ export class LabelSelector extends CanvasEventAttacher {
 				func: (event) => {
 					this.showLabelSelector(false)
 					this.setState({proposalMode: event.detail && event.detail.proposalMode})
+				}
+			},
+			{
+				event: 'contextmenu',
+				func: (event) => {
+					event.preventDefault();
+					const activeTool = this.props.getActiveTool()
+					if (activeTool) {
+						this.setState({
+							showProposalOptionSelection: true,
+							proposalOptionSelectionPosition: {
+								x: event.x,
+								y: event.y
+							}
+						})
+					}
 				}
 			}
 		];
@@ -132,6 +152,38 @@ export class LabelSelector extends CanvasEventAttacher {
 					/>
 				</div>
 			}
+
+			{
+				this.state.showProposalOptionSelection &&
+				<MaterialSelect
+					style={{
+						position: 'absolute',
+						width: 0, height: 0,
+						left: this.state.proposalOptionSelectionPosition.x,
+						top: this.state.proposalOptionSelectionPosition.y
+					}}
+					labelId="demo-simple-select-label"
+					id="demo-simple-select"
+					open={true}
+				>
+					<MenuItem
+						value={''}
+						onClick={() => {
+							this.props.getActiveTool().createAnnotation()
+							this.setState({showProposalOptionSelection: false})}}>
+						Merge
+					</MenuItem>
+					<MenuItem
+						value={''}
+						onClick={() => {
+							this.props.getActiveTool().showLabelDropDown()
+							this.setState({showProposalOptionSelection: false})}
+						}>
+						Assign Label
+					</MenuItem>
+				</MaterialSelect>
+			}
+
 			{this.state.proposalMode && <BackgroundScreen/>}
 			</>
 		)
@@ -169,84 +221,86 @@ const Label = ({
 	const [modalOpen, setModalOpen] = React.useState(false)
 	return (
 		<Paper className={classnames(classes.regionInfo)}>
-			<div style={{width: 200}}>
-				<div style={{display: "flex", flexDirection: "row"}}>
-					{
-						!proposalMode && <div
-							style={{
-								display: "flex",
-								backgroundColor: annotation.color || "#888",
-								color: "#fff",
-								padding: 4,
-								paddingLeft: 8,
-								paddingRight: 8,
-								borderRadius: 4,
-								fontWeight: "bold",
-								textShadow: "0px 0px 5px rgba(0,0,0,0.4)",
-							}}
-						>
-							{annotation.type}
-						</div>
-					}
+			<Box style={{width: 200}}>
+				<Box>
+					<Box style={{display: "flex", flexDirection: "row"}}>
+						{
+							!proposalMode && <div
+								style={{
+									display: "flex",
+									backgroundColor: annotation.color || "#888",
+									color: "#fff",
+									padding: 4,
+									paddingLeft: 8,
+									paddingRight: 8,
+									borderRadius: 4,
+									fontWeight: "bold",
+									textShadow: "0px 0px 5px rgba(0,0,0,0.4)",
+								}}
+							>
+								{annotation.type}
+							</div>
+						}
 
-					<div style={{flexGrow: 1}}/>
-					{
-						!proposalMode &&
-						<IconButton
-							onClick={deleteAnnotation}
-							tabIndex={-1}
-							style={{width: 22, height: 22}}
-							size="small"
-							variant="outlined"
-						>
-							<TrashIcon style={{marginTop: -8, width: 16, height: 16}}/>
-						</IconButton>
-					}
-				</div>
-				<br/>
-				<Select
-					placeholder="Tags"
-					value={labelValue}
-					onChange={(label) => {
-						!proposalMode && setAnnotationLabel(label.value)
-						setLabelValue(label)
-					}}
-					options={
-						labels.map(label => ({
-							value: label.label_name,
-							label: label.label_name
-						}))
-					}
-				/>
-				<Box style={{ marginTop: 4, display: "flex" }}>
-						<Button
-							onClick={() => setModalOpen(true)}
-							size="small"
-							variant="contained"
-							color="primary"
-						>
-							Create Label
-						</Button>
-						<Box style={{ flexGrow: 1 }} />
-						<Button
-							onClick={() => {
-								if(proposalMode) {
-									// point to active too assign label
-									setAnnotationLabel(labelValue)
-									resetProposalMode()
-								} else {
-									deSelectActiveAnnotation()
-								}
-								showLabelSelector(false)
-							}}
-							size="small"
-							variant="contained"
-							color="primary"
-						>
-							<CheckIcon />
-						</Button>
+						<div style={{flexGrow: 1}}/>
+						{
+							!proposalMode &&
+							<IconButton
+								onClick={deleteAnnotation}
+								tabIndex={-1}
+								style={{width: 22, height: 22}}
+								size="small"
+								variant="outlined"
+							>
+								<TrashIcon style={{marginTop: -8, width: 16, height: 16}}/>
+							</IconButton>
+						}
+					</Box>
+					<br/>
+					<Select
+						placeholder="Tags"
+						value={labelValue}
+						onChange={(label) => {
+							!proposalMode && setAnnotationLabel(label.value)
+							setLabelValue(label)
+						}}
+						options={
+							labels.map(label => ({
+								value: label.label_name,
+								label: label.label_name
+							}))
+						}
+					/>
+					<Box style={{ marginTop: 4, display: "flex" }}>
+							<Button
+								onClick={() => setModalOpen(true)}
+								size="small"
+								variant="contained"
+								color="primary"
+							>
+								Create Label
+							</Button>
+							<Box style={{ flexGrow: 1 }} />
+							<Button
+								onClick={() => {
+									if(proposalMode) {
+										// point to active too assign label
+										setAnnotationLabel(labelValue)
+										resetProposalMode()
+									} else {
+										deSelectActiveAnnotation()
+									}
+									showLabelSelector(false)
+								}}
+								size="small"
+								variant="contained"
+								color="primary"
+							>
+								<CheckIcon />
+							</Button>
+					</Box>
 				</Box>
-			</div>
+			</Box>
 
 			<CreateModalDialog
 				modalOpen={modalOpen}
@@ -256,7 +310,6 @@ const Label = ({
 		</Paper>
 	)
 }
-
 
 const BackgroundScreen = () => {
 	const classes = useStyles()
