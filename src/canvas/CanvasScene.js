@@ -27,6 +27,7 @@ export class CanvasScene {
 	imageLayer = new Konva.Layer()
 	annotationLayer = new Konva.Layer()
 	toolLayer = new Konva.Layer()
+	proposalLayer = new Konva.Layer()
 
 	containerElementId
 	// Konva.Image
@@ -74,6 +75,8 @@ export class CanvasScene {
 		this.stage.add(this.imageLayer)
 		this.stage.add(this.annotationLayer)
 		this.stage.add(this.toolLayer)
+		this.proposalLayer.hide()
+		this.stage.add(this.proposalLayer)
 		this.stageDimensions = { width: this.stage.width(), height: this.stage.height() };
 		this.container = { width: element.clientWidth, height: element.clientHeight}
 		this.attachEventListeners()
@@ -116,7 +119,13 @@ export class CanvasScene {
 			this.oldScale = newScale
 			this.stage.scale({x: newScale, y: newScale})
 			this.stage.position(newPos)
-		}, [this.imageLayer, this.annotationLayer, this.scrollLayer, this.toolLayer])
+		}, [
+			this.imageLayer,
+			this.annotationLayer,
+			this.scrollLayer,
+			this.toolLayer,
+			this.proposalLayer
+		])
 	}
 
 	repositionStageAsPerScale() {

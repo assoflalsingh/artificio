@@ -182,11 +182,6 @@ export default class RectangleAnnotation extends Annotation {
 		}
 	}
 
-	// Return type of Konva.Group
-	getShape() {
-		return this.group
-	}
-
 	getLabelSelectorPosition() {
 		const position = this.group.position()
 		const topLeft = this.getBottomRightCoordinates();
@@ -206,6 +201,10 @@ export default class RectangleAnnotation extends Annotation {
 		this.circles.forEach(c => c.hide())
 		this.group.draggable(false)
 		// this.rectangle.strokeWidth((this.strokeWidth - 5)/this.scale);
+	}
+
+	getArea() {
+		return Math.abs(this.rectangle.width() * this.rectangle.height())
 	}
 
 	getData() {

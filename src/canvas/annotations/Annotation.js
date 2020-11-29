@@ -1,8 +1,9 @@
 import Konva from "konva";
-
+import * as uuid from 'uuid'
 export const AnnotationStrokeWidth = 2
 export const AnnotationCircleRadius = 4
 export const AnnotationCircleStrokeWidth = 1
+export const AnnotationProposalColor = 'blue'
 const TextPadding = 8
 
 export default class Annotation {
@@ -12,7 +13,8 @@ export default class Annotation {
 	label
 	color
 	group = new Konva.Group({
-		draggable: true
+		draggable: true,
+		id: uuid.v4()
 	})
 	type
 
@@ -80,6 +82,11 @@ export default class Annotation {
 
 	getLabel() {
 		return this.annotationData.label
+	}
+
+	// Return type of Konva.Group
+	getShape() {
+		return this.group
 	}
 
 	setLabel(label) {

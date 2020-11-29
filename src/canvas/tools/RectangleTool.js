@@ -100,9 +100,6 @@ export class RectangleTool extends Tool {
 		}
 		const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
 		this.canvasManager.addAnnotation(rectangle)
-		this.canvasManager.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-			position: this.canvasManager.getLabelSelectorPosition()
-		})
 		this.canvasManager.setStageDraggable(true)
 		this.exit()
 	}

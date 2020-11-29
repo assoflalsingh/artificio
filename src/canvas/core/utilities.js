@@ -53,9 +53,16 @@ export function getScaledCoordinates(
 	point,
 	stage
 ) {
-	const imgCords = stage.position()
-	const x = (point.x - imgCords.x) / stage.scale().x
-	const y = (point.y - imgCords.y) / stage.scale().y
+	const stagePosition = stage.position()
+	const x = (point.x - stagePosition.x) / stage.scale().x
+	const y = (point.y - stagePosition.y) / stage.scale().y
+	return {x, y}
+}
+
+export function getUnScaledCoordinates(point, stage) {
+	const stagePosition = stage.position()
+	const x = point.x * stage.scale().x + stagePosition.x
+	const y = point.y * stage.scale().y + stagePosition.y
 	return {x, y}
 }
 

@@ -46,6 +46,13 @@ const styles = {
 				textDecoration: "underline"
 			}
 		}
+	},
+	screen: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%',
+		background: 'black',
+		opacity: 0.7
 	}
 }
 
@@ -54,11 +61,16 @@ const useStyles = makeStyles(styles)
 export class LabelSelector extends CanvasEventAttacher {
 	state = {
 		show: false,
-		position: {x: 0, y: 0}
+		position: {x: 0, y: 0},
+		proposalMode: false
 	}
 
 	showLabelSelector = (value) => {
 		this.setState({show: value})
+	}
+
+	resetProposalMode = () => {
+		this.setState({proposalMode: false})
 	}
 
 	constructor(props) {
@@ -67,7 +79,7 @@ export class LabelSelector extends CanvasEventAttacher {
 			{
 				event: CustomEventType.SHOW_LABEL_DROPDOWN,
 				func: (event) => {
-					this.setState({position: event.detail.position})
+					this.setState({position: event.detail.position, proposalMode: event.detail.proposalMode})
 					this.showLabelSelector(true)
 				}
 			},
@@ -75,6 +87,7 @@ export class LabelSelector extends CanvasEventAttacher {
 				event: CustomEventType.HIDE_LABEL_DROPDOWN,
 				func: (event) => {
 					this.showLabelSelector(false)
+					this.setState({proposalMode: event.detail && event.detail.proposalMode})
 				}
 			}
 		];
@@ -99,7 +112,8 @@ export class LabelSelector extends CanvasEventAttacher {
 						position: 'absolute',
 						opacity: 1,
 						top: this.state.position.y,
-						left: this.state.position.x
+						left: this.state.position.x,
+					  zIndex: 1000
 				}}>
 					<Label
 						showLabelSelector={this.showLabelSelector}
@@ -107,10 +121,18 @@ export class LabelSelector extends CanvasEventAttacher {
 						imageLabels={this.props.imageLabels}
 						deleteAnnotation={this.props.deleteAnnotation}
 						getSelectedAnnotation={this.props.getSelectedAnnotation}
-						setAnnotationLabel={this.props.setAnnotationLabel}
+						setAnnotationLabel={
+							this.state.proposalMode ? (label) => {
+								this.props.getActiveTool().assignLabel(label)
+								this.props.unsetActiveTool()
+							} : this.props.setAnnotationLabel
+						}
+						proposalMode={this.state.proposalMode}
+						resetProposalMode={this.resetProposalMode}
 					/>
 				</div>
 			}
+			{this.state.proposalMode && <BackgroundScreen/>}
 			</>
 		)
 	}
@@ -132,53 +154,61 @@ const Label = ({
 								 imageLabels,
 								 deleteAnnotation,
 								 getSelectedAnnotation,
-								 setAnnotationLabel
+								 setAnnotationLabel,
+								 proposalMode,
+								 resetProposalMode
 	}) => {
 	const classes = useStyles()
 	const annotation = getSelectedAnnotation()
 	const labels = Object.assign([], imageLabels)
 	labels.push(DefaultLabel)
 	const [labelValue, setLabelValue] = React.useState({
-		value: annotation.getLabel(),
-		label: annotation.getLabel()
+		value: !proposalMode ? annotation.getLabel(): DefaultLabel.label_name,
+		label: !proposalMode ? annotation.getLabel(): DefaultLabel.label_name
 	})
 	const [modalOpen, setModalOpen] = React.useState(false)
 	return (
 		<Paper className={classnames(classes.regionInfo)}>
 			<div style={{width: 200}}>
 				<div style={{display: "flex", flexDirection: "row"}}>
-					<div
-						style={{
-							display: "flex",
-							backgroundColor: annotation.color || "#888",
-							color: "#fff",
-							padding: 4,
-							paddingLeft: 8,
-							paddingRight: 8,
-							borderRadius: 4,
-							fontWeight: "bold",
-							textShadow: "0px 0px 5px rgba(0,0,0,0.4)",
-						}}
-					>
-						{annotation.type}
-					</div>
+					{
+						!proposalMode && <div
+							style={{
+								display: "flex",
+								backgroundColor: annotation.color || "#888",
+								color: "#fff",
+								padding: 4,
+								paddingLeft: 8,
+								paddingRight: 8,
+								borderRadius: 4,
+								fontWeight: "bold",
+								textShadow: "0px 0px 5px rgba(0,0,0,0.4)",
+							}}
+						>
+							{annotation.type}
+						</div>
+					}
+
 					<div style={{flexGrow: 1}}/>
-					<IconButton
-						onClick={deleteAnnotation}
-						tabIndex={-1}
-						style={{width: 22, height: 22}}
-						size="small"
-						variant="outlined"
-					>
-						<TrashIcon style={{marginTop: -8, width: 16, height: 16}}/>
-					</IconButton>
+					{
+						!proposalMode &&
+						<IconButton
+							onClick={deleteAnnotation}
+							tabIndex={-1}
+							style={{width: 22, height: 22}}
+							size="small"
+							variant="outlined"
+						>
+							<TrashIcon style={{marginTop: -8, width: 16, height: 16}}/>
+						</IconButton>
+					}
 				</div>
 				<br/>
 				<Select
 					placeholder="Tags"
 					value={labelValue}
 					onChange={(label) => {
-						setAnnotationLabel(label.value)
+						!proposalMode && setAnnotationLabel(label.value)
 						setLabelValue(label)
 					}}
 					options={
@@ -200,7 +230,13 @@ const Label = ({
 						<Box style={{ flexGrow: 1 }} />
 						<Button
 							onClick={() => {
-								deSelectActiveAnnotation()
+								if(proposalMode) {
+									// point to active too assign label
+									setAnnotationLabel(labelValue)
+									resetProposalMode()
+								} else {
+									deSelectActiveAnnotation()
+								}
 								showLabelSelector(false)
 							}}
 							size="small"
@@ -218,5 +254,13 @@ const Label = ({
 				createLabel={() => {}}
 			/>
 		</Paper>
+	)
+}
+
+
+const BackgroundScreen = () => {
+	const classes = useStyles()
+	return (
+		<Box className={classes.screen}/>
 	)
 }

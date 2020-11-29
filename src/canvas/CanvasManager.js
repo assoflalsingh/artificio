@@ -1,16 +1,26 @@
+import * as uuid from 'uuid'
 import {CanvasScene} from "./CanvasScene";
 import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
-import {getScaledCoordinates} from "./core/utilities";
+import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
+import Proposal from "./annotations/Proposal";
+import {AnnotationProposalColor} from "./annotations/Annotation";
 
 export class CanvasManager extends CanvasScene {
 	activeTool
 	annotations = []
+	proposals = []
 	selectedAnnotation
+	eventListeners = [
+		{
+			event: 'click',
+			func: this.findAndSelectAnnotation.bind(this)
+		}
+	]
 
 	// ApplicationConfig is of type {appId: string}
 	constructor(appConfig) {
 		super(appConfig.appId);
-		window.canvas = this
+		this.addEventListeners(this.eventListeners)
 	}
 
 	// Show is of type boolean
@@ -23,6 +33,32 @@ export class CanvasManager extends CanvasScene {
 		return this.annotations.find((ann) => ann.id === id)
 	}
 
+	getIntersectedAnnotation(pointer, layer, annotations) {
+		let minArea = Infinity
+		let finalAnnotation
+		const intersections = layer.getAllIntersections(getUnScaledCoordinates(pointer, this.stage))
+		intersections.forEach(intersection => {
+			const annotation = annotations.find(ann => {
+				return Boolean(intersection.findAncestor('#' + ann.getShape().id()))
+			})
+			if (annotation) {
+				const area = annotation.getArea() || 0
+				if (area < minArea) {
+					minArea = area
+					finalAnnotation = annotation
+				}
+			}
+		})
+		return finalAnnotation
+	}
+
+	findAndSelectAnnotation(pointer) {
+		if (this.annotationLayer.visible()) {
+			const intersectedAnnotation = this.getIntersectedAnnotation(pointer, this.annotationLayer, this.annotations)
+			intersectedAnnotation && this.selectAnnotation(intersectedAnnotation)
+		}
+	}
+
 	selectAnnotation(annotation) {
 		if(this.selectedAnnotation) {
 			this.deSelectActiveAnnotation()
@@ -32,6 +68,9 @@ export class CanvasManager extends CanvasScene {
 		annotation.select()
 		this.addSelectedAnnotationEventListeners()
 		this.annotationLayerDraw()
+		this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+			position: this.getLabelSelectorPosition()
+		})
 	}
 
 	getSelectedAnnotation = () => {
@@ -56,15 +95,6 @@ export class CanvasManager extends CanvasScene {
 		this.selectedAnnotation.getShape().off('dragend.select')
 	}
 
-	addAnnotationEventListeners(annotation) {
-		annotation.getShape().on('click', () => {
-			this.selectAnnotation(annotation)
-			this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-				position: this.getLabelSelectorPosition()
-			})
-		})
-	}
-
 	deSelectActiveAnnotation = () => {
 		if(this.selectedAnnotation) {
 			this.selectedAnnotation.deSelect()
@@ -84,12 +114,11 @@ export class CanvasManager extends CanvasScene {
 		}
 	 * @param annotation
 	 */
-	addAnnotation = (annotation) => {
+	addAnnotation = (annotation, select = true) => {
 		this.annotationLayer.add(annotation.getShape())
 		this.annotationLayerDraw()
 		this.annotations.push(annotation)
-		this.selectAnnotation(annotation)
-		this.addAnnotationEventListeners(annotation)
+		select && this.selectAnnotation(annotation)
 	}
 
 	deleteAnnotation(id) {
@@ -100,6 +129,7 @@ export class CanvasManager extends CanvasScene {
 		this.annotationLayer.batchDraw()
 		this.annotations.splice(index, 1);
 		this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
+		this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
 	}
 
 	/**
@@ -139,6 +169,11 @@ export class CanvasManager extends CanvasScene {
 		this.annotationLayer.destroyChildren();
 		this.annotations = [];
 		this.annotationLayer.batchDraw();
+		this.proposalLayer.destroyChildren();
+		this.proposals = [];
+		this.proposalLayer.batchDraw();
+		this.toolLayer.destroyChildren();
+		this.toolLayerDraw()
 	}
 
 	transformEventDataForTool = (event, eventData) => {
@@ -194,24 +229,29 @@ export class CanvasManager extends CanvasScene {
 	}
 
 	removeToolShape = (figure) => {
-		figure.destroy()
-		this.toolLayer.batchDraw()
+		if (figure) {
+			figure.destroy()
+			this.toolLayer.batchDraw()
+		}
 	}
 
-	getActiveTool() {
+	getActiveTool = () => {
 		return this.activeTool
 	}
 
-	setActiveTool = (toolType) => {
+	setActiveTool = (toolType, data) => {
 		const tool = ToolTypeClassNameMap[toolType]
-		this.activeTool = new tool(this)
+		this.activeTool = new tool(this, data)
 		this.addEventListeners(this.activeTool.eventListeners)
 		this.deSelectActiveAnnotation()
 	}
 
-	unsetActiveTool() {
-		this.removeEventListeners(this.activeTool.eventListeners)
-		this.activeTool = null
+	unsetActiveTool = () => {
+		if (this.activeTool) {
+			this.removeEventListeners(this.activeTool.eventListeners)
+			this.activeTool.exitTool()
+			this.activeTool = null
+		}
 	}
 
 	toolLayerDraw() {
@@ -273,19 +313,113 @@ export class CanvasManager extends CanvasScene {
 		return this.annotations
 	}
 
-	getData() {
+	/**
+	 * @param proposals
+		 {
+		 		block_details: {},
+				word_details: {
+					word_description: string;
+					entity_label: string;
+					bounding_box: {
+						vertices: {
+							x: number;
+							y: number
+						}[]
+					}
+				}
+			}
+	 */
+	addProposals(proposals) {
+		// const annotationData = {
+		// 	"dimensions": {
+		// 		"x": 329,
+		// 		"y": 103,
+		// 		"w": 146,
+		// 		"h": 109
+		// 	},
+		// 	"id": "ad3be96e-690e-4f7a-baeb-4bc8498468b5",
+		// 	"color": "rgb(198,24,138)",
+		// 	"label": "arto_others"
+		// }
+		// const proposal = new Proposal(annotationData, this.stage.scaleX())
+		// this.proposalLayer.add(proposal.getShape())
+		// this.proposalLayer.batchDraw()
+
+		if (this.proposals.length === 0) {
+			const imagePosition = this.konvaImage.position()
+			proposals.forEach(proposal => {
+				proposal.word_details.forEach(word => {
+					const coordinates = word.bounding_box.vertices
+					const topLeft = coordinates[0]
+					const bottomRight = coordinates[2]
+					const width = (bottomRight.x - topLeft.x)/this.imageDimensions.width * this.konvaImage.width()
+					const height = (bottomRight.y - topLeft.y)/this.imageDimensions.height * this.konvaImage.height()
+					const annotationData = {
+						dimensions: {
+							x: (topLeft.x / this.imageDimensions.width * this.konvaImage.width()) + imagePosition.x,
+							y: (topLeft.y / this.imageDimensions.height * this.konvaImage.height()) + imagePosition.y,
+							w: width,
+							h: height
+						},
+						id: uuid.v4(),
+						label: word.bounding_box.entity_label,
+						color: AnnotationProposalColor
+					}
+					const proposal = new Proposal(annotationData, this.stage.scaleX())
+					this.proposals.push(proposal)
+					this.proposalLayer.add(proposal.getShape())
+				})
+			})
+		} else {
+			this.proposals.forEach(p => p.deSelect())
+		}
+		this.annotationLayer.hide()
+		this.annotationLayerDraw()
+		this.proposalLayer.show()
+		this.proposalLayer.batchDraw()
+	}
+
+	hideProposals() {
+		this.proposalLayer.hide()
+		this.proposalLayer.batchDraw()
+		this.annotationLayer.show()
+		this.annotationLayerDraw()
+	}
+
+	getData(scaled = false) {
 		const imagePosition = this.konvaImage.position()
 		return this.annotations.map(ann => {
 			let data = ann.getData()
 			const coordinates =  Object.assign([], ann.getData().coordinates)
+
 			// x1
-			coordinates[0] = (coordinates[0] - imagePosition.x) / this.konvaImage.width()
+			coordinates[0] = coordinates[0] - imagePosition.x
 			// y1
-			coordinates[1] = (coordinates[1] - imagePosition.y) / this.konvaImage.height()
+			coordinates[1] = coordinates[1] - imagePosition.y
 			// x2
-			coordinates[2] = (coordinates[2] - imagePosition.x) / this.konvaImage.width()
+			coordinates[2] = coordinates[2] - imagePosition.x
 			// y2
-			coordinates[3] = (coordinates[3] - imagePosition.y) / this.konvaImage.height()
+			coordinates[3] = coordinates[3] - imagePosition.y
+
+			if (scaled) {
+				// x1
+				coordinates[0] = coordinates[0] / this.konvaImage.width()
+				// y1
+				coordinates[1] = coordinates[1] / this.konvaImage.height()
+				// x2
+				coordinates[2] = coordinates[2] / this.konvaImage.width()
+				// y2
+				coordinates[3] = coordinates[3] / this.konvaImage.height()
+			} else {
+				// x1
+				coordinates[0] = coordinates[0] / this.konvaImage.width() * this.imageDimensions.width
+				// y1
+				coordinates[1] = coordinates[1] / this.konvaImage.height() * this.imageDimensions.height
+				// x2
+				coordinates[2] = coordinates[2] / this.konvaImage.width() * this.imageDimensions.width
+				// y2
+				coordinates[3] = coordinates[3] / this.konvaImage.height() * this.imageDimensions.height
+			}
 			data = {...data, coordinates}
 			return data
 		})
@@ -301,4 +435,10 @@ export class CanvasManager extends CanvasScene {
 			element = document.getElementById(this.appId);
 		element.dispatchEvent(event);
 	};
+
+	destroy() {
+		this.removeEventListeners(this.eventListeners)
+		this.stage.destroyChildren()
+		this.stage.destroy()
+	}
 }

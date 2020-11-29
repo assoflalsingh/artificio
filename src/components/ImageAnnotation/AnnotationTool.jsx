@@ -10,6 +10,7 @@ import Loader from "./Loader";
 import {ToolBar} from "./ToolBar";
 import {LabelSelector} from "./LabelSelector";
 import {LabelsContainer} from "./LabelsContainer";
+import {ToolType} from "../../canvas/core/constants";
 
 export const appId = 'canvas-annotation-tool'
 
@@ -77,6 +78,14 @@ export default class AnnotationTool extends React.Component {
 		}
 	}
 
+	showProposals = (show) => {
+		if(show) {
+			this.canvasManager.setActiveTool(ToolType.Proposal, this.state.textAnnotations)
+		} else {
+			this.canvasManager.unsetActiveTool()
+		}
+	}
+
 	setLoader(value) {
 		this.setState({loading: value})
 	}
@@ -114,6 +123,7 @@ export default class AnnotationTool extends React.Component {
 						<ToolBar
 							setActiveTool={this.canvasManager && this.canvasManager.setActiveTool}
 							onAnnotationToolClose={onAnnotationToolClose}
+							showProposals={this.showProposals}
 						/>
 						<Box style={{backgroundColor: '#383838', height: '78%'}}>
 							{this.state.loading && <Loader/>}
@@ -161,6 +171,8 @@ export default class AnnotationTool extends React.Component {
 								}
 								getSelectedAnnotation={this.canvasManager.getSelectedAnnotation}
 								setAnnotationLabel={this.canvasManager.setAnnotationLabel}
+								getActiveTool={this.canvasManager.getActiveTool}
+								unsetActiveTool={this.canvasManager.unsetActiveTool}
 							/>
 					}
 				</Box>

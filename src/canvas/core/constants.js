@@ -1,4 +1,5 @@
 import {RectangleTool} from "../tools/RectangleTool";
+import {ProposalTool} from "../tools/ProposalTool";
 
 export const CustomEventType = {
 	SHOW_LOADER: 'SHOW_LOADER',
@@ -8,7 +9,15 @@ export const CustomEventType = {
 };
 
 export const ToolType = {
-	Rectangle: 'Rectangle'
+	Rectangle: 'Rectangle',
+	Proposal: 'Proposal'
+}
+
+export const ToolBarItemType = {
+	Proposals: 'Proposals',
+	Shape: 'Shape',
+	Select: 'Select',
+	Drag: 'Drag'
 }
 
 export const AnnotationType = {
@@ -20,5 +29,6 @@ export const KeyMappings = {
 }
 
 export const ToolTypeClassNameMap = {
-	[ToolType.Rectangle]: RectangleTool
+	[ToolType.Rectangle]: RectangleTool,
+	[ToolType.Proposal]: ProposalTool
 }
