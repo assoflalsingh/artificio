@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField } from '@material-ui/core';
+import { Box, FormControl, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField } from '@material-ui/core';
 import MuiPhoneNumber from 'material-ui-phone-number';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { ColorPalette, ColorButton } from 'material-ui-color';
@@ -103,6 +103,7 @@ export function doValidation(value, validators, errorMessages) {
       validatorParam = validator.param;
       validator = getDefaultValidator(validator.type);
     }
+
     if(!validator(value, validatorParam)) {
       errMsg = errorMessages[i] || 'Invalid';
       break;
@@ -199,27 +200,32 @@ export function FormInputSelect({
   } else {
     return (
       <FormInput required={required} label={label}>
-        <Select
-          onChange={onChange}
-          variant="outlined"
-          className={classes.formInput}
-          fullWidth
-          {...props}
-        >
-          {noOptions && <MenuItem value=''><em>{loading ? 'Loading...' : 'None'}</em></MenuItem>}
-          {!noOptions && firstEmpty && <MenuItem value=""><em>None</em></MenuItem>}
-          {options.map((opt)=>{
-            let label = '', value = '';
+        <FormControl error={Boolean(errorMsg)} fullWidth>
+          <Select
+            onChange={onChange}
+            onBlur={onChange}
+            variant="outlined"
+            className={classes.formInput}
+            fullWidth
+            helperText={errorMsg}
+            {...props}
+          >
+            {noOptions && <MenuItem value=''><em>{loading ? 'Loading...' : 'None'}</em></MenuItem>}
+            {!noOptions && firstEmpty && <MenuItem value=""><em>None</em></MenuItem>}
+            {options.map((opt)=>{
+              let label = '', value = '';
 
-            if(typeof(opt) === 'string') {
-              label = value = opt;
-            } else {
-              label = opt[labelKey];
-              value = opt[valueKey];
-            }
-            return  <MenuItem key={value} value={value}>{label}</MenuItem>
-          })}
-        </Select>
+              if(typeof(opt) === 'string') {
+                label = value = opt;
+              } else {
+                label = opt[labelKey];
+                value = opt[valueKey];
+              }
+              return  <MenuItem key={value} value={value}>{label}</MenuItem>
+            })}
+          </Select>
+          <FormHelperText>{errorMsg}</FormHelperText>
+        </FormControl>
       </FormInput>
     );
   }

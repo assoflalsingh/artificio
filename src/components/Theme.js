@@ -59,14 +59,15 @@ const globalTheme = createMuiTheme({
     shadows: defaultTheme.shadows,
     spacing: factor => `${0.25 * factor}rem`,
     typography: {
-      htmlFontSize: 16
+      htmlFontSize: 16,
+      fontFamily: ["Nunito", "Arial", "sans-serif"].join(','),
+      fontSize: 14,
     }
 });
 
 const theme = createMuiTheme({
     typography: {
-      fontFamily: ["Nunito", "Arial", "sans-serif"].join(','),
-      fontSize: 14,
+      ...globalTheme.typography,
     },
     overrides: {
         MuiCssBaseline: {
@@ -163,7 +164,8 @@ const theme = createMuiTheme({
               border: 'none',
               color: globalTheme.palette.primary.main,
               backgroundColor: globalTheme.palette.primary.contrastText,
-              boxShadow: globalTheme.shadows[1]
+              boxShadow: globalTheme.shadows[1],
+              fontWeight: 'bold'
             }
           }
         },
@@ -235,6 +237,11 @@ const theme = createMuiTheme({
         MuiBackdrop: {
           root: {
             color: '#fff'
+          }
+        },
+        MUIDataTableHeadCell: {
+          data: {
+            fontWeight: 'bold'
           }
         }
     }

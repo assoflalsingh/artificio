@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 import MenuTile from '../components/MenuTile';
 import DataExtractionIcon from '../assets/images/data-extraction.svg';
+import TextDataIcon from '../assets/images/text-data.svg';
+import ImageDataIcon from '../assets/images/image-data.svg';
 import DataExtraction from './DataExtraction';
 import {Switch as RouterSwitch, Route} from 'react-router-dom';
 
@@ -26,7 +28,9 @@ export default function Annotation({match}) {
       <Route path={match.url+'/dataExtraction'} component={DataExtraction} />
       <Route>
         <Box className={classes.self}>
-          <MenuTile to={match.url+'/dataExtraction'} icon={DataExtractionIcon} label="Data Extraction" buttonLabel="Open Data" className={classes.menucard}/>
+          <MenuTile to={match.url+'/dataExtraction'} icon={DataExtractionIcon} label="Data Extraction" buttonLabel="Open Data extraction" className={classes.menucard}/>
+          <MenuTile to={match.url+'/textData'} icon={TextDataIcon} label="Text data" buttonLabel="Open text data" className={classes.menucard}/>
+          <MenuTile to={match.url+'/imageData'} icon={ImageDataIcon} label="Image data" buttonLabel="Open image data" className={classes.menucard}/>
         </Box>
       </Route>
     </RouterSwitch>
