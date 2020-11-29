@@ -10,6 +10,7 @@ export class CanvasManager extends CanvasScene {
 	// ApplicationConfig is of type {appId: string}
 	constructor(appConfig) {
 		super(appConfig.appId);
+		window.canvas = this
 	}
 
 	// Show is of type boolean
@@ -270,6 +271,24 @@ export class CanvasManager extends CanvasScene {
 
 	getAnnotations = () => {
 		return this.annotations
+	}
+
+	getData() {
+		const imagePosition = this.konvaImage.position()
+		return this.annotations.map(ann => {
+			let data = ann.getData()
+			const coordinates =  Object.assign([], ann.getData().coordinates)
+			// x1
+			coordinates[0] = (coordinates[0] - imagePosition.x) / this.konvaImage.width()
+			// y1
+			coordinates[1] = (coordinates[1] - imagePosition.y) / this.konvaImage.height()
+			// x2
+			coordinates[2] = (coordinates[2] - imagePosition.x) / this.konvaImage.width()
+			// y2
+			coordinates[3] = (coordinates[3] - imagePosition.y) / this.konvaImage.height()
+			data = {...data, coordinates}
+			return data
+		})
 	}
 
 	/**

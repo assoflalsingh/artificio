@@ -147,6 +147,20 @@ export default class RectangleAnnotation extends Annotation {
 	}
 
 	getTopLeftCoordinates() {
+		const coor = {x: Infinity, y: Infinity}
+		// Get max position for circles
+		this.circles.forEach(c => {
+			if(c.x() < coor.x) {
+				coor.x = c.x()
+			}
+			if(c.y() < coor.y) {
+				coor.y = c.y()
+			}
+		})
+		return coor
+	}
+
+	getBottomRightCoordinates() {
 		const coor = {x: -Infinity, y: -Infinity}
 		// Get max position for circles
 		this.circles.forEach(c => {
@@ -161,7 +175,7 @@ export default class RectangleAnnotation extends Annotation {
 	}
 
 	getLabelPosition() {
-		const position = this.getTopLeftCoordinates()
+		const position = this.getBottomRightCoordinates()
 		return {
 			x: position.x,
 			y: position.y
@@ -175,9 +189,9 @@ export default class RectangleAnnotation extends Annotation {
 
 	getLabelSelectorPosition() {
 		const position = this.group.position()
-		const topLeft = this.getTopLeftCoordinates();
+		const topLeft = this.getBottomRightCoordinates();
 		return {
-			x: position.x + topLeft.x - this.rectangle.width(),
+			x: position.x + topLeft.x - Math.abs(this.rectangle.width()),
 			y: position.y + topLeft.y,
 		}
 	}
@@ -202,7 +216,11 @@ export default class RectangleAnnotation extends Annotation {
 		const x1 = position.x + topLeft.x,
 			y1 = position.y + topLeft.y,
 			x2 = x1 + width,
-			y2 = position + height
-		return [x1, y1, x2, y2]
+			y2 = y1 + height
+		return {
+			coordinates: [x1, y1, x2, y2],
+			label: this.annotationData.label,
+			id: this.id
+		}
 	}
 }
