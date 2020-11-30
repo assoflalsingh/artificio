@@ -9,7 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import SignUpImg from '../assets/images/signup.png';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
+import { doValidation, FormInputPhoneNo, FormInputText } from '../components/FormElements';
 import Logo from '../assets/images/Logo-final.svg';
 
 const api = getInstance();
@@ -57,10 +57,10 @@ export default function SignUp({match, history}) {
     confirm_pass: '',
     accept: false,
   }
-  const [fields, setFileds] = useState({
+  const [formData, setFormData] = useState({
     ...defaults,
   });
-  const [errors, setErrors] = useState({
+  const [formDataErr, setFormDataErr] = useState({
     first_name: '',
     last_name: '',
     email: '',
@@ -80,73 +80,84 @@ export default function SignUp({match, history}) {
     history.push('/signin');
   }
 
-  const validateForm = ()=>{
-    let reqArgs = ['first_name', 'last_name', 'email', 'password', 'confirm_pass'];
-    let allValid = true;
-    reqArgs.forEach((fieldName)=>{
-      let value = fields[fieldName];
-      let err = '';
-      if(value === '' || value === null) {
-        err = 'This field is required.';
-        allValid = false;
-      } else {
-        err = '';
-      }
-      setErrors((prevErrors)=>({
-        ...prevErrors,
-        [fieldName]: err
-      }));
-    });
-    return allValid;
+  const formValidators = {
+    first_name: {
+      validators: ['required'],
+      messages: ['This field is required'],
+    },
+    last_name: {
+      validators: ['required'],
+      messages: ['This field is required'],
+    },
+    email: {
+      validators: ['required', 'email'],
+      messages: ['This field is required', 'Invalid email id'],
+    },
+    password: {
+      validators: ['required'],
+      messages: ['This field is required'],
+    },
+    confirm_pass: {
+      validators: ['required', function(value) { return formData.password == value}],
+      messages: ['This field is required', 'Does not match with the password'],
+    },
   }
 
-  const fieldChanged = (name, value) => {
-    setFileds((prevFields)=>({
-      ...prevFields,
+  const validateField = (name, value) => {
+    let errMsg = '';
+    let fieldValidators = formValidators[name];
+    if(fieldValidators) {
+      errMsg = doValidation(value, fieldValidators.validators, fieldValidators.messages);
+      setFormDataErr((prevErr)=>({
+        ...prevErr,
+        [name]: errMsg,
+      }));
+    }
+    return errMsg;
+  }
+
+  const onTextChange = (e, name) => {
+    let value = e;
+    if(e.target) {
+      name = e.target.name;
+      if(name == 'accept') {
+        value = e.target.checked;
+      } else {
+        value = e.target.value;
+      }
+    }
+    setFormData((prevData)=>({
+      ...prevData,
       [name]: value
     }));
-  }
 
-  const onChange = (e)=>{
-    let name = e.target.name,
-      value = null;
-
-    if(name == 'accept') {
-      value = e.target.checked;
-    } else {
-      value = e.target.value;
-    }
-
-    let err = '';
-    if((value === '' || value === null) && reqFields.indexOf(name) > -1) {
-      err = 'This field is required.';
-    } else if(name == 'confirm_pass' && value != fields['password']) {
-      err = 'This is not same as password';
-    }
-
-    setErrors((prevErrors)=>({
-      ...prevErrors,
-      [name]: err
-    }));
-
-    fieldChanged(name, value);
+    validateField(name, value);
   }
 
   const onRegisterClick = (e)=>{
+    let isFormValid = true;
     setFormError('');
     setFormSuccess('');
-    if(validateForm()) {
+
+    /* Validate */
+    Object.keys(formValidators).forEach(name => {
+      if(Boolean(validateField(name, formData[name]))) {
+        isFormValid = false;
+      }
+    });
+
+    if(isFormValid) {
       setSaving(true);
       api.post(URL_MAP.SIGN_UP, {
-        first_name: fields.first_name,
-        last_name: fields.last_name,
-        email: fields.email,
-        org: fields.org,
-        phone_no: fields.phone_no,
-        password: fields.password,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        org: formData.org,
+        phone_no: formData.phone_no,
+        password: formData.password,
       }).then((resp)=>{
         setFormSuccess('User registered sucessfully.');
-        setFileds(defaults);
+        setFormData(defaults);
       }).catch((err)=>{
         if (err.response) {
           // client received an error response (5xx, 4xx)
@@ -186,33 +197,33 @@ export default function SignUp({match, history}) {
               <form className={classes.root} noValidate autoComplete="off">
                 <Grid container spacing={2} className={classes.formRow}>
                   <Grid item md={6} xs={12}>
-                    <FormInputText name="first_name" value={fields.first_name} label="First name"
-                      InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.first_name} required/>
+                    <FormInputText name="first_name" value={formData.first_name} label="First name"
+                      InputIcon={PersonOutlineIcon} onChange={onTextChange} errorMsg={formDataErr.first_name} required/>
                   </Grid>
                   <Grid item md={6} xs={12}>
-                    <FormInputText name="last_name" value={fields.last_name} label="Last name"
-                      InputIcon={PersonOutlineIcon} onChange={onChange} errorMsg={errors.last_name} required/>
+                    <FormInputText name="last_name" value={formData.last_name} label="Last name"
+                      InputIcon={PersonOutlineIcon} onChange={onTextChange} errorMsg={formDataErr.last_name} required/>
                   </Grid>
                 </Grid>
                 <Box className={classes.formRow}>
-                  <FormInputText name="email" value={fields.email} label="Email id"
-                    InputIcon={MailOutlineIcon} onChange={onChange} errorMsg={errors.email} required/>
+                  <FormInputText name="email" value={formData.email} label="Email id"
+                    InputIcon={MailOutlineIcon} onChange={onTextChange} errorMsg={formDataErr.email} required/>
                 </Box>
                 <Box className={classes.formRow}>
-                  <FormInputText name="org" value={fields.org} label="Organisation"
-                    InputIcon={BusinessIcon} onChange={onChange} errorMsg={errors.org} />
+                  <FormInputText name="org" value={formData.org} label="Organisation"
+                    InputIcon={BusinessIcon} onChange={onTextChange} errorMsg={formDataErr.org} />
                 </Box>
                 <Box className={classes.formRow}>
-                  <FormInputPhoneNo name="phone_no" value={fields.phone_no} label="Phone no"
-                    defaultCountry={'us'} onChange={(value)=>{console.log(value); fieldChanged('phone_no', value)}} errorMsg={errors.phone_no} />
+                  <FormInputPhoneNo name="phone_no" value={formData.phone_no} label="Phone no"
+                    defaultCountry={'us'} onChange={(value)=>{onTextChange(value, 'phone_no')}} errorMsg={formDataErr.phone_no} />
                 </Box>
                 <Box className={classes.formRow}>
-                  <FormInputText name="password" value={fields.password} label="Password"
-                    InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.password} required />
+                  <FormInputText name="password" value={formData.password} label="Password"
+                    InputIcon={LockOutlinedIcon} type='password' onChange={onTextChange} errorMsg={formDataErr.password} required />
                 </Box>
                 <Box className={classes.formRow}>
-                  <FormInputText name="confirm_pass" value={fields.confirm_pass} label="Confirm password"
-                    InputIcon={LockOutlinedIcon} type='password' onChange={onChange} errorMsg={errors.confirm_pass} required />
+                  <FormInputText name="confirm_pass" value={formData.confirm_pass} label="Confirm password"
+                    InputIcon={LockOutlinedIcon} type='password' onChange={onTextChange} errorMsg={formDataErr.confirm_pass} required />
                 </Box>
                 {formSuccess &&
                 <Box className={classes.formRow}>
@@ -224,12 +235,12 @@ export default function SignUp({match, history}) {
                 </Box>}
                 <Box className={classes.formRow}>
                   <FormControlLabel
-                    control={<Checkbox name="accept" color='primary' checked={fields.accept} onChange={onChange} />}
+                    control={<Checkbox name="accept" color='primary' checked={formData.accept} onChange={onTextChange} />}
                     label={'I accept Terms and Conditions'}
                   />
                 </Box>
                 <Box className={classes.formRow}>
-                  <Button onClick={onRegisterClick} variant="contained" color="primary" fullWidth disabled={!fields.accept || saving}>{saving ? 'Registering...' : 'Register'}</Button>
+                  <Button onClick={onRegisterClick} variant="contained" color="primary" fullWidth disabled={!formData.accept || saving}>{saving ? 'Registering...' : 'Register'}</Button>
                 </Box>
                 <Box display="flex" className={classes.formRow}>
                   <Typography style={{margin: 'auto'}}>Already have an account ? <Link href="#" onClick={onSigninClick}>Sign in</Link></Typography>

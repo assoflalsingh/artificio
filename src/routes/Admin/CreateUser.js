@@ -35,8 +35,8 @@ export default function CreateUser({onCancel, ...props}) {
       messages: ['This field is required'],
     },
     email: {
-      validators: ['required'],
-      messages: ['This field is required'],
+      validators: ['required', 'email'],
+      messages: ['This field is required', 'Invalid email id'],
     },
     password: {
       validators: ['required'],
