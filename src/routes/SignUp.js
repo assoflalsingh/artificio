@@ -156,7 +156,7 @@ export default function SignUp({match, history}) {
         phone_no: formData.phone_no,
         password: formData.password,
       }).then((resp)=>{
-        setFormSuccess('User registered sucessfully.');
+        setFormSuccess('User registered sucessfully. Please check your email to activate your account.');
         setFormData(defaults);
       }).catch((err)=>{
         if (err.response) {

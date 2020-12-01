@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, FormControl, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField } from '@material-ui/core';
+import { Box, CircularProgress, Divider, FormControl, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField, Typography } from '@material-ui/core';
 import MuiPhoneNumber from 'material-ui-phone-number';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { ColorPalette, ColorButton } from 'material-ui-color';
@@ -115,7 +115,7 @@ export function doValidation(value, validators, errorMessages) {
   return errMsg;
 }
 
-export function FormInputText({InputIcon, errorMsg, required, onChange, label, ...props}) {
+export function FormInputText({InputIcon, errorMsg, required, onChange, label, readOnly, ...props}) {
   const classes = useStyles();
 
   return (
@@ -133,7 +133,8 @@ export function FormInputText({InputIcon, errorMsg, required, onChange, label, .
         data-required={required}
         inputProps={{
           'data-label': label,
-          'data-required': required
+          'data-required': required,
+          readOnly: Boolean(readOnly)
         }}
         onChange={onChange}
         onBlur={onChange}
@@ -161,6 +162,7 @@ export function FormInputPhoneNo({InputIcon, errorMsg, required, onChange, label
           'data-required': required
         }}
         onChange={onChange}
+        onBlur={onChange}
         {...props}
       />
     </FormInput>
@@ -318,5 +320,21 @@ export function FormInputColor({
       <ColorButton disableRipple className={classes.formInput} color={value} onClick={(e)=>setAnchorEl(e.target)}
       />
     </FormInput>
+  );
+}
+
+export function FormHeader({title, hasTopDivider, loadingText}) {
+  return (
+    <>
+      {hasTopDivider && <Divider style={{marginTop: '1rem', marginBottom: '1rem'}} variant="middle" />}
+      <Box display="flex">
+      <Typography variant="h6" color="primary">{title}</Typography>
+      {loadingText &&
+      <>
+      <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} />
+      <Typography style={{alignSelf:'center'}}>&nbsp;{loadingText}</Typography>
+      </>}
+      </Box>
+    </>
   );
 }

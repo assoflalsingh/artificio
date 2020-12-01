@@ -12,7 +12,11 @@ import Dashboard from './routes/Dashboard';
 import SignUp from './routes/SignUp';
 import Activate from './routes/Activate';
 
-const reduxStore = configureStore();
+const reduxStore = configureStore({
+  user: {
+    user_set: false,
+  }
+});
 
 export default function App() {
   return (

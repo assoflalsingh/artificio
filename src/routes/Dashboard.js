@@ -3,13 +3,14 @@ import { Container, Box, Paper, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { connect } from "react-redux";
-import {setUser} from "../store/reducers/user";
+import {setUser, setUserLoading} from "../store/reducers/user";
 
 import { getInstance, URL_MAP } from '../others/artificio_api.instance';
 import Logo from '../assets/images/Logo-final.svg';
 import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
 import SideMenuBar from '../components/SideMenuBar';
+import { titleCase } from '../others/utils';
 
 const useStyles = makeStyles((theme)=>({
   root: {
@@ -55,15 +56,16 @@ const Dashboard = (props) => {
 
   useEffect(()=>{
     const api = getInstance(localStorage.getItem('token'));
-
+    props.setUserLoading();
     api.get(URL_MAP.USER_INFO)
       .then((res)=>{
         let data = res.data.data;
+        data.role_name = titleCase(data.role_name.replace('_', ' '))
         props.setUser(data);
       })
       .catch((err)=>{
         console.log(err);
-      })
+      });
   }, []);
 
   return (
@@ -91,5 +93,6 @@ const Dashboard = (props) => {
 }
 
 export default connect(()=>{}, (dispatch)=>({
-  setUser: (user)=>dispatch(setUser(user))
+  setUser: (user)=>dispatch(setUser(user)),
+  setUserLoading: ()=>dispatch(setUserLoading()),
 }))(Dashboard);
