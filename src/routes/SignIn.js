@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
   },
   img: {
     maxWidth: '100%',
-    height: '100%',
     padding: '0.5rem'
   },
   root: {
@@ -42,6 +41,8 @@ const useStyles = makeStyles((theme) => ({
   },
   page: {
     minHeight: '100%',
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: theme.palette.common.white
   }
 }));
@@ -167,10 +168,10 @@ export default function SignIn({history, location}) {
           </Link>
         </Container>
       </Paper>
-      <Container maxWidth='lg'>
+      <Container maxWidth='lg' style={{flexGrow: 1, display:'flex', alignItems: 'stretch'}}>
         <Grid container>
-          <Grid item lg={7} md={6} sm={12} xs={12}>
-            <img src={SigninImg} className={classes.img} />
+          <Grid item lg={7} md={6} sm={12} xs={12} style={{display:'flex'}}>
+            <img src={SigninImg} className={classes.img} style={{alignSelf: 'center'}}/>
           </Grid>
           <Grid item item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
             <Paper className={classes.formRoot} style={{margin: 'auto'}} elevation={3}>

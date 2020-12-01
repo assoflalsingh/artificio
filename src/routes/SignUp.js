@@ -34,11 +34,12 @@ const useStyles = makeStyles((theme) => ({
   },
   img: {
     maxWidth: '100%',
-    height: '100%',
     padding: '0.5rem'
   },
   page: {
     minHeight: '100%',
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: theme.palette.common.white
   }
 }));
@@ -186,13 +187,13 @@ export default function SignUp({match, history}) {
           </Link>
         </Container>
       </Paper>
-      <Container maxWidth='lg'>
+      <Container maxWidth='lg' style={{flexGrow: 1, display:'flex', alignItems: 'stretch'}}>
         <Grid container>
-          <Grid item lg={7} md={6} sm={12} xs={12}>
-            <img src={SignUpImg} className={classes.img} />
+          <Grid item lg={7} md={6} sm={12} xs={12} style={{display:'flex'}}>
+            <img src={SignUpImg} className={classes.img} style={{alignSelf: 'center'}}/>
           </Grid>
-          <Grid item item lg={5} md={6} sm={12} xs={12}>
-            <Paper className={classes.formRoot} style={{marginTop: '0.5rem'}} elevation={3}>
+          <Grid item item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
+            <Paper className={classes.formRoot} style={{margin: 'auto'}} elevation={3}>
               <Typography variant="h6">Sign up</Typography>
               <form className={classes.root} noValidate autoComplete="off">
                 <Grid container spacing={2} className={classes.formRow}>
