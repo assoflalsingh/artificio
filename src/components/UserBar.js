@@ -48,14 +48,14 @@ function UserBar({className, user, history}) {
         | Account: <strong>{user.account_number}</strong></Typography>}
       <Box className={classes.right}>
         <Box className={classes.rightItem}>
-          <TextFieldRounded
+          {/* <TextFieldRounded
             startAdornment={
                 <InputAdornment position="end">
                   <SearchIcon />
                 </InputAdornment>
             }
             placeholder='Search'
-          />
+          /> */}
         </Box>
         <IconButton>
           <Badge badgeContent={0} max={99} color="primary">
