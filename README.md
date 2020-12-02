@@ -61,6 +61,12 @@ server {
 
         server_name artificio.ai www.artificio.ai;
 
+        location /ping {
+                access_log off;
+                return 200 'SUCCESS';
+                add_header Content-Type text/html;
+        }
+
         location / {
                 try_files $uri $uri/ /index.html;
         }
