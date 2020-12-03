@@ -73,7 +73,7 @@ export function ToolBar(props) {
 			</Menu>
 			<ToolBarButton
 				active={activeTool === ToolBarItemType.Proposals}
-				disabled={activeTool === ToolBarItemType.Shape}
+				// disabled={activeTool === ToolBarItemType.Shape}
 				label='Proposals'
 				icon={<AppsIcon />}
 				onClick={() => {

@@ -63,6 +63,7 @@ export default class Proposal extends Annotation {
 	}
 
 	select() {
+		this.group.moveToTop()
 		this.rectangle.stroke(ProposalHoverColor)
 		this.isSelected = true
 	}

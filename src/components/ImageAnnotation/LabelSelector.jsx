@@ -8,7 +8,7 @@ import TrashIcon from "@material-ui/icons/Delete"
 import {Select as MaterialSelect}  from '@material-ui/core';
 import {grey} from "@material-ui/core/colors";
 import {CanvasEventAttacher} from "./CanvasEventAttacher";
-import {CustomEventType} from "../../canvas/core/constants";
+import {CustomEventType, ToolType} from "../../canvas/core/constants";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import Box from "@material-ui/core/Box";
@@ -99,7 +99,7 @@ export class LabelSelector extends CanvasEventAttacher {
 				func: (event) => {
 					event.preventDefault();
 					const activeTool = this.props.getActiveTool()
-					if (activeTool) {
+					if (activeTool.toolType === ToolType.Proposal) {
 						this.setState({
 							showProposalOptionSelection: true,
 							proposalOptionSelectionPosition: {

@@ -194,6 +194,7 @@ export default class RectangleAnnotation extends Annotation {
 	select() {
 		this.circles.forEach(c => c.show())
 		this.group.draggable(true)
+		this.group.moveToTop()
 		// this.rectangle.strokeWidth((this.strokeWidth + 5)/this.scale);
 	}
 
