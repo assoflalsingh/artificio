@@ -46,6 +46,8 @@ export const URL_MAP = {
   ADD_USER: 'auth/add-user/',
   UPDATE_USER: 'auth/update-user/',
   UPDATE_PASSWORD: 'auth/change-password/',
+  FORGOT_PASSWORD: 'auth/forgot-password/',
+  RESET_PASSWORD: 'auth/reset-password/',
 
   /* annotation */
   UPLOAD_TO_S3: 'upload-to-s3/',

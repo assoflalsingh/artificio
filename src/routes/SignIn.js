@@ -116,13 +116,9 @@ export default function SignIn({history, location}) {
     fieldChanged(name, value);
   }
 
-  const onRegisterClick = (e)=>{
+  const goToURL = (e, url)=>{
     e.preventDefault();
-    history.push('/signup');
-  }
-
-  const onForgotClick = (e)=>{
-    e.preventDefault();
+    history.push(url);
   }
 
   const onSubmitClick = (e)=>{
@@ -194,7 +190,7 @@ export default function SignIn({history, location}) {
                     />
                   </Grid>
                   <Grid item md={6} xs={12} style={{display: 'flex'}}>
-                    <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={onForgotClick}>Forgot password ?</Link>
+                    <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={(e)=>goToURL(e, '/forgotpassword')}>Forgot password ?</Link>
                   </Grid>
                 </Grid>
                 {formSuccess &&
@@ -209,7 +205,7 @@ export default function SignIn({history, location}) {
                   <Button onClick={onSubmitClick} variant="contained" color="primary" disabled={authorizing}>{authorizing ? 'Authorizing...' : 'Login'}</Button>
                 </Box>
                 <Box className={classes.formRow}>
-                  <Typography><Link href="#" onClick={onRegisterClick}>Register</Link> if you don't have an account ?</Typography>
+                  <Typography><Link href="#" onClick={(e)=>goToURL(e, '/signup')}>Register</Link> if you don't have an account ?</Typography>
                 </Box>
               </form>
               <Divider variant="middle" style={{marginTop: '1rem'}}/>
