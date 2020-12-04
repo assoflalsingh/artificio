@@ -3,9 +3,11 @@ import {KeyMappings} from "../core/constants";
 export class Tool {
 	toolType
 	canvasManager
+	imageLabels
 
-	constructor(canvasManager) {
+	constructor(canvasManager, data, imageLabels) {
 		this.canvasManager = canvasManager
+		this.imageLabels = imageLabels
 		this.addEventListeners()
 	}
 

@@ -79,7 +79,7 @@ export default class AnnotationTool extends React.Component {
 
 	showProposals = (show) => {
 		if(show) {
-			this.canvasManager.setActiveTool(ToolType.Proposal, this.state.textAnnotations)
+			this.canvasManager.setActiveTool(ToolType.Proposal, this.state.textAnnotations, this.state.imageLabels)
 		} else {
 			this.canvasManager.unsetActiveTool()
 		}
@@ -121,7 +121,7 @@ export default class AnnotationTool extends React.Component {
 					<Box style={{flexGrow: 1, overflow: 'hidden', width: '75%'}}>
 						<ToolBar
 							setActiveTool={this.canvasManager
-								&& this.canvasManager.setActiveTool.bind(this, ToolType.Rectangle, this.state.imageLabels)
+								&& this.canvasManager.setActiveTool.bind(this, ToolType.Rectangle, null, this.state.imageLabels)
 							}
 							onAnnotationToolClose={onAnnotationToolClose}
 							showProposals={this.showProposals}

@@ -240,9 +240,9 @@ export class CanvasManager extends CanvasScene {
 		return this.activeTool
 	}
 
-	setActiveTool = (toolType, data) => {
+	setActiveTool = (toolType, data, imageLabels) => {
 		const tool = ToolTypeClassNameMap[toolType]
-		this.activeTool = new tool(this, data)
+		this.activeTool = new tool(this, data, imageLabels)
 		this.addEventListeners(this.activeTool.eventListeners)
 		this.deSelectActiveAnnotation()
 	}

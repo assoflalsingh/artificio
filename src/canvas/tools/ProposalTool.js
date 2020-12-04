@@ -6,8 +6,8 @@ import {DefaultLabel} from "../../components/ImageAnnotation/LabelSelector";
 import RectangleAnnotation from "../annotations/RectangleAnnotation";
 
 export class ProposalTool extends Tool {
-	constructor(canvasManager, proposals) {
-		super(canvasManager);
+	constructor(canvasManager, proposals, imageLabels) {
+		super(canvasManager, proposals, imageLabels);
 		this.toolType = ToolType.Proposal
 		this.canvasManager.addProposals(proposals)
 	}
@@ -72,9 +72,9 @@ export class ProposalTool extends Tool {
 				color: generateRandomColor(),
 				label: DefaultLabel.label_name
 			}
-			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
+			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX(), this.imageLabels)
 			this.canvasManager.addAnnotation(rectangle)
-			this.exitTool()
+			// this.exitTool()
 		} else {
 
 		}
@@ -114,7 +114,7 @@ export class ProposalTool extends Tool {
 				color: generateRandomColor(),
 				label: label.value
 			}
-			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
+			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX(), this.imageLabels)
 			rectangle.deSelect()
 			this.canvasManager.addAnnotation(rectangle, false)
 		})

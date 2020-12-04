@@ -62,7 +62,8 @@ export function ToolBar(props) {
 			<Menu open={Boolean(shapesAnchor)} anchorEl={shapesAnchor} onClose={(e)=>setShapesAnchor(null)}>
 				<MenuItem data-name="create-box"
 									onClick={(e)=>{
-										setShapesAnchor(null);onSelectTool(e);
+										setShapesAnchor(null);
+										onSelectTool(e);
 										setActiveTool(ToolBarItemType.Shape)
 									}}>
 					<ListItemText primary="Bounding Box" />

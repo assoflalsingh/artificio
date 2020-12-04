@@ -10,9 +10,8 @@ export class RectangleTool extends Tool {
 	tempRectangle
 	imageLabels
 
-	constructor(canvasManager, imageLabels) {
-		super(canvasManager, imageLabels)
-		this.imageLabels = imageLabels
+	constructor(canvasManager, data, imageLabels) {
+		super(canvasManager, data, imageLabels)
 		this.toolType = ToolType.Rectangle
 		this.initializeTool()
 	}
