@@ -17,6 +17,7 @@ export default class Annotation {
 		id: uuid.v4()
 	})
 	type
+	imageLabels = []
 
 	/**
 	 * @param data
@@ -26,12 +27,21 @@ export default class Annotation {
 			color: string;
 			label: string;
 		}
+	 * @param scale
+	 * @param imageLabels
+	 * {
+			"label_name": string,
+			"label_shape": string",
+			"label_datatype": string",
+			"label_color": string
+			}
 	 */
-	constructor(data, scale) {
+	constructor(data, scale, imageLabels) {
 		this.annotationData = data
 		this.id = data.id
 		this.scale = scale
 		this.color = data.color
+		this.imageLabels = imageLabels || []
 	}
 
 	// Method will be overriden by child class
@@ -49,34 +59,43 @@ export default class Annotation {
 
 	}
 
+	shouldLabelBeAdded() {
+		return !!this.imageLabels.find(label => label.label_name === this.annotationData.label)
+	}
+
 	addLabel() {
-		const labelPosition = this.getLabelPosition();
-		this.label = new Konva.Label({
-			x: labelPosition.x,
-			y: labelPosition.y,
-		});
-		const tag = new Konva.Tag({
-			fill: this.annotationData.color,
-			cornerRadius: 4 / this.scale
-		})
-		this.label.add(tag);
-		const text = new Konva.Text({
-			text: this.annotationData.label || 'annotation',
-			fontSize: 12 / this.scale,
-			fontStyle: 'bold',
-			padding: 5 / this.scale,
-			fill: 'white'
-		})
-		text.width(text.width() + TextPadding/this.scale)
-		this.label.add(text);
-		this.label.x(this.label.x() - this.label.width())
-		this.group.add(this.label);
+		if (this.shouldLabelBeAdded()) {
+			const labelPosition = this.getLabelPosition();
+			this.label = new Konva.Label({
+				x: labelPosition.x,
+				y: labelPosition.y,
+			});
+			const tag = new Konva.Tag({
+				fill: this.annotationData.color,
+				cornerRadius: 4 / this.scale
+			})
+			this.label.add(tag);
+			const text = new Konva.Text({
+				text: this.annotationData.label || 'annotation',
+				fontSize: 12 / this.scale,
+				fontStyle: 'bold',
+				padding: 5 / this.scale,
+				fill: 'white'
+			})
+			text.width(text.width() + TextPadding/this.scale)
+			this.label.add(text);
+			this.label.x(this.label.x() - this.label.width())
+			this.group.add(this.label);
+		}
 	}
 
 	reCreateLabel() {
 		// Recreate Label
-		this.label.destroy()
-		this.label.destroyChildren()
+		if (this.label) {
+			this.label.destroy()
+			this.label.destroyChildren()
+			this.group.getLayer() && this.group.getLayer().draw()
+		}
 		this.addLabel()
 	}
 

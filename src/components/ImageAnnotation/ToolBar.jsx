@@ -50,7 +50,7 @@ export function ToolBar(props) {
 	});
 
 	const onSelectTool = (e) => {
-		props.setActiveTool(ToolType.Rectangle)
+		props.setActiveTool()
 	}
 
 	return(

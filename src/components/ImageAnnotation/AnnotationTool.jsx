@@ -1,7 +1,6 @@
 import * as React from "react";
 import {RegionLeftToolBar} from "../../annotator/defaults";
-import {Box, Button, Typography} from "@material-ui/core";
-import CloseOutlinedIcon from "@material-ui/icons/CloseOutlined";
+import {Box, Typography} from "@material-ui/core";
 import CanvasWrapper from "./CanvasWrapper";
 import {CanvasManager} from "../../canvas/CanvasManager";
 import {URL_MAP} from "../../others/artificio_api.instance";
@@ -121,7 +120,9 @@ export default class AnnotationTool extends React.Component {
 					<RegionLeftToolBar dispatch={undefined} regions={activeImage ? activeImage.regions : []} />
 					<Box style={{flexGrow: 1, overflow: 'hidden', width: '75%'}}>
 						<ToolBar
-							setActiveTool={this.canvasManager && this.canvasManager.setActiveTool}
+							setActiveTool={this.canvasManager
+								&& this.canvasManager.setActiveTool.bind(this, ToolType.Rectangle, this.state.imageLabels)
+							}
 							onAnnotationToolClose={onAnnotationToolClose}
 							showProposals={this.showProposals}
 						/>

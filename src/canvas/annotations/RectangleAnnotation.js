@@ -17,8 +17,8 @@ export default class RectangleAnnotation extends Annotation {
 		}
 	 * @param scale
 	 */
-	constructor(annotationData, scale) {
-		super(annotationData, scale)
+	constructor(annotationData, scale, imageLabels) {
+		super(annotationData, scale, imageLabels)
 		this.type = AnnotationType.Rectangle
 		this.initialize()
 	}
@@ -112,8 +112,8 @@ export default class RectangleAnnotation extends Annotation {
 		})
 		this.circles.forEach(c => {
 			c.on('dragstart', () => {
-				this.label.destroy()
-				this.label.destroyChildren()
+				this.label && this.label.destroy()
+				this.label && this.label.destroyChildren()
 			})
 			c.on('dragend', () => {
 				this.addLabel()

@@ -99,7 +99,7 @@ export class LabelSelector extends CanvasEventAttacher {
 				func: (event) => {
 					event.preventDefault();
 					const activeTool = this.props.getActiveTool()
-					if (activeTool.toolType === ToolType.Proposal) {
+					if (activeTool && activeTool.toolType === ToolType.Proposal) {
 						this.setState({
 							showProposalOptionSelection: true,
 							proposalOptionSelectionPosition: {
@@ -213,7 +213,6 @@ const Label = ({
 	const classes = useStyles()
 	const annotation = getSelectedAnnotation()
 	const labels = Object.assign([], imageLabels)
-	labels.push(DefaultLabel)
 	const [labelValue, setLabelValue] = React.useState({
 		value: !proposalMode ? annotation.getLabel(): DefaultLabel.label_name,
 		label: !proposalMode ? annotation.getLabel(): DefaultLabel.label_name
@@ -305,7 +304,14 @@ const Label = ({
 			<CreateModalDialog
 				modalOpen={modalOpen}
 				onClose={() => setModalOpen(false)}
-				createLabel={() => {}}
+				createLabel={(labelName) => {
+					setAnnotationLabel(labelName)
+					setLabelValue({
+						value: labelName,
+						label: labelName
+					})
+					setModalOpen(false)
+				}}
 			/>
 		</Paper>
 	)

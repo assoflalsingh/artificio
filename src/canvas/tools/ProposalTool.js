@@ -33,57 +33,66 @@ export class ProposalTool extends Tool {
 
 	createAnnotation = () => {
 		const proposals = this.canvasManager.proposals.filter(p => p.isSelected)
-		let minX = Infinity
-		let minY = Infinity
-		let maxX = -Infinity
-		let maxY = -Infinity
-		proposals.forEach(p => {
-			const coordinates = p.getData()
-			const x1 = coordinates[0]
-			const y1 = coordinates[1]
-			const x2 = coordinates[2]
-			const y2 = coordinates[3]
+		if (proposals.length > 0) {
+			let minX = Infinity
+			let minY = Infinity
+			let maxX = -Infinity
+			let maxY = -Infinity
+			proposals.forEach(p => {
+				const coordinates = p.getData()
+				const x1 = coordinates[0]
+				const y1 = coordinates[1]
+				const x2 = coordinates[2]
+				const y2 = coordinates[3]
 
-			if(x1 < minX) {
-				minX = x1
-			}
+				if(x1 < minX) {
+					minX = x1
+				}
 
-			if(y1 < minY) {
-				minY = y1
-			}
+				if(y1 < minY) {
+					minY = y1
+				}
 
-			if(x2 > maxX) {
-				maxX = x2
-			}
+				if(x2 > maxX) {
+					maxX = x2
+				}
 
-			if(y2 > maxY) {
-				maxY = y2
+				if(y2 > maxY) {
+					maxY = y2
+				}
+			})
+			const annotationData = {
+				dimensions: {
+					x: minX,
+					y: minY,
+					w: maxX - minX,
+					h: maxY - minY
+				},
+				id: uuid.v4(),
+				color: generateRandomColor(),
+				label: DefaultLabel.label_name
 			}
-		})
-		const annotationData = {
-			dimensions: {
-				x: minX,
-				y: minY,
-				w: maxX - minX,
-				h: maxY - minY
-			},
-			id: uuid.v4(),
-			color: generateRandomColor(),
-			label: DefaultLabel.label_name
+			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
+			this.canvasManager.addAnnotation(rectangle)
+			this.exitTool()
+		} else {
+
 		}
-		const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX())
-		this.canvasManager.addAnnotation(rectangle)
-		this.exitTool()
 	}
 
 	showLabelDropDown = () => {
-		this.canvasManager.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-			position: {
-				x: this.canvasManager.stage.width()/2,
-				y: this.canvasManager.stage.height()/2
-			},
-			proposalMode: true
-		})
+		const selectedProposals = this.canvasManager.proposals.filter(p => p.isSelected)
+		if (selectedProposals.length > 0) {
+			this.canvasManager.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+				position: {
+					x: this.canvasManager.stage.width()/2,
+					y: this.canvasManager.stage.height()/2
+				},
+				proposalMode: true
+			})
+		} else {
+
+		}
 	}
 
 	assignLabel = (label) => {

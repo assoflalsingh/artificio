@@ -21,6 +21,7 @@ export class CanvasManager extends CanvasScene {
 	constructor(appConfig) {
 		super(appConfig.appId);
 		this.addEventListeners(this.eventListeners)
+		window.canvas = this
 	}
 
 	// Show is of type boolean
@@ -373,8 +374,6 @@ export class CanvasManager extends CanvasScene {
 		} else {
 			this.proposals.forEach(p => p.deSelect())
 		}
-		this.annotationLayer.hide()
-		this.annotationLayerDraw()
 		this.proposalLayer.show()
 		this.proposalLayer.batchDraw()
 	}
@@ -382,8 +381,6 @@ export class CanvasManager extends CanvasScene {
 	hideProposals() {
 		this.proposalLayer.hide()
 		this.proposalLayer.batchDraw()
-		this.annotationLayer.show()
-		this.annotationLayerDraw()
 	}
 
 	getData(scaled = false) {

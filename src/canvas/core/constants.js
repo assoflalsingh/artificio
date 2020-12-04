@@ -21,7 +21,8 @@ export const ToolBarItemType = {
 }
 
 export const AnnotationType = {
-	Rectangle: 'Box'
+	Rectangle: 'Box',
+	Proposal: 'Proposal'
 }
 
 export const KeyMappings = {
