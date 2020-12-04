@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Divider, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation, FormHeader, FormInputPhoneNo } from '../../components/FormElements';
+import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation, FormHeader, FormInputPhoneNo, PasswordPolicy } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import {getEpochNow, titleCase} from '../../others/utils';
 import { connect } from 'react-redux';
@@ -197,8 +197,8 @@ function Auth({api}) {
       messages: ['This field is required'],
     },
     password: {
-      validators: ['required'],
-      messages: ['This field is required'],
+      validators: ['required', 'password'],
+      messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
       validators: ['required', function(value) { return formData.password == value}],
@@ -285,7 +285,7 @@ function Auth({api}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Password" required name='password' type='password'
+          <FormInputText label="Password" required name='password' type='password' info={<PasswordPolicy />}
             value={formData.password} errorMsg={formDataErr.password} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>

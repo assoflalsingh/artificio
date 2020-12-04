@@ -31,6 +31,10 @@ const globalTheme = createMuiTheme({
         success: {
           main: '#04b66d',
         },
+        info: {
+          main: '#ffb600',
+          dark: '#dea414'
+        },
         grey: {
           200: '#eff0f0',
         },

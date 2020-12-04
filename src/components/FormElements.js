@@ -4,6 +4,7 @@ import { Box, CircularProgress, Divider, FormControl, FormHelperText, FormLabel,
 import MuiPhoneNumber from 'material-ui-phone-number';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { ColorPalette, ColorButton } from 'material-ui-color';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 const useStyles = makeStyles((theme) => ({
   formRoot: {
@@ -22,6 +23,11 @@ const useStyles = makeStyles((theme) => ({
   img: {
     maxWidth: '100%',
     height: 'auto'
+  },
+  info: {
+    color: theme.palette.info.main,
+    marginLeft: '0.25rem',
+    fontSize: '1.2rem',
   }
 }));
 
@@ -65,11 +71,50 @@ export function FormRowItem({children, ...props}) {
   );
 }
 
-export function FormInput({children, ...props}) {
+export function FormInput({children, info, ...props}) {
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handlePopoverOpen = (event) => {
+    console.log('open');
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    console.log('close');
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
   return (
     <Box>
-      <FormLabel component={Box} required={props.required} className={classes.formLabel}>{props.label}</FormLabel>
+      <Box display="flex" style={{alignItems: 'flex-end'}}>
+        <FormLabel component={Box} required={props.required} className={classes.formLabel}>
+          {props.label}
+        </FormLabel>
+          {info &&
+            <>
+            <HelpOutlineIcon className={classes.info} onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}/>
+            <Popover
+              style={{pointerEvents: 'none'}}
+              open={open}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'center',
+                horizontal: 'left',
+              }}
+              onClose={handlePopoverClose}
+              disableRestoreFocus
+            >
+              {info}
+            </Popover>
+            </>
+          }
+      </Box>
       {children}
     </Box>
   );
@@ -82,6 +127,9 @@ function getDefaultValidator(name) {
     },
     'email': (value)=>{
       return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(value);
+    },
+    'password': (value)=>{
+      return /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,40})/.test(value);
     },
     'regex': (value, exp)=>{
       const checker = new RegExp(exp);
@@ -115,11 +163,11 @@ export function doValidation(value, validators, errorMessages) {
   return errMsg;
 }
 
-export function FormInputText({InputIcon, errorMsg, required, onChange, label, readOnly, ...props}) {
+export function FormInputText({InputIcon, errorMsg, required, onChange, label, readOnly, info, ...props}) {
   const classes = useStyles();
 
   return (
-    <FormInput required={required} label={label}>
+    <FormInput required={required} label={label} info={info}>
       <TextField
         variant="outlined"
         InputProps={{
@@ -337,4 +385,18 @@ export function FormHeader({title, hasTopDivider, loadingText}) {
       </Box>
     </>
   );
+}
+
+export function PasswordPolicy() {
+  return (
+    <Box style={{padding: '0.5rem'}}>
+      <Typography>
+      * Must contain one digit from 0-9<br/>
+      * Must contain one lowercase characters<br/>
+      * Must contain one uppercase characters<br/>
+      * Must contain one special symbols in the list "@#$%"<br/>
+      * Length at least 8 characters and maximum of 40<br/>
+      </Typography>
+    </Box>
+  )
 }

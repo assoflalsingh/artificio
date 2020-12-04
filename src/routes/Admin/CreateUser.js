@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation } from '../../components/FormElements';
+import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation, PasswordPolicy } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import {getEpochNow, titleCase} from '../../others/utils';
 
@@ -39,8 +39,8 @@ export default function CreateUser({onCancel, ...props}) {
       messages: ['This field is required', 'Invalid email id'],
     },
     password: {
-      validators: ['required'],
-      messages: ['This field is required'],
+      validators: ['required', 'password'],
+      messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
       validators: ['required', function(value) { return formData.password == value}],
@@ -176,7 +176,7 @@ export default function CreateUser({onCancel, ...props}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Password" required name='password' type='password'
+          <FormInputText label="Password" required name='password' type='password' info={<PasswordPolicy />}
             value={formData.password} errorMsg={formDataErr.password} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
