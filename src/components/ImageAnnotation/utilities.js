@@ -181,7 +181,7 @@ export function findTextAnnotations(points, textAnnotations) {
 			}
 		})
 	})
-	words = words.filter(w => w.confidence_score > 0.5)
+	// words = words.filter(w => w.confidence_score > 0.5)
 
 	return words
 }

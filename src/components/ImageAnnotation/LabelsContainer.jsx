@@ -1,10 +1,11 @@
-import {Box, Typography} from "@material-ui/core";
+import {Box, Tooltip, Typography} from "@material-ui/core";
 import * as React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import CommonTabs from "../CommonTabs";
 import {CanvasEventAttacher} from "./CanvasEventAttacher";
 import {CustomEventType} from "../../canvas/core/constants";
 import {findTextAnnotations} from "./utilities";
+import TextField from "@material-ui/core/TextField";
 
 const styles = {
 	labelContainer: {
@@ -92,8 +93,12 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
 					annotations.forEach(ann => {
 						const scaledData = getAnnotationData(ann)
 						const words = findTextAnnotations(scaledData.label_points, textAnnotations)
+						let labelValue = ''
+						words.forEach(w => {
+							labelValue = labelValue.concat(w.word_description + ' ')
+						})
 						if (imageLabels.find(label => label.label_name === ann.getLabel())) {
-							labels.push(<Label key={ann.id} labelName={ann.getLabel()} color={ann.color}/>)
+							labels.push(<Label labelValue={labelValue} key={ann.id} labelName={ann.getLabel()} color={ann.color}/>)
 						}
 					})
 					this.setState({labels})
@@ -119,7 +124,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
 	}
 }
 
-const Label = ({labelName, color}) => {
+const Label = ({labelName, color, labelValue}) => {
 	const classes = useStyles()
 	return(
 		<Box>
@@ -127,7 +132,19 @@ const Label = ({labelName, color}) => {
 			<Box className={classes.label} style={{
 				borderLeft: `9px solid ${color}`
 			}}>
-				Test
+				<Tooltip title={labelValue}>
+					<TextField
+						id="outlined-basic"
+						variant="outlined"
+						value={labelValue}
+						style={{
+							width: '100%'
+						}}
+						onChange={(e) => {
+
+						}}
+					/>
+				</Tooltip>
 			</Box>
 		</Box>
 	)

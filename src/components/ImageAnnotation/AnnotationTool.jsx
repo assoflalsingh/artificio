@@ -9,7 +9,7 @@ import Loader from "./Loader";
 import {ToolBar} from "./ToolBar";
 import {LabelSelector} from "./LabelSelector";
 import {LabelsContainer} from "./LabelsContainer";
-import {ToolType} from "../../canvas/core/constants";
+import {CustomEventType, ToolType} from "../../canvas/core/constants";
 
 export const appId = 'canvas-annotation-tool'
 
@@ -72,6 +72,8 @@ export default class AnnotationTool extends React.Component {
 			this.canvasManager.setImage(imageData.image_url, () => {
 				this.setLoader(false)
 			})
+			this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
+			this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
 		} else {
 			this.setLoader(false)
 		}
