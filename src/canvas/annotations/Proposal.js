@@ -2,7 +2,7 @@ import Konva from "konva";
 import Annotation, {AnnotationCircleRadius, AnnotationCircleStrokeWidth} from "./Annotation";
 import {AnnotationType} from "../core/constants";
 import {createCircle} from "../core/utilities";
-const ProposalHoverColor = 'red'
+const ProposalHoverColor = 'green'
 
 export default class Proposal extends Annotation {
 	rectangle
@@ -42,7 +42,7 @@ export default class Proposal extends Annotation {
 			y: 0,
 			radius: AnnotationCircleRadius / this.scale,
 			fill: 'white',
-			stroke: this.annotationData.color,
+			stroke: ProposalHoverColor,
 			strokeWidth: AnnotationCircleStrokeWidth / this.scale,
 			draggable: true
 		});
@@ -51,7 +51,7 @@ export default class Proposal extends Annotation {
 			y: 0,
 			radius: AnnotationCircleRadius/this.scale,
 			fill: 'white',
-			stroke: this.annotationData.color,
+			stroke: ProposalHoverColor,
 			strokeWidth: AnnotationCircleStrokeWidth / this.scale,
 			draggable: true
 		});
@@ -60,7 +60,7 @@ export default class Proposal extends Annotation {
 			y: this.annotationData.dimensions.h,
 			radius: AnnotationCircleRadius / this.scale,
 			fill: 'white',
-			stroke: this.annotationData.color,
+			stroke: ProposalHoverColor,
 			strokeWidth: AnnotationCircleStrokeWidth / this.scale,
 			draggable: true
 		});
@@ -69,7 +69,7 @@ export default class Proposal extends Annotation {
 			y: this.annotationData.dimensions.h,
 			radius: AnnotationCircleRadius / this.scale,
 			fill: 'white',
-			stroke: this.annotationData.color,
+			stroke: ProposalHoverColor,
 			strokeWidth: AnnotationCircleStrokeWidth / this.scale,
 			draggable: true
 		});

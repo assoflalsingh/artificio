@@ -66,7 +66,6 @@ export function getUnScaledCoordinates(point, stage) {
 	return {x, y}
 }
 
-
 export const TempRectangle = (scale) => {
 	return new Konva.Rect({
 		x: 0,

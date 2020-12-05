@@ -120,3 +120,68 @@ export function getHorizontalScrollbar(stage) {
 		},
 	})
 }
+
+/**
+ * @param words
+ * {
+ *  confidence_score: number,
+		entity_label: string,
+		word_description: string,
+		vertices: {x: number, y: number}[]
+ * }[]
+ */
+function sortWordsColumnWise(words) {
+	words = words.sort((firstWord, lastWord) => {
+		return firstWord.vertices[0].y - lastWord.vertices[0].y
+	})
+	words = words.sort((firstWord, lastWord) => {
+		return firstWord.vertices[0].x - lastWord.vertices[0].x
+	})
+}
+
+/**
+ *
+ * @param points: number[][]
+ * @param textAnnotations
+ * {
+ * 		block_details: [],
+			word_details: {
+				word_description: string;
+				entity_label: string;
+				bounding_box: {
+					vertices: {
+						x: number;
+						y: number
+					}[]
+				}
+			}[]
+		}[]
+ */
+export function findTextAnnotations(points, textAnnotations) {
+	let words = []
+	const px1 = points[0][0]
+	const py1 = points[0][1]
+	const px2 = points[2][0]
+	const py2 = points[2][1]
+	textAnnotations.forEach(textAnnotation => {
+		textAnnotation.word_details.forEach(word => {
+			const vertices = word.bounding_box.vertices
+			const x1 = vertices[0].x
+			const y1 = vertices[0].y
+			const x2 = vertices[2].x
+			const y2 = vertices[2].y
+
+			if (x1 >= px1  && y1 >= py1 && x2 <= px2 && y2 <= py2) {
+				words.push({
+					confidence_score: word.confidence_score,
+					entity_label: word.entity_label,
+					word_description: word.word_description,
+					vertices
+				})
+			}
+		})
+	})
+	words = words.filter(w => w.confidence_score > 0.5)
+
+	return words
+}

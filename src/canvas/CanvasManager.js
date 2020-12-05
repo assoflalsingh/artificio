@@ -3,7 +3,7 @@ import {CanvasScene} from "./CanvasScene";
 import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
 import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
 import Proposal from "./annotations/Proposal";
-import {AnnotationProposalColor} from "./annotations/Annotation";
+import {AnnotationProposalColor, AnnotationProposalLowConfidenceScoreColor} from "./annotations/Annotation";
 
 export class CanvasManager extends CanvasScene {
 	activeTool
@@ -330,7 +330,7 @@ export class CanvasManager extends CanvasScene {
 				}
 			}
 	 */
-	addProposals(proposals) {
+	addOrResetProposals(proposals) {
 		// const annotationData = {
 		// 	"dimensions": {
 		// 		"x": 329,
@@ -364,7 +364,7 @@ export class CanvasManager extends CanvasScene {
 						},
 						id: uuid.v4(),
 						label: word.bounding_box.entity_label,
-						color: AnnotationProposalColor
+						color: word.confidence_score > 0.5 ? AnnotationProposalColor : AnnotationProposalLowConfidenceScoreColor
 					}
 					const proposal = new Proposal(annotationData, this.stage.scaleX())
 					this.proposals.push(proposal)
@@ -383,43 +383,83 @@ export class CanvasManager extends CanvasScene {
 		this.proposalLayer.batchDraw()
 	}
 
-	getData(scaled = false) {
+	getAnnotationData = (annotation, scaled) => {
 		const imagePosition = this.konvaImage.position()
-		return this.annotations.map(ann => {
-			let data = ann.getData()
-			const coordinates =  Object.assign([], ann.getData().coordinates)
+		const annotationData = annotation.getData()
+		const coordinates =  Object.assign([], annotationData.coordinates)
 
+		// x1
+		coordinates[0] = coordinates[0] - imagePosition.x
+		// y1
+		coordinates[1] = coordinates[1] - imagePosition.y
+		// x2
+		coordinates[2] = coordinates[2] - imagePosition.x
+		// y2
+		coordinates[3] = coordinates[3] - imagePosition.y
+
+		if (scaled) {
 			// x1
-			coordinates[0] = coordinates[0] - imagePosition.x
+			coordinates[0] = coordinates[0] / this.konvaImage.width()
 			// y1
-			coordinates[1] = coordinates[1] - imagePosition.y
+			coordinates[1] = coordinates[1] / this.konvaImage.height()
 			// x2
-			coordinates[2] = coordinates[2] - imagePosition.x
+			coordinates[2] = coordinates[2] / this.konvaImage.width()
 			// y2
-			coordinates[3] = coordinates[3] - imagePosition.y
+			coordinates[3] = coordinates[3] / this.konvaImage.height()
+		} else {
+			// x1
+			coordinates[0] = coordinates[0] / this.konvaImage.width() * this.imageDimensions.width
+			// y1
+			coordinates[1] = coordinates[1] / this.konvaImage.height() * this.imageDimensions.height
+			// x2
+			coordinates[2] = coordinates[2] / this.konvaImage.width() * this.imageDimensions.width
+			// y2
+			coordinates[3] = coordinates[3] / this.konvaImage.height() * this.imageDimensions.height
+		}
+		const width = coordinates[2] - coordinates[0]
+		const height = coordinates[3] - coordinates[1]
+		return {
+			label_name: annotationData.label,
+			label_value: annotationData.label,
+			label_shape: annotation.type.toLowerCase(),
+			label_points: [
+				[Math.round(coordinates[0]), Math.round(coordinates[1])],
+				[Math.round(coordinates[0] + width), Math.round(coordinates[1])],
+				[Math.round(coordinates[2]), Math.round(coordinates[3])],
+				[Math.round(coordinates[0]), Math.round(coordinates[1] + height)]
+			]
+		}
+	}
 
-			if (scaled) {
-				// x1
-				coordinates[0] = coordinates[0] / this.konvaImage.width()
-				// y1
-				coordinates[1] = coordinates[1] / this.konvaImage.height()
-				// x2
-				coordinates[2] = coordinates[2] / this.konvaImage.width()
-				// y2
-				coordinates[3] = coordinates[3] / this.konvaImage.height()
-			} else {
-				// x1
-				coordinates[0] = coordinates[0] / this.konvaImage.width() * this.imageDimensions.width
-				// y1
-				coordinates[1] = coordinates[1] / this.konvaImage.height() * this.imageDimensions.height
-				// x2
-				coordinates[2] = coordinates[2] / this.konvaImage.width() * this.imageDimensions.width
-				// y2
-				coordinates[3] = coordinates[3] / this.konvaImage.height() * this.imageDimensions.height
-			}
-			data = {...data, coordinates}
-			return data
+	/**
+	 *
+	 * @param scaled
+	 * @returns
+	 * {
+	 *   "image": {
+					"w": number,
+					"h": number
+				},
+				labels: {
+					"label_name": number,
+					"label_value": number,
+					"label_shape": number,
+					"label_points": number[][]
+				}[]
+	 * }
+	 */
+	getData = (scaled = false) => {
+		const labels = []
+		this.annotations.forEach(ann => {
+			labels.push(this.getAnnotationData(ann, scaled))
 		})
+		return {
+			image: {
+				w: this.imageDimensions.width,
+				h: this.imageDimensions.height
+			},
+			labels
+		}
 	}
 
 	/**

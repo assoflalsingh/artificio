@@ -4,6 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import CommonTabs from "../CommonTabs";
 import {CanvasEventAttacher} from "./CanvasEventAttacher";
 import {CustomEventType} from "../../canvas/core/constants";
+import {findTextAnnotations} from "./utilities";
 
 const styles = {
 	labelContainer: {
@@ -48,7 +49,7 @@ const useStyles = makeStyles(styles)
   "label_color": string
 	}
  */
-export const LabelsContainer = ({getAnnotations, imageLabels, textAnnotations}) => {
+export const LabelsContainer = ({getAnnotations, imageLabels, textAnnotations, getAnnotationData}) => {
 	const classes = useStyles()
 	return (
 		<Box className={classes.labelContainer}>
@@ -60,6 +61,7 @@ export const LabelsContainer = ({getAnnotations, imageLabels, textAnnotations}) 
 							<Box className={classes.scrollableLabelsContainer}>
 								<ScrollableLabelsContainer
 									getAnnotations={getAnnotations}
+									getAnnotationData={getAnnotationData}
 									imageLabels={imageLabels}
 									textAnnotations={textAnnotations}
 								/>
@@ -84,11 +86,13 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
 			{
 				event: CustomEventType.NOTIFY_LABEL_CREATION,
 				func: (event) => {
-					const {getAnnotations, imageLabels, textAnnotations} = this.props
+					const {getAnnotations, imageLabels, textAnnotations, getAnnotationData} = this.props
 					const annotations = getAnnotations() || []
 					const labels = []
 					annotations.forEach(ann => {
-						if(imageLabels.find(label => label.label_name === ann.getLabel())) {
+						const scaledData = getAnnotationData(ann)
+						const words = findTextAnnotations(scaledData.label_points, textAnnotations)
+						if (imageLabels.find(label => label.label_name === ann.getLabel())) {
 							labels.push(<Label key={ann.id} labelName={ann.getLabel()} color={ann.color}/>)
 						}
 					})

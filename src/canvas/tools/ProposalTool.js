@@ -9,7 +9,7 @@ export class ProposalTool extends Tool {
 	constructor(canvasManager, proposals, imageLabels) {
 		super(canvasManager, proposals, imageLabels);
 		this.toolType = ToolType.Proposal
-		this.canvasManager.addProposals(proposals)
+		this.canvasManager.addOrResetProposals(proposals)
 	}
 
 	findAndSelectProposal(pointer) {
@@ -74,6 +74,7 @@ export class ProposalTool extends Tool {
 			}
 			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX(), this.imageLabels)
 			this.canvasManager.addAnnotation(rectangle)
+			this.canvasManager.addOrResetProposals()
 			// this.exitTool()
 		} else {
 
@@ -118,6 +119,7 @@ export class ProposalTool extends Tool {
 			rectangle.deSelect()
 			this.canvasManager.addAnnotation(rectangle, false)
 		})
+		this.canvasManager.addOrResetProposals()
 	}
 
 	resizeCanvasStroke() {

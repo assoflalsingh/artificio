@@ -149,6 +149,7 @@ export default class AnnotationTool extends React.Component {
 							this.canvasManager &&
 								<LabelsContainer
 									getAnnotations={this.canvasManager.getAnnotations}
+									getAnnotationData={this.canvasManager.getAnnotationData}
 									imageLabels={this.state.imageLabels}
 									textAnnotations={this.state.textAnnotations}
 								/>

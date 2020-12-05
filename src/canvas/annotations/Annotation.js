@@ -4,6 +4,7 @@ export const AnnotationStrokeWidth = 2
 export const AnnotationCircleRadius = 4
 export const AnnotationCircleStrokeWidth = 1
 export const AnnotationProposalColor = 'blue'
+export const AnnotationProposalLowConfidenceScoreColor = 'red'
 const TextPadding = 8
 
 export default class Annotation {
