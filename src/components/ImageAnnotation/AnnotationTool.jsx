@@ -1,38 +1,18 @@
 import * as React from "react";
 import {RegionLeftToolBar} from "../../annotator/defaults";
-import {Box, Typography} from "@material-ui/core";
+import {Box, Snackbar, Typography} from "@material-ui/core";
 import CanvasWrapper from "./CanvasWrapper";
 import {CanvasManager} from "../../canvas/CanvasManager";
-import {URL_MAP} from "../../others/artificio_api.instance";
 import Thumbnails from "./Thumbnails";
 import Loader from "./Loader";
 import {ToolBar} from "./ToolBar";
 import {LabelSelector} from "./LabelSelector";
 import {LabelsContainer} from "./LabelsContainer";
 import {CustomEventType, ToolType} from "../../canvas/core/constants";
+import {getImageData, saveAnnotationData} from "./apiMethods";
+import Alert from "@material-ui/lab/Alert";
 
 export const appId = 'canvas-annotation-tool'
-
-async function getImageData(api, imageId, pageNo) {
-	// setProcessMsg('Fetching image file information...');
-	try {
-		const response = await api.post(URL_MAP.GET_ANNOTATION_DETAILS, {
-			document_id: imageId,
-			page_no: pageNo,
-		})
-		const data = response.data.data;
-		// setProcessMsg(null);
-		return data
-	} catch (error) {
-		if(error.response) {
-			// setAjaxMessage({
-			// 	error: true, text: error.response.data.message,
-			// });
-		} else {
-			console.error(error);
-		}
-	}
-}
 
 export default class AnnotationTool extends React.Component {
 	canvasManager
@@ -55,7 +35,9 @@ export default class AnnotationTool extends React.Component {
 				}
 			}
 		 */
-		textAnnotations: []
+		textAnnotations: [],
+		imageMetadata: null,
+		ajaxMessage: null
 	}
 
 	async fetchImageData(index) {
@@ -66,7 +48,8 @@ export default class AnnotationTool extends React.Component {
 			const imageData = await getImageData(this.props.api, selectedImage._id, selectedImage.page_no);
 			this.setState({
 				imageLabels: imageData.image_labels,
-				textAnnotations: imageData.image_json ? imageData.image_json.text_annotations : []
+				textAnnotations: imageData.image_json ? imageData.image_json.text_annotations : [],
+				imageMetadata: imageData.image_json.metadata
 			})
 			this.canvasManager.clearAnnotations()
 			this.canvasManager.resetUndoRedoStack()
@@ -78,6 +61,31 @@ export default class AnnotationTool extends React.Component {
 		} else {
 			this.setLoader(false)
 		}
+	}
+
+	saveImageData = () =>  {
+		const selectedImage = this.props.images[this.state.activeImageIndex]
+		const annotatedData = this.canvasManager.getData()
+		saveAnnotationData(
+			this.props.api,
+			selectedImage._id,
+			selectedImage.page_no,
+			this.state.imageMetadata,
+			this.state.textAnnotations,
+			annotatedData
+		).then(()=>{
+			this.setState({ajaxMessage: {
+				error: false, text: 'Annotation details saved successfully !!',
+			}});
+		}).catch((error) => {
+			if(error.response) {
+				this.setState({ajaxMessage: {
+					error: true, text: error.response.data.message,
+				}});
+			} else {
+				console.error(error);
+			}
+		})
 	}
 
 	showProposals = (show) => {
@@ -141,6 +149,7 @@ export default class AnnotationTool extends React.Component {
 						redo={this.canvasManager && this.canvasManager.redo}
 						fetchNextImage={this.fetchNextImage}
 						fetchPreviousImage={this.fetchPreviousImage}
+						save={this.saveImageData}
 					/>
 					<Box style={{flexGrow: 1, overflow: 'hidden', width: '75%'}}>
 						<ToolBar
@@ -201,6 +210,15 @@ export default class AnnotationTool extends React.Component {
 								unsetActiveTool={this.canvasManager.unsetActiveTool}
 							/>
 					}
+					<Snackbar open={Boolean(this.state.ajaxMessage)} autoHideDuration={6000} >
+						{this.state.ajaxMessage &&
+							<Alert
+								onClose={() => this.setState({ajaxMessage: null})}
+								severity={this.state.ajaxMessage.error ? "error" : "success"}
+							>
+							{this.state.ajaxMessage.error ? "Error occurred: " : ""}{this.state.ajaxMessage.text}
+						</Alert>}
+					</Snackbar>
 				</Box>
 		)
 	}

@@ -298,9 +298,7 @@ export class CanvasManager extends CanvasScene {
 				x: args.x + stage.x,
 				y: args.y + stage.y
 			}
-
 			const padding = 20
-
 			return {
 				x: canvasBoundingRect.x + position.x,
 				y: canvasBoundingRect.y + position.y + padding

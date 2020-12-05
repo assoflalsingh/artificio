@@ -1,7 +1,17 @@
 import React from 'react';
 import SaveIcon from '@material-ui/icons/Save';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import { Box, Button, IconButton, ListItemIcon, ListItemText, makeStyles, Menu, MenuItem, Tooltip, withStyles } from '@material-ui/core';
+import {
+	Box,
+	Button,
+	IconButton,
+	ListItemText,
+	makeStyles,
+	Menu,
+	MenuItem,
+	Tooltip,
+	withStyles
+} from '@material-ui/core';
 import useEventCallback from 'react-image-annotate/hooks/use-event-callback';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import FormatShapesIcon from '@material-ui/icons/FormatShapes';
@@ -31,17 +41,21 @@ const useStyles = makeStyles((theme)=>({
 
 }));
 
-export function RegionLeftToolBar({dispatch, inReview, undo, redo, fetchNextImage, fetchPreviousImage}) {
+export function RegionLeftToolBar(
+	{
+		inReview,
+		undo,
+		redo,
+		fetchNextImage,
+		fetchPreviousImage,
+		save
+}) {
   const classes = useStyles();
-
-  const onClickItem = useEventCallback((event) => {
-    dispatch({ type: "LEFT_TOOLBAR", button: event.currentTarget.dataset.name })
-  });
 
   return(
     <Box className={classes.leftBar}>
       <Tooltip title="Save progress">
-        <IconButton data-name="save" onClick={onClickItem} className={classes.leftBarButton}><SaveIcon/></IconButton>
+        <IconButton data-name="save" onClick={save} className={classes.leftBarButton}><SaveIcon/></IconButton>
       </Tooltip>
 			<Tooltip title="Zoom In">
 				<IconButton data-name="zoom in" className={classes.leftBarButton}><ZoomInIcon/></IconButton>
@@ -66,7 +80,7 @@ export function RegionLeftToolBar({dispatch, inReview, undo, redo, fetchNextImag
       <IconButton data-name="zoom-out" onClick={onClickItem} className={classes.leftBarButton}><ZoomOutIcon fontSize="large" /></IconButton> */}
       {inReview &&
       <Tooltip title="Push to done">
-        <IconButton data-name="done-save" onClick={onClickItem} className={classes.leftBarButton}><AssignmentTurnedInIcon fontSize="large" /></IconButton>
+        <IconButton data-name="done-save" onClick={() => {}} className={classes.leftBarButton}><AssignmentTurnedInIcon fontSize="large" /></IconButton>
       </Tooltip>}
     </Box>
   )
