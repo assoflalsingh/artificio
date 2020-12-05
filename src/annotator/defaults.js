@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme)=>({
 
 }));
 
-export function RegionLeftToolBar({dispatch, inReview, undo, redo}) {
+export function RegionLeftToolBar({dispatch, inReview, undo, redo, fetchNextImage, fetchPreviousImage}) {
   const classes = useStyles();
 
   const onClickItem = useEventCallback((event) => {
@@ -56,10 +56,10 @@ export function RegionLeftToolBar({dispatch, inReview, undo, redo}) {
 				<IconButton data-name="redo" onClick={redo} className={classes.leftBarButton}><RefreshIcon/></IconButton>
 			</Tooltip>
 			<Tooltip title="Next Image">
-				<IconButton data-name="next image" className={classes.leftBarButton}><ArrowForwardIcon/></IconButton>
+				<IconButton data-name="next image" onClick={fetchNextImage} className={classes.leftBarButton}><ArrowForwardIcon/></IconButton>
 			</Tooltip>
 			<Tooltip title="Previous Image">
-				<IconButton data-name="previous Image" className={classes.leftBarButton}><ArrowBackIcon/></IconButton>
+				<IconButton data-name="previous Image" onClick={fetchPreviousImage} className={classes.leftBarButton}><ArrowBackIcon/></IconButton>
 			</Tooltip>
 
       {/* <IconButton data-name="zoom-in" onClick={onClickItem} className={classes.leftBarButton}><ZoomInIcon fontSize="large" /></IconButton>

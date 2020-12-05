@@ -92,6 +92,20 @@ export default class AnnotationTool extends React.Component {
 		this.setState({loading: value})
 	}
 
+	fetchNextImage = () => {
+		const nextIndex = this.state.activeImageIndex + 1
+		if(nextIndex < this.props.images.length) {
+			this.fetchImageData(nextIndex)
+		}
+	}
+
+	fetchPreviousImage = () => {
+		const prevIndex = this.state.activeImageIndex - 1
+		if(prevIndex >= 0) {
+			this.fetchImageData(prevIndex)
+		}
+	}
+
 	componentWillReceiveProps(nextProps, nextContext) {
 		// Todo simplify logic
 		// select first image
@@ -125,6 +139,8 @@ export default class AnnotationTool extends React.Component {
 						regions={activeImage ? activeImage.regions : []}
 						undo={this.canvasManager && this.canvasManager.undo}
 						redo={this.canvasManager && this.canvasManager.redo}
+						fetchNextImage={this.fetchNextImage}
+						fetchPreviousImage={this.fetchPreviousImage}
 					/>
 					<Box style={{flexGrow: 1, overflow: 'hidden', width: '75%'}}>
 						<ToolBar
