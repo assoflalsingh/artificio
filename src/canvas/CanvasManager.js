@@ -1,15 +1,19 @@
 import * as uuid from 'uuid'
 import {CanvasScene} from "./CanvasScene";
 import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
-import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
+import {generateRandomColor, getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
 import Proposal from "./annotations/Proposal";
 import {AnnotationProposalColor, AnnotationProposalLowConfidenceScoreColor} from "./annotations/Annotation";
+import {UndoRedoStack} from "./core/UndoRedoStack";
+import RectangleAnnotation from "./annotations/RectangleAnnotation";
+import {DefaultLabel} from "../components/ImageAnnotation/LabelSelector";
 
 export class CanvasManager extends CanvasScene {
 	activeTool
 	annotations = []
 	proposals = []
 	selectedAnnotation
+	undoRedoStack = new UndoRedoStack()
 	eventListeners = [
 		{
 			event: 'click',
@@ -88,6 +92,7 @@ export class CanvasManager extends CanvasScene {
 		  this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
 				position: this.getLabelSelectorPosition()
 			})
+			this.updateUndoStack()
 		})
 	}
 
@@ -120,6 +125,7 @@ export class CanvasManager extends CanvasScene {
 		this.annotationLayerDraw()
 		this.annotations.push(annotation)
 		select && this.selectAnnotation(annotation)
+		this.updateUndoStack()
 	}
 
 	deleteAnnotation(id) {
@@ -131,6 +137,7 @@ export class CanvasManager extends CanvasScene {
 		this.annotations.splice(index, 1);
 		this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
 		this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
+		this.updateUndoStack()
 	}
 
 	/**
@@ -167,6 +174,7 @@ export class CanvasManager extends CanvasScene {
 	}
 
 	clearAnnotations() {
+		this.deSelectActiveAnnotation()
 		this.annotationLayer.destroyChildren();
 		this.annotations = [];
 		this.annotationLayer.batchDraw();
@@ -308,6 +316,7 @@ export class CanvasManager extends CanvasScene {
 		this.selectedAnnotation.setLabel(label)
 		this.selectedAnnotation.draw()
 		this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
+		this.updateUndoStack()
 	}
 
 	getAnnotations = () => {
@@ -460,6 +469,57 @@ export class CanvasManager extends CanvasScene {
 			},
 			labels
 		}
+	}
+
+	updateUndoStack() {
+		this.undoRedoStack.push(this.annotations.map(annotation => {
+			const data = annotation.getData()
+			return {...data, imageLabels: annotation.imageLabels, color: annotation.annotationData.color}
+		}))
+	}
+
+	addAnnotationsFromData(annotations) {
+		annotations.forEach(annotation => {
+			const x1 = annotation.coordinates[0]
+			const y1 = annotation.coordinates[1]
+			const x2 = annotation.coordinates[2]
+			const y2 = annotation.coordinates[3]
+			const width = x2 - x1
+			const height = y2 - y1
+			const annotationData = {
+				dimensions: {x: x1, y: y1, w: width, h: height},
+				id: annotation.id,
+				color: annotation.color,
+				label: annotation.label
+			}
+			const ann = new RectangleAnnotation(annotationData, this.stage.scaleX(), annotation.imageLabels)
+			ann.deSelect()
+			this.annotationLayer.add(ann.getShape())
+			this.annotations.push(ann)
+		})
+		this.annotationLayerDraw()
+	}
+
+	undo = () => {
+		this.clearAnnotations()
+		const annotations = this.undoRedoStack.undo()
+		if (annotations && annotations.length > 0) {
+			this.addAnnotationsFromData(annotations)
+			this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
+		}
+	}
+
+	redo = () => {
+		const annotations = this.undoRedoStack.redo()
+		if (annotations && annotations.length > 0) {
+			this.clearAnnotations()
+			this.addAnnotationsFromData(annotations)
+			this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
+		}
+	}
+
+	resetUndoRedoStack = () => {
+		this.undoRedoStack.reset()
 	}
 
 	/**

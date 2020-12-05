@@ -69,6 +69,7 @@ export default class AnnotationTool extends React.Component {
 				textAnnotations: imageData.image_json ? imageData.image_json.text_annotations : []
 			})
 			this.canvasManager.clearAnnotations()
+			this.canvasManager.resetUndoRedoStack()
 			this.canvasManager.setImage(imageData.image_url, () => {
 				this.setLoader(false)
 			})
@@ -119,7 +120,12 @@ export default class AnnotationTool extends React.Component {
 		const activeImage = images && images[this.state.activeImageIndex]
 		return (
 				<Box display="flex" style={{height: '100%'}}>
-					<RegionLeftToolBar dispatch={undefined} regions={activeImage ? activeImage.regions : []} />
+					<RegionLeftToolBar
+						dispatch={undefined}
+						regions={activeImage ? activeImage.regions : []}
+						undo={this.canvasManager && this.canvasManager.undo}
+						redo={this.canvasManager && this.canvasManager.redo}
+					/>
 					<Box style={{flexGrow: 1, overflow: 'hidden', width: '75%'}}>
 						<ToolBar
 							setActiveTool={this.canvasManager

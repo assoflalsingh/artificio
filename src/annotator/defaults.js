@@ -10,6 +10,8 @@ import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ReplayIcon from '@material-ui/icons/Replay';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 const useStyles = makeStyles((theme)=>({
   leftBar: {
@@ -29,7 +31,7 @@ const useStyles = makeStyles((theme)=>({
 
 }));
 
-export function RegionLeftToolBar({dispatch, inReview}) {
+export function RegionLeftToolBar({dispatch, inReview, undo, redo}) {
   const classes = useStyles();
 
   const onClickItem = useEventCallback((event) => {
@@ -46,6 +48,12 @@ export function RegionLeftToolBar({dispatch, inReview}) {
 			</Tooltip>
 			<Tooltip title="Zoom Out">
 				<IconButton data-name="zoom out" className={classes.leftBarButton}><ZoomOutIcon/></IconButton>
+			</Tooltip>
+			<Tooltip title="Undo">
+				<IconButton data-name="undo" onClick={undo} className={classes.leftBarButton}><ReplayIcon/></IconButton>
+			</Tooltip>
+			<Tooltip title="Redo">
+				<IconButton data-name="redo" onClick={redo} className={classes.leftBarButton}><RefreshIcon/></IconButton>
 			</Tooltip>
 			<Tooltip title="Next Image">
 				<IconButton data-name="next image" className={classes.leftBarButton}><ArrowForwardIcon/></IconButton>

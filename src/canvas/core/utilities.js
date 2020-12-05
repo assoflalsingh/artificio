@@ -100,3 +100,17 @@ export function createCircle(params) {
 	})
 	return circle
 }
+
+export function cloneNestedObject(object, level) {
+	if (object) {
+		object = Object.assign(object instanceof Array ? [] : {}, object)
+		for (const key in object) {
+			if (typeof object[key] === 'object' && level !== 0) {
+				const value = object[key]
+				// Carrying out recursion till defined level in the method
+				object[key] = cloneNestedObject(value, level - 1)
+			}
+		}
+		return object
+	}
+}
