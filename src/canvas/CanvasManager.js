@@ -21,14 +21,16 @@ export class CanvasManager extends CanvasScene {
 			func: this.findAndSelectAnnotation.bind(this)
 		}
 	]
-	updateModelData
+	updateModelAnnotationData
+	updateModelAnnotationLabel
 	textAnnotations
 
 	// ApplicationConfig is of type {appId: string}
-	constructor(appConfig, updateModelData) {
-		super(appConfig.appId, updateModelData);
+	constructor(appConfig, updateModelAnnotationData, updateModelAnnotationLabel) {
+		super(appConfig.appId, updateModelAnnotationData, updateModelAnnotationLabel);
 		this.addEventListeners(this.eventListeners)
-		this.updateModelData = updateModelData
+		this.updateModelAnnotationData = updateModelAnnotationData
+		this.updateModelAnnotationLabel = updateModelAnnotationLabel
 		window.canvas = this
 	}
 
@@ -379,7 +381,7 @@ export class CanvasManager extends CanvasScene {
 			}
 		})
 		proposal.getShape().on('dragend', () => {
-			this.updateModelData(proposal)
+			this.updateModelAnnotationData(proposal)
 		})
 	}
 

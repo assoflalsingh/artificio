@@ -42,16 +42,28 @@ export default class AnnotationTool extends React.Component {
 		ajaxMessage: null
 	}
 
-	updateModelData = (proposal) => {
-		const ids = proposal.id.split('-')
-		const proposalIndex = parseInt(ids[0])
-		const wordIndex = parseInt(ids[1])
-		const data = this.canvasManager.getAnnotationData(proposal)
-		const word = this.textAnnotations[proposalIndex].word_details[wordIndex]
-		if(word && word.bounding_box && word.bounding_box.vertices) {
-			word.bounding_box.vertices = data.label_points.map(point => {
-				return {x: point[0], y: point[1]}
-			})
+	updateModelAnnotationLabel = (proposals, labelName) => {
+		proposals.forEach(proposal => {
+			const ids = proposal.id.split('-')
+			const proposalIndex = parseInt(ids[0])
+			const wordIndex = parseInt(ids[1])
+			const word = this.textAnnotations[proposalIndex].word_details[wordIndex]
+			word.entity_label = labelName
+		})
+	}
+
+	updateModelAnnotationData = (proposal) => {
+		if(proposal) {
+			const ids = proposal.id.split('-')
+			const proposalIndex = parseInt(ids[0])
+			const wordIndex = parseInt(ids[1])
+			const data = this.canvasManager.getAnnotationData(proposal)
+			const word = this.textAnnotations[proposalIndex].word_details[wordIndex]
+			if(word && word.bounding_box && word.bounding_box.vertices) {
+				word.bounding_box.vertices = data.label_points.map(point => {
+					return {x: point[0], y: point[1]}
+				})
+			}
 		}
 	}
 
@@ -177,7 +189,7 @@ export default class AnnotationTool extends React.Component {
 
 	componentDidMount() {
 		this.setLoader(true);
-		this.canvasManager = new CanvasManager({appId}, this.updateModelData)
+		this.canvasManager = new CanvasManager({appId}, this.updateModelAnnotationData, this.updateModelAnnotationLabel)
 	}
 
 	render() {

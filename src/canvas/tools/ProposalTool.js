@@ -120,6 +120,7 @@ export class ProposalTool extends Tool {
 			this.canvasManager.addAnnotation(rectangle, false)
 		})
 		this.canvasManager.addOrResetProposals()
+		this.canvasManager.updateModelAnnotationLabel(proposals, label.value)
 	}
 
 	resizeCanvasStroke() {
