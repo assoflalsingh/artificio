@@ -124,8 +124,12 @@ export class CanvasManager extends CanvasScene {
 		this.annotationLayer.add(annotation.getShape())
 		this.annotationLayerDraw()
 		this.annotations.push(annotation)
-		select && this.selectAnnotation(annotation)
-		this.updateUndoStack()
+		if (select) {
+			this.selectAnnotation(annotation)
+			this.updateUndoStack()
+		} else {
+			annotation.deSelect()
+		}
 	}
 
 	deleteAnnotation(id) {

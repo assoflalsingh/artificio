@@ -3,7 +3,7 @@ import {Dialog} from "@material-ui/core";
 import ImageAnnotation from "./ImageAnnotation";
 
 export const ImageAnnotationDialog = (props) => {
-	const {getImages, api} = props
+	const {getImages, api, inReview} = props
 	return (
 		<Dialog
 			fullScreen
@@ -13,7 +13,13 @@ export const ImageAnnotationDialog = (props) => {
 			disableEscapeKeyDown
 		>
 			{
-				props.open && <ImageAnnotation getImages={getImages} api={api} onClose={props.onClose}/>
+				props.open &&
+					<ImageAnnotation
+						getImages={getImages}
+						api={api}
+						inReview={inReview}
+						onClose={props.onClose}
+					/>
 			}
 		</Dialog>
 	)

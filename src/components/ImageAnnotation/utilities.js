@@ -1,4 +1,6 @@
 import Konva from "konva";
+import * as uuid from "uuid";
+import {generateRandomColor} from "../../canvas/core/utilities";
 export const scrollPadding = 5;
 export const scrollBarWidth = 10;
 export const scrollBarHeight = 10;
@@ -163,7 +165,7 @@ export function findTextAnnotations(points, textAnnotations) {
 	const py1 = points[0][1]
 	const px2 = points[2][0]
 	const py2 = points[2][1]
-	textAnnotations.forEach(textAnnotation => {
+	textAnnotations && textAnnotations.forEach(textAnnotation => {
 		textAnnotation.word_details.forEach(word => {
 			const vertices = word.bounding_box.vertices
 			const x1 = vertices[0].x
@@ -184,4 +186,33 @@ export function findTextAnnotations(points, textAnnotations) {
 	// words = words.filter(w => w.confidence_score > 0.5)
 
 	return words
+}
+
+export function generateAnnotationsFromData(
+	data,
+	stage,
+	imageLabels,
+	imageDimensions,
+	imageWrapperPosition,
+	imageWrapperDimensions) {
+	return data.labels.map(annotationData => {
+		const x = annotationData.label_points[0][0]
+		const y = annotationData.label_points[0][1]
+		let width = annotationData.label_points[2][0] - annotationData.label_points[0][0]
+		let height = annotationData.label_points[2][1] - annotationData.label_points[0][1]
+		width = width / imageDimensions.width * imageWrapperDimensions.width
+		height = height / imageDimensions.height * imageWrapperDimensions.height
+
+		const x1 = (x / imageDimensions.width * imageWrapperDimensions.width) + imageWrapperPosition.x
+		const y1 = (y / imageDimensions.height * imageWrapperDimensions.height) + imageWrapperPosition.y
+
+		return {
+			coordinates: [x1, y1, x1 + width, y1 + height],
+			label: annotationData.label_name,
+			imageLabels,
+			labelValue: annotationData.label_value,
+			color: generateRandomColor(),
+			id: uuid.v4()
+		}
+	})
 }

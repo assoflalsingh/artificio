@@ -11,6 +11,7 @@ import {LabelsContainer} from "./LabelsContainer";
 import {CustomEventType, ToolType} from "../../canvas/core/constants";
 import {getImageData, saveAnnotationData} from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
+import {generateAnnotationsFromData} from "./utilities";
 
 export const appId = 'canvas-annotation-tool'
 
@@ -40,6 +41,23 @@ export default class AnnotationTool extends React.Component {
 		ajaxMessage: null
 	}
 
+	addAnnotations(userAnnotatedData) {
+		if (userAnnotatedData && userAnnotatedData.labels && userAnnotatedData.labels.length > 0) {
+			const annotations = generateAnnotationsFromData(
+				userAnnotatedData,
+				this.canvasManager.stage,
+				this.state.imageLabels,
+				this.canvasManager.imageDimensions,
+				this.canvasManager.konvaImage.position(),
+				{
+					width: this.canvasManager.konvaImage.width(),
+					height: this.canvasManager.konvaImage.height()
+				},
+			)
+			this.canvasManager.addAnnotationsFromData(annotations)
+		}
+	}
+
 	async fetchImageData(index) {
 		this.setLoader(true);
 		this.setState({activeImageIndex: index})
@@ -54,6 +72,7 @@ export default class AnnotationTool extends React.Component {
 			this.canvasManager.clearAnnotations()
 			this.canvasManager.resetUndoRedoStack()
 			this.canvasManager.setImage(imageData.image_url, () => {
+				this.addAnnotations(imageData.image_json ? imageData.image_json.user_annotate_data : {})
 				this.setLoader(false)
 			})
 			this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
