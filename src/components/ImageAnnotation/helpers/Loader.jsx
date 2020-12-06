@@ -3,8 +3,10 @@ import * as React from "react";
 
 const useClasses = makeStyles(() => ({
 	container : {
-		width: '71%',
-		height: '78%',
+		top: 0,
+		left:0,
+		width: '100%',
+		height: '100%',
 		background: '#383838',
 		opacity: '0.8',
 		display: 'flex',
