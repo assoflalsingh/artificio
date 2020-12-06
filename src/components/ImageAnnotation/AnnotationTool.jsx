@@ -43,13 +43,15 @@ export default class AnnotationTool extends React.Component {
 	}
 
 	updateModelAnnotationLabel = (proposals, labelName) => {
-		proposals.forEach(proposal => {
-			const ids = proposal.id.split('-')
-			const proposalIndex = parseInt(ids[0])
-			const wordIndex = parseInt(ids[1])
-			const word = this.textAnnotations[proposalIndex].word_details[wordIndex]
-			word.entity_label = labelName
-		})
+		if (proposals && proposals.length > 0) {
+			proposals.forEach(proposal => {
+				const ids = proposal.id.split('-')
+				const proposalIndex = parseInt(ids[0])
+				const wordIndex = parseInt(ids[1])
+				const word = this.textAnnotations[proposalIndex].word_details[wordIndex]
+				word.entity_label = labelName
+			})
+		}
 	}
 
 	updateModelAnnotationData = (proposal) => {
