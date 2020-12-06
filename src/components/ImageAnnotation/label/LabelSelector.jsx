@@ -7,12 +7,12 @@ import IconButton from "@material-ui/core/IconButton"
 import TrashIcon from "@material-ui/icons/Delete"
 import {Select as MaterialSelect} from '@material-ui/core';
 import {grey} from "@material-ui/core/colors";
-import {CanvasEventAttacher} from "./CanvasEventAttacher";
-import {CustomEventType} from "../../canvas/core/constants";
+import {CanvasEventAttacher} from "../canvas/CanvasEventAttacher";
+import {CustomEventType} from "../../../canvas/core/constants";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import Box from "@material-ui/core/Box";
-import {CreateModalDialog} from "./CreateModalDialog";
+import {CreateModalDialog} from "../helpers/CreateModalDialog";
 import MenuItem from "@material-ui/core/MenuItem";
 
 export const DefaultLabel = {

@@ -3,7 +3,7 @@ import {Tool} from "./tool";
 import {ToolType} from "../core/constants";
 import {CursorPointerCrossHair, generateRandomColor, TempRectangle} from "../core/utilities";
 import RectangleAnnotation from "../annotations/RectangleAnnotation";
-import {DefaultLabel} from "../../components/ImageAnnotation/LabelSelector";
+import {DefaultLabel} from "../../components/ImageAnnotation/label/LabelSelector";
 
 export class RectangleTool extends Tool {
 	tempCrossHairCursor

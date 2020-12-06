@@ -2,7 +2,7 @@ import {Tool} from "./tool";
 import {CustomEventType, ToolType} from "../core/constants";
 import * as uuid from "uuid";
 import {generateRandomColor} from "../core/utilities";
-import {DefaultLabel} from "../../components/ImageAnnotation/LabelSelector";
+import {DefaultLabel} from "../../components/ImageAnnotation/label/LabelSelector";
 import RectangleAnnotation from "../annotations/RectangleAnnotation";
 
 const ToolMode = {

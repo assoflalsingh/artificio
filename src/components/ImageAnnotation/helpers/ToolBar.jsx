@@ -5,7 +5,7 @@ import useEventCallback from 'react-image-annotate/hooks/use-event-callback';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import FormatShapesIcon from '@material-ui/icons/FormatShapes';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import {ToolBarItemType, ToolType} from "../../canvas/core/constants";
+import {ToolBarItemType, ToolType} from "../../../canvas/core/constants";
 import AppsIcon from '@material-ui/icons/Apps';
 
 const useClasses = makeStyles(() => ({

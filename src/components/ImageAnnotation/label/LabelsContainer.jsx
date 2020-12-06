@@ -1,10 +1,10 @@
 import {Box, Tooltip, Typography} from "@material-ui/core";
 import * as React from "react";
 import {makeStyles} from "@material-ui/core/styles";
-import CommonTabs from "../CommonTabs";
-import {CanvasEventAttacher} from "./CanvasEventAttacher";
-import {CustomEventType} from "../../canvas/core/constants";
-import {findTextAnnotations, getLabelValueFromTextAnnotations} from "./utilities";
+import CommonTabs from "../../CommonTabs";
+import {CanvasEventAttacher} from "../canvas/CanvasEventAttacher";
+import {CustomEventType} from "../../../canvas/core/constants";
+import {findTextAnnotations, getLabelValueFromTextAnnotations} from "../utilities";
 import TextField from "@material-ui/core/TextField";
 
 const styles = {

@@ -1,5 +1,5 @@
 import  React from 'react';
-import {appId} from "./AnnotationTool";
+import {appId} from "../AnnotationTool";
 
 
 const addEventListenersToApp = (listeners, containerId) => {
