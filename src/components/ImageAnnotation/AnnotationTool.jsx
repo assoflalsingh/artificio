@@ -83,6 +83,7 @@ export default class AnnotationTool extends React.Component {
 				},
 			)
 			this.canvasManager.addAnnotationsFromData(annotations)
+			this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
 		}
 	}
 

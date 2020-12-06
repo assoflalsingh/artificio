@@ -1,4 +1,3 @@
-import * as uuid from 'uuid'
 import {CanvasScene} from "./CanvasScene";
 import {AnnotationType, CustomEventType, ToolTypeClassNameMap} from "./core/constants";
 import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
@@ -483,10 +482,10 @@ export class CanvasManager extends CanvasScene {
 			label_value: annotationData.labelValue,
 			label_shape: annotation.type.toLowerCase(),
 			label_points: [
-				[Math.round(coordinates[0]), Math.round(coordinates[1])],
-				[Math.round(coordinates[0] + width), Math.round(coordinates[1])],
-				[Math.round(coordinates[2]), Math.round(coordinates[3])],
-				[Math.round(coordinates[0]), Math.round(coordinates[1] + height)]
+				[coordinates[0], coordinates[1]],
+				[coordinates[0] + width, coordinates[1]],
+				[coordinates[2], coordinates[3]],
+				[coordinates[0], coordinates[1] + height]
 			]
 		}
 	}
