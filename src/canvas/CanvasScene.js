@@ -188,11 +188,9 @@ export class CanvasScene {
 			}, wheelingTimeout)
 		})
 		this.stage.on('dragstart', (e) => {
-			console.log(this.stage.position())
 			e.target.getClassName && e.target.getClassName() === 'Stage' && this.scrollLayer.hide()
 		})
 		this.stage.on('dragend', () => {
-			console.log(this.stage.position())
 			this.repositionScrollBars()
 		})
 	}

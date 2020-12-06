@@ -1,6 +1,6 @@
 import * as uuid from 'uuid'
 import {CanvasScene} from "./CanvasScene";
-import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
+import {AnnotationType, CustomEventType, ToolTypeClassNameMap} from "./core/constants";
 import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
 import Proposal from "./annotations/Proposal";
 import {AnnotationProposalColor, AnnotationProposalLowConfidenceScoreColor} from "./annotations/Annotation";
@@ -20,11 +20,13 @@ export class CanvasManager extends CanvasScene {
 			func: this.findAndSelectAnnotation.bind(this)
 		}
 	]
+	updateModelData
 
 	// ApplicationConfig is of type {appId: string}
-	constructor(appConfig) {
-		super(appConfig.appId);
+	constructor(appConfig, updateModelData) {
+		super(appConfig.appId, updateModelData);
 		this.addEventListeners(this.eventListeners)
+		this.updateModelData = updateModelData
 		window.canvas = this
 	}
 
@@ -350,6 +352,25 @@ export class CanvasManager extends CanvasScene {
 		return this.annotations
 	}
 
+	addProposalEventListeners(proposal) {
+		// Add proposal event listeners
+		proposal.getShape().on('mouseover', () => {
+			if (!this.activeTool) {
+				proposal.showCircles()
+				this.proposalLayer.batchDraw()
+			}
+		})
+		proposal.getShape().on('mouseout', () => {
+			if (!this.activeTool) {
+				proposal.hideCircles()
+				this.proposalLayer.batchDraw()
+			}
+		})
+		proposal.getShape().on('dragend', () => {
+			this.updateModelData(proposal)
+		})
+	}
+
 	/**
 	 * @param proposals
 		 {
@@ -369,8 +390,8 @@ export class CanvasManager extends CanvasScene {
 	addOrResetProposals(proposals) {
 		if (this.proposals.length === 0 && proposals) {
 			const imagePosition = this.konvaImage.position()
-			proposals.forEach(proposal => {
-				proposal.word_details.forEach(word => {
+			proposals.forEach((proposal, proposalIndex) => {
+				proposal.word_details.forEach((word, wordIndex) => {
 					const coordinates = word.bounding_box.vertices
 					const topLeft = coordinates[0]
 					const bottomRight = coordinates[2]
@@ -383,25 +404,12 @@ export class CanvasManager extends CanvasScene {
 							w: width,
 							h: height
 						},
-						id: uuid.v4(),
+						id: `${proposalIndex}-${wordIndex}`,
 						label: word.bounding_box.entity_label,
 						color: word.confidence_score > 0.5 ? AnnotationProposalColor : AnnotationProposalLowConfidenceScoreColor
 					}
 					const proposal = new Proposal(annotationData, this.stage.scaleX())
-
-					// Add proposal event listeners
-					proposal.getShape().on('mouseover', () => {
-						if (!this.activeTool) {
-							proposal.showCircles()
-							this.proposalLayer.batchDraw()
-						}
-					})
-					proposal.getShape().on('mouseout', () => {
-						if (!this.activeTool) {
-							proposal.hideCircles()
-							this.proposalLayer.batchDraw()
-						}
-					})
+					this.addProposalEventListeners(proposal)
 
 					this.proposals.push(proposal)
 					this.proposalLayer.add(proposal.getShape())
@@ -422,7 +430,9 @@ export class CanvasManager extends CanvasScene {
 	getAnnotationData = (annotation, scaled) => {
 		const imagePosition = this.konvaImage.position()
 		const annotationData = annotation.getData()
-		const coordinates =  Object.assign([], annotationData.coordinates)
+		const coordinates =  Object.assign([],
+			annotation.type === AnnotationType.Proposal ? annotationData : annotationData.coordinates
+		)
 
 		// x1
 		coordinates[0] = coordinates[0] - imagePosition.x

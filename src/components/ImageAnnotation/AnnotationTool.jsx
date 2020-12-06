@@ -17,6 +17,7 @@ export const appId = 'canvas-annotation-tool'
 
 export default class AnnotationTool extends React.Component {
 	canvasManager
+	textAnnotations
 	state = {
 		activeImageIndex: 0,
 		loading: false,
@@ -39,6 +40,19 @@ export default class AnnotationTool extends React.Component {
 		textAnnotations: [],
 		imageMetadata: null,
 		ajaxMessage: null
+	}
+
+	updateModelData = (proposal) => {
+		const ids = proposal.id.split('-')
+		const proposalIndex = parseInt(ids[0])
+		const wordIndex = parseInt(ids[1])
+		const data = this.canvasManager.getAnnotationData(proposal)
+		const word = this.textAnnotations[proposalIndex].word_details[wordIndex]
+		if(word && word.bounding_box && word.bounding_box.vertices) {
+			word.bounding_box.vertices = data.label_points.map(point => {
+				return {x: point[0], y: point[1]}
+			})
+		}
 	}
 
 	addAnnotations(userAnnotatedData) {
@@ -64,9 +78,9 @@ export default class AnnotationTool extends React.Component {
 		const selectedImage = this.props.images[index]
 		if(selectedImage) {
 			const imageData = await getImageData(this.props.api, selectedImage._id, selectedImage.page_no);
+			this.textAnnotations = imageData.image_json ? imageData.image_json.text_annotations : []
 			this.setState({
 				imageLabels: imageData.image_labels,
-				textAnnotations: imageData.image_json ? imageData.image_json.text_annotations : [],
 				imageMetadata: imageData.image_json.metadata
 			})
 			this.canvasManager.clearAnnotations()
@@ -90,7 +104,7 @@ export default class AnnotationTool extends React.Component {
 			selectedImage._id,
 			selectedImage.page_no,
 			this.state.imageMetadata,
-			this.state.textAnnotations,
+			this.textAnnotations,
 			annotatedData
 		).then(()=>{
 			this.setState({ajaxMessage: {
@@ -109,7 +123,7 @@ export default class AnnotationTool extends React.Component {
 
 	showProposals = (show) => {
 		if(show) {
-			this.canvasManager.setProposalTool(ToolType.Proposal, this.state.textAnnotations, this.state.imageLabels)
+			this.canvasManager.setProposalTool(ToolType.Proposal, this.textAnnotations, this.state.imageLabels)
 		} else {
 			this.canvasManager.unsetProposalTool()
 		}
@@ -153,7 +167,7 @@ export default class AnnotationTool extends React.Component {
 
 	componentDidMount() {
 		this.setLoader(true);
-		this.canvasManager = new CanvasManager({appId})
+		this.canvasManager = new CanvasManager({appId}, this.updateModelData)
 	}
 
 	render() {
@@ -203,7 +217,7 @@ export default class AnnotationTool extends React.Component {
 									getAnnotations={this.canvasManager.getAnnotations}
 									getAnnotationData={this.canvasManager.getAnnotationData}
 									imageLabels={this.state.imageLabels}
-									textAnnotations={this.state.textAnnotations}
+									textAnnotations={this.textAnnotations}
 								/>
 						}
 						{/*<Box style={{overflow: 'auto', flexGrow: 1}}>*/}
