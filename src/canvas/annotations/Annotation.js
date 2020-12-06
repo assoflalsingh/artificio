@@ -18,6 +18,7 @@ export default class Annotation {
 		id: uuid.v4()
 	})
 	type
+	labelValue
 	imageLabels = []
 
 	/**
@@ -42,6 +43,7 @@ export default class Annotation {
 		this.id = data.id
 		this.scale = scale
 		this.color = data.color
+		this.labelValue = data.labelValue
 		this.imageLabels = imageLabels || []
 	}
 
@@ -112,6 +114,14 @@ export default class Annotation {
 	setLabel(label) {
 		this.annotationData.label = label
 		this.reCreateLabel()
+	}
+
+	setLabelValue = (labelValue) => {
+		this.labelValue = labelValue
+	}
+
+	getLabelValue = () => {
+		return  this.labelValue
 	}
 
 	draw() {

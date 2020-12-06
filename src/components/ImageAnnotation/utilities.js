@@ -188,6 +188,15 @@ export function findTextAnnotations(points, textAnnotations) {
 	return words
 }
 
+export function getLabelValueFromTextAnnotations(labelPoints, textAnnotations) {
+	const words = findTextAnnotations(labelPoints, textAnnotations)
+	let labelValue = ''
+	words.forEach(w => {
+		labelValue = labelValue.concat(w.word_description + ' ')
+	})
+	return labelValue
+}
+
 export function generateAnnotationsFromData(
 	data,
 	stage,

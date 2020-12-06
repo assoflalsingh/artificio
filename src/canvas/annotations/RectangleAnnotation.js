@@ -220,6 +220,7 @@ export default class RectangleAnnotation extends Annotation {
 		return {
 			coordinates: [x1, y1, x2, y2],
 			label: this.annotationData.label,
+			labelValue: this.getLabelValue(),
 			id: this.id
 		}
 	}

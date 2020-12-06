@@ -79,12 +79,22 @@ export default class AnnotationTool extends React.Component {
 		if(selectedImage) {
 			const imageData = await getImageData(this.props.api, selectedImage._id, selectedImage.page_no);
 			this.textAnnotations = imageData.image_json ? imageData.image_json.text_annotations : []
+
 			this.setState({
 				imageLabels: imageData.image_labels,
 				imageMetadata: imageData.image_json.metadata
 			})
+
+			// Clear canvas
 			this.canvasManager.clearAnnotations()
+
+			// Reset undo redo stack
 			this.canvasManager.resetUndoRedoStack()
+
+			// set text annotations in canvas manager
+			this.canvasManager.setTextAnnotations(this.textAnnotations)
+
+			// Set canvas image
 			this.canvasManager.setImage(imageData.image_url, () => {
 				this.addAnnotations(imageData.image_json ? imageData.image_json.user_annotate_data : {})
 				this.setLoader(false)

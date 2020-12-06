@@ -4,7 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import CommonTabs from "../CommonTabs";
 import {CanvasEventAttacher} from "./CanvasEventAttacher";
 import {CustomEventType} from "../../canvas/core/constants";
-import {findTextAnnotations} from "./utilities";
+import {findTextAnnotations, getLabelValueFromTextAnnotations} from "./utilities";
 import TextField from "@material-ui/core/TextField";
 
 const styles = {
@@ -92,13 +92,19 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
 					const labels = []
 					annotations.forEach(ann => {
 						const scaledData = getAnnotationData(ann)
-						const words = findTextAnnotations(scaledData.label_points, textAnnotations)
-						let labelValue = ''
-						words.forEach(w => {
-							labelValue = labelValue.concat(w.word_description + ' ')
-						})
+						const labelValue = getLabelValueFromTextAnnotations(scaledData.label_points, textAnnotations)
+						if(!ann.getLabelValue()) {
+							ann.setLabelValue(labelValue)
+						}
 						if (imageLabels.find(label => label.label_name === ann.getLabel())) {
-							labels.push(<Label labelValue={labelValue} key={ann.id} labelName={ann.getLabel()} color={ann.color}/>)
+							labels.push(
+								<Label
+									labelValue={ann.getLabelValue()}
+									setLabelValue={ann.setLabelValue}
+									key={ann.id}
+									labelName={ann.getLabel()}
+									color={ann.color}
+								/>)
 						}
 					})
 					this.setState({labels})
@@ -124,24 +130,30 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
 	}
 }
 
-const Label = ({labelName, color, labelValue}) => {
+const Label = ({labelName, color, labelValue, setLabelValue}) => {
 	const classes = useStyles()
+	const [label, setLabel] = React.useState(labelValue)
+	React.useEffect(() => {
+		setLabel(labelValue)
+	}, [labelValue])
 	return(
 		<Box>
 			<Box className={classes.labelName}>{labelName}</Box>
 			<Box className={classes.label} style={{
 				borderLeft: `9px solid ${color}`
 			}}>
-				<Tooltip title={labelValue}>
+				<Tooltip title={label}>
 					<TextField
 						id="outlined-basic"
 						variant="outlined"
-						value={labelValue}
+						value={label}
 						style={{
 							width: '100%'
 						}}
 						onChange={(e) => {
-
+							const value = e.target.value
+							setLabel(value)
+							setLabelValue(value)
 						}}
 					/>
 				</Tooltip>

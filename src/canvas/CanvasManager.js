@@ -6,6 +6,7 @@ import Proposal from "./annotations/Proposal";
 import {AnnotationProposalColor, AnnotationProposalLowConfidenceScoreColor} from "./annotations/Annotation";
 import {UndoRedoStack} from "./core/UndoRedoStack";
 import RectangleAnnotation from "./annotations/RectangleAnnotation";
+import {getLabelValueFromTextAnnotations} from "../components/ImageAnnotation/utilities";
 
 export class CanvasManager extends CanvasScene {
 	activeTool
@@ -21,6 +22,7 @@ export class CanvasManager extends CanvasScene {
 		}
 	]
 	updateModelData
+	textAnnotations
 
 	// ApplicationConfig is of type {appId: string}
 	constructor(appConfig, updateModelData) {
@@ -28,6 +30,10 @@ export class CanvasManager extends CanvasScene {
 		this.addEventListeners(this.eventListeners)
 		this.updateModelData = updateModelData
 		window.canvas = this
+	}
+
+	setTextAnnotations(textAnnotations) {
+		this.textAnnotations = textAnnotations
 	}
 
 	// Show is of type boolean
@@ -90,10 +96,16 @@ export class CanvasManager extends CanvasScene {
 			this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN)
 		})
 		this.selectedAnnotation.getShape().on('dragend.select', () => {
+			// set label value
+			const annotationData = this.getAnnotationData(this.selectedAnnotation)
+			const labelValue = getLabelValueFromTextAnnotations(annotationData.label_points, this.textAnnotations)
+			this.selectedAnnotation.setLabelValue(labelValue)
+
 			// Show label selector dropdown
 		  this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
 				position: this.getLabelSelectorPosition()
 			})
+			this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION)
 			this.updateUndoStack()
 		})
 	}
@@ -466,7 +478,7 @@ export class CanvasManager extends CanvasScene {
 		const height = coordinates[3] - coordinates[1]
 		return {
 			label_name: annotationData.label,
-			label_value: annotationData.label,
+			label_value: annotationData.labelValue,
 			label_shape: annotation.type.toLowerCase(),
 			label_points: [
 				[Math.round(coordinates[0]), Math.round(coordinates[1])],
@@ -527,7 +539,8 @@ export class CanvasManager extends CanvasScene {
 				dimensions: {x: x1, y: y1, w: width, h: height},
 				id: annotation.id,
 				color: annotation.color,
-				label: annotation.label
+				label: annotation.label,
+				labelValue: annotation.labelValue
 			}
 			const ann = new RectangleAnnotation(annotationData, this.stage.scaleX(), annotation.imageLabels)
 			ann.deSelect()
