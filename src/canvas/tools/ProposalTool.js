@@ -107,6 +107,7 @@ export class ProposalTool extends Tool {
 	assignLabel = (label) => {
 		const proposals = this.canvasManager.proposals.filter(p => p.isSelected)
 		if(this.toolMode === ToolMode.Merge) {
+			// Note: push to undo stack not required as add annotation is already carrying out the same
 			this.canvasManager.setAnnotationLabel(label.value)
 		} else {
 			proposals.forEach(proposal => {
@@ -130,6 +131,8 @@ export class ProposalTool extends Tool {
 				rectangle.deSelect()
 				this.canvasManager.addAnnotation(rectangle, false)
 			})
+			// push to undo stack
+			this.canvasManager.updateUndoStack()
 		}
 
 		this.canvasManager.addOrResetProposals()
