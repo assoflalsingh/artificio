@@ -1,15 +1,15 @@
 import * as uuid from 'uuid'
 import {CanvasScene} from "./CanvasScene";
 import {CustomEventType, ToolTypeClassNameMap} from "./core/constants";
-import {generateRandomColor, getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
+import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
 import Proposal from "./annotations/Proposal";
 import {AnnotationProposalColor, AnnotationProposalLowConfidenceScoreColor} from "./annotations/Annotation";
 import {UndoRedoStack} from "./core/UndoRedoStack";
 import RectangleAnnotation from "./annotations/RectangleAnnotation";
-import {DefaultLabel} from "../components/ImageAnnotation/LabelSelector";
 
 export class CanvasManager extends CanvasScene {
 	activeTool
+	proposalTool
 	annotations = []
 	proposals = []
 	selectedAnnotation
@@ -252,11 +252,32 @@ export class CanvasManager extends CanvasScene {
 		return this.activeTool
 	}
 
+	getProposalTool = () => {
+		return this.proposalTool
+	}
+
 	setActiveTool = (toolType, data, imageLabels) => {
 		const tool = ToolTypeClassNameMap[toolType]
 		this.activeTool = new tool(this, data, imageLabels)
 		this.addEventListeners(this.activeTool.eventListeners)
 		this.deSelectActiveAnnotation()
+	}
+
+	setProposalTool = (toolType, data, imageLabels) => {
+		const tool = ToolTypeClassNameMap[toolType]
+		this.proposalTool = new tool(this, data, imageLabels)
+		this.addEventListeners(this.proposalTool.eventListeners)
+		this.deSelectActiveAnnotation()
+	}
+
+	unsetProposalTool = () => {
+		if (this.proposalTool) {
+			this.removeEventListeners(this.proposalTool.eventListeners)
+			this.proposalTool.exitTool()
+			this.proposalTool = null
+			// Add click event listener to capture stage click events
+			this.addEventListeners(this.eventListeners)
+		}
 	}
 
 	unsetActiveTool = () => {
@@ -276,9 +297,13 @@ export class CanvasManager extends CanvasScene {
 	}
 
 	resizeCanvasStroke(scale) {
-		if(this.activeTool) {
+		if (this.activeTool) {
 			this.activeTool.resizeCanvasStroke(scale)
 			this.toolLayerDraw()
+		}
+		if (this.proposalTool) {
+			this.proposalTool.resizeCanvasStroke(scale)
+			this.proposalLayer.batchDraw()
 		}
 		this.annotations.forEach(ann => {
 			ann.resizeCanvasStroke(this.stage.scaleX())
@@ -342,22 +367,7 @@ export class CanvasManager extends CanvasScene {
 			}
 	 */
 	addOrResetProposals(proposals) {
-		// const annotationData = {
-		// 	"dimensions": {
-		// 		"x": 329,
-		// 		"y": 103,
-		// 		"w": 146,
-		// 		"h": 109
-		// 	},
-		// 	"id": "ad3be96e-690e-4f7a-baeb-4bc8498468b5",
-		// 	"color": "rgb(198,24,138)",
-		// 	"label": "arto_others"
-		// }
-		// const proposal = new Proposal(annotationData, this.stage.scaleX())
-		// this.proposalLayer.add(proposal.getShape())
-		// this.proposalLayer.batchDraw()
-
-		if (this.proposals.length === 0) {
+		if (this.proposals.length === 0 && proposals) {
 			const imagePosition = this.konvaImage.position()
 			proposals.forEach(proposal => {
 				proposal.word_details.forEach(word => {
@@ -378,6 +388,21 @@ export class CanvasManager extends CanvasScene {
 						color: word.confidence_score > 0.5 ? AnnotationProposalColor : AnnotationProposalLowConfidenceScoreColor
 					}
 					const proposal = new Proposal(annotationData, this.stage.scaleX())
+
+					// Add proposal event listeners
+					proposal.getShape().on('mouseover', () => {
+						if (!this.activeTool) {
+							proposal.showCircles()
+							this.proposalLayer.batchDraw()
+						}
+					})
+					proposal.getShape().on('mouseout', () => {
+						if (!this.activeTool) {
+							proposal.hideCircles()
+							this.proposalLayer.batchDraw()
+						}
+					})
+
 					this.proposals.push(proposal)
 					this.proposalLayer.add(proposal.getShape())
 				})

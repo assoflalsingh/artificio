@@ -74,8 +74,8 @@ export class CanvasScene {
 		});
 		this.stage.add(this.imageLayer)
 		this.proposalLayer.hide()
-		this.stage.add(this.proposalLayer)
 		this.stage.add(this.annotationLayer)
+		this.stage.add(this.proposalLayer)
 		this.stage.add(this.toolLayer)
 		this.stageDimensions = { width: this.stage.width(), height: this.stage.height() };
 		this.container = { width: element.clientWidth, height: element.clientHeight}

@@ -109,9 +109,9 @@ export default class AnnotationTool extends React.Component {
 
 	showProposals = (show) => {
 		if(show) {
-			this.canvasManager.setActiveTool(ToolType.Proposal, this.state.textAnnotations, this.state.imageLabels)
+			this.canvasManager.setProposalTool(ToolType.Proposal, this.state.textAnnotations, this.state.imageLabels)
 		} else {
-			this.canvasManager.unsetActiveTool()
+			this.canvasManager.unsetProposalTool()
 		}
 	}
 
@@ -225,8 +225,9 @@ export default class AnnotationTool extends React.Component {
 								}
 								getSelectedAnnotation={this.canvasManager.getSelectedAnnotation}
 								setAnnotationLabel={this.canvasManager.setAnnotationLabel}
-								getActiveTool={this.canvasManager.getActiveTool}
-								unsetActiveTool={this.canvasManager.unsetActiveTool}
+								// getActiveTool={this.canvasManager.getActiveTool}
+								// unsetActiveTool={this.canvasManager.unsetActiveTool}
+								getProposalTool={this.canvasManager.getProposalTool}
 							/>
 					}
 					<Snackbar open={Boolean(this.state.ajaxMessage)} autoHideDuration={6000} >

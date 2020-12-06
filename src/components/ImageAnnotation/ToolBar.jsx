@@ -81,7 +81,6 @@ export function ToolBar(props) {
 					const show = !showProposals
 					props.showProposals(show)
 					setProposals(show)
-					setActiveTool(show ? ToolBarItemType.Proposals : undefined)
 				}}
 			/>
 			<ToolBarButton style={{float: 'right'}} label='Exit' icon={<ExitToAppIcon />} onClick={props.onAnnotationToolClose} />

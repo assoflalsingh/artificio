@@ -86,7 +86,6 @@ export default class Proposal extends Annotation {
 
 	showCircles() {
 		this.circles.forEach(c => c.show())
-		this.group.getLayer() && this.group.getLayer().batchDraw()
 	}
 
 	addEventListenersToCircles(topLeft, topRight, bottomRight, bottomLeft) {
@@ -147,12 +146,6 @@ export default class Proposal extends Annotation {
 			document.body.style.cursor = 'auto'
 			!this.isSelected && this.rectangle.stroke(this.annotationData.color)
 			this.draw()
-		})
-		this.group.on('mouseover', () => {
-			this.showCircles()
-		})
-		this.group.on('mouseout', () => {
-			this.hideCircles()
 		})
 		this.group.add(this.rectangle)
 	}

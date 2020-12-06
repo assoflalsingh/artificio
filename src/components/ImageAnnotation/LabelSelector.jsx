@@ -5,10 +5,10 @@ import {makeStyles} from "@material-ui/core/styles"
 import classnames from "classnames"
 import IconButton from "@material-ui/core/IconButton"
 import TrashIcon from "@material-ui/icons/Delete"
-import {Select as MaterialSelect}  from '@material-ui/core';
+import {Select as MaterialSelect} from '@material-ui/core';
 import {grey} from "@material-ui/core/colors";
 import {CanvasEventAttacher} from "./CanvasEventAttacher";
-import {CustomEventType, ToolType} from "../../canvas/core/constants";
+import {CustomEventType} from "../../canvas/core/constants";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import Box from "@material-ui/core/Box";
@@ -98,8 +98,8 @@ export class LabelSelector extends CanvasEventAttacher {
 				event: 'contextmenu',
 				func: (event) => {
 					event.preventDefault();
-					const activeTool = this.props.getActiveTool()
-					if (activeTool && activeTool.toolType === ToolType.Proposal) {
+					const proposalTool = this.props.getProposalTool()
+					if (proposalTool) {
 						this.setState({
 							showProposalOptionSelection: true,
 							proposalOptionSelectionPosition: {
@@ -125,66 +125,64 @@ export class LabelSelector extends CanvasEventAttacher {
 		const show = this.state.show
 		return (
 			<>
-			{
-				show &&
-				<div style={{
-						height: 'auto',
-						position: 'absolute',
-						opacity: 1,
-						top: this.state.position.y,
-						left: this.state.position.x,
-					  zIndex: 1000
-				}}>
-					<Label
-						showLabelSelector={this.showLabelSelector}
-						deSelectActiveAnnotation={this.props.deSelectActiveAnnotation}
-						imageLabels={this.props.imageLabels}
-						deleteAnnotation={this.props.deleteAnnotation}
-						getSelectedAnnotation={this.props.getSelectedAnnotation}
-						setAnnotationLabel={
-							this.state.proposalMode ? (label) => {
-								this.props.getActiveTool().assignLabel(label)
-								this.props.unsetActiveTool()
-							} : this.props.setAnnotationLabel
-						}
-						proposalMode={this.state.proposalMode}
-						resetProposalMode={this.resetProposalMode}
-					/>
-				</div>
-			}
+				{
+					show &&
+					<div style={{
+							height: 'auto',
+							position: 'absolute',
+							opacity: 1,
+							top: this.state.position.y,
+							left: this.state.position.x,
+							zIndex: 1000
+					}}>
+						<Label
+							showLabelSelector={this.showLabelSelector}
+							deSelectActiveAnnotation={this.props.deSelectActiveAnnotation}
+							imageLabels={this.props.imageLabels}
+							deleteAnnotation={this.props.deleteAnnotation}
+							getSelectedAnnotation={this.props.getSelectedAnnotation}
+							setAnnotationLabel={
+								this.state.proposalMode ? (label) => {
+									this.props.getProposalTool().assignLabel(label)
+								} : this.props.setAnnotationLabel
+							}
+							proposalMode={this.state.proposalMode}
+							resetProposalMode={this.resetProposalMode}
+						/>
+					</div>
+				}
 
-			{
-				this.state.showProposalOptionSelection &&
-				<MaterialSelect
-					style={{
-						position: 'absolute',
-						width: 0, height: 0,
-						left: this.state.proposalOptionSelectionPosition.x,
-						top: this.state.proposalOptionSelectionPosition.y
-					}}
-					labelId="demo-simple-select-label"
-					id="demo-simple-select"
-					open={true}
-				>
-					<MenuItem
-						value={''}
-						onClick={() => {
-							this.props.getActiveTool().createAnnotation()
-							this.setState({showProposalOptionSelection: false})}}>
-						Merge
-					</MenuItem>
-					<MenuItem
-						value={''}
-						onClick={() => {
-							this.props.getActiveTool().showLabelDropDown()
-							this.setState({showProposalOptionSelection: false})}
-						}>
-						Assign Label
-					</MenuItem>
-				</MaterialSelect>
-			}
-
-			{this.state.proposalMode && <BackgroundScreen/>}
+				{
+					this.state.showProposalOptionSelection &&
+					<MaterialSelect
+						style={{
+							position: 'absolute',
+							width: 0, height: 0,
+							left: this.state.proposalOptionSelectionPosition.x,
+							top: this.state.proposalOptionSelectionPosition.y
+						}}
+						labelId="demo-simple-select-label"
+						id="demo-simple-select"
+						open={true}
+					>
+						<MenuItem
+							value={''}
+							onClick={() => {
+								this.props.getProposalTool().createAnnotation()
+								this.setState({showProposalOptionSelection: false})}}>
+							Merge
+						</MenuItem>
+						<MenuItem
+							value={''}
+							onClick={() => {
+								this.props.getProposalTool().showLabelDropDown()
+								this.setState({showProposalOptionSelection: false})}
+							}>
+							Assign Label
+						</MenuItem>
+					</MaterialSelect>
+				}
+				{this.state.proposalMode && <BackgroundScreen/>}
 			</>
 		)
 	}
