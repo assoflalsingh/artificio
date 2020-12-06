@@ -93,6 +93,24 @@ export default class AnnotationTool extends React.Component {
     }
   }
 
+  initializeCanvas(imageData) {
+		// Clear canvas
+		this.canvasManager.clearAnnotations();
+		// Reset undo redo stack
+		this.canvasManager.resetUndoRedoStack();
+		// set text annotations in canvas manager
+		this.canvasManager.setTextAnnotations(this.textAnnotations);
+		// Set canvas image
+		this.canvasManager.setImage(imageData.image_url, () => {
+			this.addAnnotations(
+				imageData.image_json ? imageData.image_json.user_annotate_data : {}
+			);
+			this.setLoader(false);
+		});
+		this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+		this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+	}
+
   async fetchImageData(index) {
     this.setLoader(true);
     this.setState({ activeImageIndex: index });
@@ -111,25 +129,7 @@ export default class AnnotationTool extends React.Component {
         imageLabels: imageData.image_labels,
         imageMetadata: imageData.image_json.metadata,
       });
-
-      // Clear canvas
-      this.canvasManager.clearAnnotations();
-
-      // Reset undo redo stack
-      this.canvasManager.resetUndoRedoStack();
-
-      // set text annotations in canvas manager
-      this.canvasManager.setTextAnnotations(this.textAnnotations);
-
-      // Set canvas image
-      this.canvasManager.setImage(imageData.image_url, () => {
-        this.addAnnotations(
-          imageData.image_json ? imageData.image_json.user_annotate_data : {}
-        );
-        this.setLoader(false);
-      });
-      this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
-      this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+			this.initializeCanvas(imageData)
     } else {
       this.setLoader(false);
     }
