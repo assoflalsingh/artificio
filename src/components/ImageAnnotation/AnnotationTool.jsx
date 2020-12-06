@@ -53,7 +53,7 @@ export default class AnnotationTool extends React.Component {
 	}
 
 	updateModelAnnotationData = (proposal) => {
-		if(proposal) {
+		if (proposal) {
 			const ids = proposal.id.split('-')
 			const proposalIndex = parseInt(ids[0])
 			const wordIndex = parseInt(ids[1])

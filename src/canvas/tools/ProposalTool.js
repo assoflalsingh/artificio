@@ -5,7 +5,14 @@ import {generateRandomColor} from "../core/utilities";
 import {DefaultLabel} from "../../components/ImageAnnotation/LabelSelector";
 import RectangleAnnotation from "../annotations/RectangleAnnotation";
 
+const ToolMode = {
+	Merge: 'Merge',
+	AssignLabel: 'AssignLabel'
+}
+
 export class ProposalTool extends Tool {
+	toolMode
+
 	constructor(canvasManager, proposals, imageLabels) {
 		super(canvasManager, proposals, imageLabels);
 		this.toolType = ToolType.Proposal
@@ -74,7 +81,8 @@ export class ProposalTool extends Tool {
 			}
 			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX(), this.imageLabels)
 			this.canvasManager.addAnnotation(rectangle)
-			this.canvasManager.addOrResetProposals()
+			this.toolMode = ToolMode.Merge
+			this.showLabelDropDown()
 			// this.exitTool()
 		} else {
 
@@ -98,29 +106,35 @@ export class ProposalTool extends Tool {
 
 	assignLabel = (label) => {
 		const proposals = this.canvasManager.proposals.filter(p => p.isSelected)
-		proposals.forEach(proposal => {
-			const coordinates = proposal.getData()
-			const x1 = coordinates[0]
-			const y1 = coordinates[1]
-			const x2 = coordinates[2]
-			const y2 = coordinates[3]
-			const annotationData = {
-				dimensions: {
-					x: x1,
-					y: y1,
-					w: x2 - x1,
-					h: y2 - y1
-				},
-				id: uuid.v4(),
-				color: generateRandomColor(),
-				label: label.value
-			}
-			const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX(), this.imageLabels)
-			rectangle.deSelect()
-			this.canvasManager.addAnnotation(rectangle, false)
-		})
+		if(this.toolMode === ToolMode.Merge) {
+			this.canvasManager.setAnnotationLabel(label.value)
+		} else {
+			proposals.forEach(proposal => {
+				const coordinates = proposal.getData()
+				const x1 = coordinates[0]
+				const y1 = coordinates[1]
+				const x2 = coordinates[2]
+				const y2 = coordinates[3]
+				const annotationData = {
+					dimensions: {
+						x: x1,
+						y: y1,
+						w: x2 - x1,
+						h: y2 - y1
+					},
+					id: uuid.v4(),
+					color: generateRandomColor(),
+					label: label.value
+				}
+				const rectangle = new RectangleAnnotation(annotationData, this.canvasManager.stage.scaleX(), this.imageLabels)
+				rectangle.deSelect()
+				this.canvasManager.addAnnotation(rectangle, false)
+			})
+		}
+
 		this.canvasManager.addOrResetProposals()
 		this.canvasManager.updateModelAnnotationLabel(proposals, label.value)
+		this.toolMode = null
 	}
 
 	resizeCanvasStroke() {
