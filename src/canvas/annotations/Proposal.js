@@ -134,8 +134,8 @@ export default class Proposal extends Annotation {
 		})
 		const text = new Konva.Text({
 			x: -radius/2,
-			y: -3 / scale,
-			text: 'X',
+			y: -3.5/scale,
+			text: '\u2A09',
 			fontSize: 7 / scale,
 			fill: 'white',
 			fontStyle: 'bold'
