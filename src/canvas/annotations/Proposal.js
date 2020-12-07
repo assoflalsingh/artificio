@@ -1,7 +1,7 @@
 import Konva from "konva";
 import Annotation, {
-  AnnotationCircleRadius,
-  AnnotationCircleStrokeWidth,
+	AnnotationCircleRadius,
+	AnnotationCircleStrokeWidth, AnnotationEventType,
 } from "./Annotation";
 import { AnnotationType } from "../core/constants";
 import { createCircle } from "../core/utilities";
@@ -12,6 +12,7 @@ export default class Proposal extends Annotation {
   strokeWidth = 2;
   circles = [];
   isSelected;
+	deleteIconGroup
   /**
 	 * @param annotationData
 	 * {
@@ -37,6 +38,7 @@ export default class Proposal extends Annotation {
     });
     this.createRectangle();
     this.addCircles();
+		this.addDeleteIcon()
   }
 
   addCircles() {
@@ -77,10 +79,91 @@ export default class Proposal extends Annotation {
       draggable: true,
     });
     this.circles = [topLeft, topRight, bottomRight, bottomLeft];
+    this.addCircleEventListeners()
     this.addEventListenersToCircles(topLeft, topRight, bottomRight, bottomLeft);
     this.hideCircles();
     this.group.add(topLeft, topRight, bottomRight, bottomLeft);
   }
+
+  addCircleEventListeners() {
+		// Add circle event listeners to add & remove deleteicon
+		this.circles.forEach(c => {
+			c.on('dragstart', () => {
+				this.removeDeleteIcon()
+				this.draw()
+			})
+			c.on('dragend', () => {
+				this.addDeleteIcon()
+				this.draw()
+			})
+		})
+	}
+
+	getTopLeftCoordinates() {
+		const coor = { x: Infinity, y: Infinity };
+		// Get max position for circles
+		this.circles.forEach((c) => {
+			if (c.x() < coor.x) {
+				coor.x = c.x();
+			}
+			if (c.y() < coor.y) {
+				coor.y = c.y();
+			}
+		});
+		return coor;
+	}
+
+	addDeleteIcon() {
+		const topLeft = this.getTopLeftCoordinates();
+		const scale = this.scale === 1 ? this.scale : this.scale * 0.5
+		const radius = 5 / scale
+		const padding = 2 / scale
+		const topRight = {
+			x: topLeft.x + Math.abs(this.rectangle.width()),
+			y: topLeft.y
+		}
+		this.deleteIconGroup = new Konva.Group({
+			y: topRight.y - radius - padding,
+			x: topRight.x
+		})
+		const circle = new Konva.Circle({
+			x: 0,
+			y: 0,
+			fill: 'blue',
+			radius
+		})
+		const text = new Konva.Text({
+			x: -radius/2,
+			y: -3 / scale,
+			text: 'X',
+			fontSize: 7 / scale,
+			fill: 'white',
+			fontStyle: 'bold'
+		})
+		this.deleteIconGroup.add(circle, text)
+		this.deleteIconGroup.on("mouseover", () => {
+			document.body.style.cursor = "pointer";
+		});
+		this.deleteIconGroup.on("mouseout", () => {
+			document.body.style.cursor = "auto";
+		});
+		this.deleteIconGroup.on('click', () => {
+			this.events[AnnotationEventType.Delete] && this.events[AnnotationEventType.Delete]()
+		})
+		this.group.add(this.deleteIconGroup)
+	}
+
+	removeDeleteIcon() {
+  	if (this.deleteIconGroup) {
+			this.deleteIconGroup.destroy()
+			this.deleteIconGroup.destroyChildren()
+		}
+	}
+
+	recreateDeleteIcon() {
+  	this.removeDeleteIcon()
+		this.addDeleteIcon()
+	}
 
   hideCircles() {
     this.circles.forEach((c) => c.hide());
@@ -160,6 +243,7 @@ export default class Proposal extends Annotation {
       circle.radius(AnnotationCircleRadius / this.scale);
       circle.strokeWidth(AnnotationCircleStrokeWidth / this.scale);
     });
+    this.recreateDeleteIcon()
   }
 
   select() {

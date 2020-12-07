@@ -7,6 +7,10 @@ export const AnnotationProposalColor = "blue";
 export const AnnotationProposalLowConfidenceScoreColor = "red";
 const TextPadding = 8;
 
+export const AnnotationEventType = {
+	Delete: 'Delete'
+}
+
 export default class Annotation {
   annotationData;
   scale;
@@ -20,6 +24,7 @@ export default class Annotation {
   type;
   labelValue;
   imageLabels = [];
+  events = {}
 
   /**
 	 * @param data
@@ -121,6 +126,10 @@ export default class Annotation {
   getLabelValue = () => {
     return this.labelValue;
   };
+
+  on = (eventName, callback) => {
+  	this.events[eventName] = callback
+	}
 
   draw() {
     this.group.draw();

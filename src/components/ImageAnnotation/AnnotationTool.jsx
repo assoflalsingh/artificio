@@ -42,6 +42,15 @@ export default class AnnotationTool extends React.Component {
     ajaxMessage: null,
   };
 
+	deleteProposalInModelData = (proposal) => {
+		const ids = proposal.id.split("-");
+		const proposalIndex = parseInt(ids[0]);
+		const wordIndex = parseInt(ids[1]);
+		if (this.textAnnotations[proposalIndex]) {
+			this.textAnnotations[proposalIndex].word_details.splice(wordIndex, 1)
+		}
+	}
+
   updateModelAnnotationLabel = (proposals, labelName) => {
     if (proposals && proposals.length > 0) {
       proposals.forEach((proposal) => {
@@ -221,7 +230,8 @@ export default class AnnotationTool extends React.Component {
     this.canvasManager = new CanvasManager(
       { appId },
       this.updateModelAnnotationData,
-      this.updateModelAnnotationLabel
+      this.updateModelAnnotationLabel,
+			this.deleteProposalInModelData
     );
   }
 

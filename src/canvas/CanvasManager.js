@@ -7,8 +7,9 @@ import {
 import { getScaledCoordinates, getUnScaledCoordinates } from "./core/utilities";
 import Proposal from "./annotations/Proposal";
 import {
-  AnnotationProposalColor,
-  AnnotationProposalLowConfidenceScoreColor,
+	AnnotationEventType,
+	AnnotationProposalColor,
+	AnnotationProposalLowConfidenceScoreColor,
 } from "./annotations/Annotation";
 import { UndoRedoStack } from "./core/UndoRedoStack";
 import RectangleAnnotation from "./annotations/RectangleAnnotation";
@@ -35,7 +36,8 @@ export class CanvasManager extends CanvasScene {
   constructor(
     appConfig,
     updateModelAnnotationData,
-    updateModelAnnotationLabel
+    updateModelAnnotationLabel,
+		deleteProposalInModelData
   ) {
     super(
       appConfig.appId,
@@ -45,6 +47,7 @@ export class CanvasManager extends CanvasScene {
     this.addEventListeners(this.eventListeners);
     this.updateModelAnnotationData = updateModelAnnotationData;
     this.updateModelAnnotationLabel = updateModelAnnotationLabel;
+    this.deleteProposalInModelData = deleteProposalInModelData;
     window.canvas = this;
   }
 
@@ -406,6 +409,10 @@ export class CanvasManager extends CanvasScene {
     proposal.getShape().on("dragend", () => {
       this.updateModelAnnotationData(proposal);
     });
+    proposal.on(AnnotationEventType.Delete, () => {
+    	this.deleteProposal(proposal)
+			this.deleteProposalInModelData(proposal)
+		})
   }
 
   /**
@@ -476,6 +483,15 @@ export class CanvasManager extends CanvasScene {
     this.proposalLayer.hide();
     this.proposalLayer.batchDraw();
   }
+
+  deleteProposal(proposal) {
+  	const id = proposal.id
+		const index = this.proposals.find(p => p.id === id)
+		this.proposals.splice(index, 1);
+  	proposal.getShape().destroy()
+		proposal.getShape().destroyChildren()
+		this.proposalLayer.draw()
+	}
 
   getAnnotationData = (annotation, scaled) => {
     const imagePosition = this.konvaImage.position();
