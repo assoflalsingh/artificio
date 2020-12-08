@@ -117,7 +117,9 @@ export default class AnnotationTool extends React.Component {
       this.setLoader(false);
     });
     this.canvasManager.notifyLabelCreation();
+    this.canvasManager.unsetProposalTool()
     this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+		this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
   }
 
   async fetchImageData(index) {

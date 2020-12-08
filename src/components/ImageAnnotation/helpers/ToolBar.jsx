@@ -70,6 +70,12 @@ export class ToolBar extends CanvasEventAttacher {
         this.setState({ activeTool: event.detail.toolType });
       },
     },
+		{
+			event: CustomEventType.NOTIFY_PROPOSAL_RESET,
+			func: () => {
+				this.setState({ showProposals: false });
+			},
+		},
   ];
 
   onSelectTool = () => {
