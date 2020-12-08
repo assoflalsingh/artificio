@@ -98,7 +98,7 @@ export function getVerticalScrollBar(stage) {
     draggable: true,
     dragBoundFunc: function (pos) {
       const scaleY = stage.scale().y;
-      pos.x = stageWidth - scrollPadding - 10;
+      pos.x = stageWidth - scrollPadding - 18;
       pos.y = Math.max(
         Math.min(pos.y, stageHeight - scrollPadding - this.height() * scaleY),
         scrollPadding

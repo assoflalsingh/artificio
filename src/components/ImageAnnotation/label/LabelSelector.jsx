@@ -311,12 +311,9 @@ const Label = ({
       <CreateModalDialog
         modalOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        createLabel={(labelName) => {
-          setAnnotationLabel(labelName);
-          setLabelValue({
-            value: labelName,
-            label: labelName,
-          });
+        createLabel={(label) => {
+          setAnnotationLabel(label);
+          setLabelValue(label);
           setModalOpen(false);
         }}
       />

@@ -27,7 +27,8 @@ export const CreateModalDialog = ({ modalOpen, onClose, createLabel }) => {
             padding: 5,
           }}
           onChange={(e) => {
-            setLabelName(e.target.value);
+          	const value = e.target.value
+            setLabelName({value, label: value, color: 'blue'});
           }}
         />
       </DialogContent>
