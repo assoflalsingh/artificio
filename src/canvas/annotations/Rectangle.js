@@ -7,7 +7,7 @@ import Annotation, {
 import { createCircle } from "../core/utilities";
 import { AnnotationType } from "../core/constants";
 
-export default class RectangleAnnotation extends Annotation {
+export default class Rectangle extends Annotation {
   rectangle;
   circles = [];
   strokeWidth = AnnotationStrokeWidth;

@@ -6,7 +6,7 @@ import {
   generateRandomColor,
   TempRectangle,
 } from "../core/utilities";
-import RectangleAnnotation from "../annotations/RectangleAnnotation";
+import Rectangle from "../annotations/Rectangle";
 import { DefaultLabel } from "../../components/ImageAnnotation/label/LabelSelector";
 
 export class RectangleTool extends Tool {
@@ -103,7 +103,7 @@ export class RectangleTool extends Tool {
       color: generateRandomColor(),
       label: DefaultLabel.label_name,
     };
-    const rectangle = new RectangleAnnotation(
+    const rectangle = new Rectangle(
       annotationData,
       this.canvasManager.stage.scaleX(),
       this.imageLabels

@@ -12,7 +12,7 @@ import {
 	AnnotationProposalLowConfidenceScoreColor,
 } from "./annotations/Annotation";
 import { UndoRedoStack } from "./core/UndoRedoStack";
-import RectangleAnnotation from "./annotations/RectangleAnnotation";
+import Rectangle from "./annotations/Rectangle";
 import { getLabelValueFromTextAnnotations } from "../components/ImageAnnotation/utilities";
 
 export class CanvasManager extends CanvasScene {
@@ -60,7 +60,7 @@ export class CanvasManager extends CanvasScene {
     this.dispatch(CustomEventType.SHOW_LOADER, { loading: show });
   }
 
-  // Return type RectangleAnnotation
+  // Return type Rectangle
   getAnnotationById(id) {
     return this.annotations.find((ann) => ann.id === id);
   }
@@ -611,7 +611,7 @@ export class CanvasManager extends CanvasScene {
         label: annotation.label,
         labelValue: annotation.labelValue,
       };
-      const ann = new RectangleAnnotation(
+      const ann = new Rectangle(
         annotationData,
         this.stage.scaleX(),
         annotation.imageLabels

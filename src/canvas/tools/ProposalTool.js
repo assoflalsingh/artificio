@@ -3,7 +3,7 @@ import { CustomEventType, ToolType } from "../core/constants";
 import * as uuid from "uuid";
 import { generateRandomColor } from "../core/utilities";
 import { DefaultLabel } from "../../components/ImageAnnotation/label/LabelSelector";
-import RectangleAnnotation from "../annotations/RectangleAnnotation";
+import Rectangle from "../annotations/Rectangle";
 
 const ToolMode = {
   Merge: "Merge",
@@ -80,7 +80,7 @@ export class ProposalTool extends Tool {
         color: generateRandomColor(),
         label: DefaultLabel.label_name,
       };
-      const rectangle = new RectangleAnnotation(
+      const rectangle = new Rectangle(
         annotationData,
         this.canvasManager.stage.scaleX(),
         this.imageLabels
@@ -132,7 +132,7 @@ export class ProposalTool extends Tool {
           color: generateRandomColor(),
           label: label.value,
         };
-        const rectangle = new RectangleAnnotation(
+        const rectangle = new Rectangle(
           annotationData,
           this.canvasManager.stage.scaleX(),
           this.imageLabels

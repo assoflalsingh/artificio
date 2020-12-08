@@ -1,6 +1,6 @@
 import Konva from "konva";
 import * as uuid from "uuid";
-import { generateRandomColor } from "../../canvas/core/utilities";
+import {generateRandomColor, getIntersectingRectangle} from "../../canvas/core/utilities";
 export const scrollPadding = 5;
 export const scrollBarWidth = 10;
 export const scrollBarHeight = 10;
@@ -180,14 +180,34 @@ export function findTextAnnotations(points, textAnnotations) {
         const x2 = vertices[2].x;
         const y2 = vertices[2].y;
 
-        if (x1 >= px1 && y1 >= py1 && x2 <= px2 && y2 <= py2) {
-          words.push({
-            confidence_score: word.confidence_score,
-            entity_label: word.entity_label,
-            word_description: word.word_description,
-            vertices,
-          });
-        }
+				if (x1 >= px1 && y1 >= py1 && x2 <= px2 && y2 <= py2) {
+					words.push({
+						confidence_score: word.confidence_score,
+						entity_label: word.entity_label,
+						word_description: word.word_description,
+						vertices,
+					});
+				}
+
+        const intersectingRectangle = getIntersectingRectangle(
+        	{x1: px1, y1: py1, x2: px2, y2: py2},
+					{x1, y1, x2, y2})
+				if (intersectingRectangle) {
+					const rectArea = (x2 - x1) * (y2 - y1)
+					const intersectingRectArea =
+						(intersectingRectangle.x2 - intersectingRectangle.x1) * (intersectingRectangle.y2 - intersectingRectangle.y1)
+					const ratio = intersectingRectArea / rectArea
+					if (ratio >= 0.5) {
+						if (!words.find(w => w.word_description === word.word_description)) {
+							words.push({
+								confidence_score: word.confidence_score,
+								entity_label: word.entity_label,
+								word_description: word.word_description,
+								vertices,
+							});
+						}
+					}
+				}
       });
     });
   // words = words.filter(w => w.confidence_score > 0.5)

@@ -147,6 +147,7 @@ export default class AnnotationTool extends React.Component {
   saveImageData = () => {
     const selectedImage = this.props.images[this.state.activeImageIndex];
     const annotatedData = this.canvasManager.getData();
+    this.setLoader(true)
     saveAnnotationData(
       this.props.api,
       selectedImage._id,
@@ -156,6 +157,7 @@ export default class AnnotationTool extends React.Component {
       annotatedData
     )
       .then(() => {
+      	this.setLoader(false)
         this.setState({
           ajaxMessage: {
             error: false,
@@ -164,6 +166,7 @@ export default class AnnotationTool extends React.Component {
         });
       })
       .catch((error) => {
+      	this.setLoader(false)
         if (error.response) {
           this.setState({
             ajaxMessage: {
