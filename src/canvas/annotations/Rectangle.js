@@ -11,6 +11,7 @@ export default class Rectangle extends Annotation {
   rectangle;
   circles = [];
   strokeWidth = AnnotationStrokeWidth;
+  isSelected = false
   /**
 	 * @param annotationData
 	 * {
@@ -35,7 +36,6 @@ export default class Rectangle extends Annotation {
     });
     this.createRectangle();
     this.addCircles();
-    this.addLabel();
   }
 
   createRectangle() {
@@ -147,7 +147,7 @@ export default class Rectangle extends Annotation {
       circle.strokeWidth(AnnotationCircleStrokeWidth / this.scale);
     });
 
-    this.reCreateLabel();
+		this.isSelected && this.reCreateLabel();
   }
 
   getTopLeftCoordinates() {
@@ -205,15 +205,19 @@ export default class Rectangle extends Annotation {
   }
 
   select() {
+  	this.isSelected = true
     this.circles.forEach((c) => c.show());
     this.group.draggable(true);
     this.group.moveToTop();
+    this.addLabel()
     // this.rectangle.strokeWidth((this.strokeWidth + 5)/this.scale);
   }
 
   deSelect() {
+		this.isSelected = false
     this.circles.forEach((c) => c.hide());
     this.group.draggable(false);
+    this.destroyLabel()
     // this.rectangle.strokeWidth((this.strokeWidth - 5)/this.scale);
   }
 

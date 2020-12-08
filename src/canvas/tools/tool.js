@@ -14,7 +14,7 @@ export class Tool {
   onKeyDown = (event) => {
     switch (event.keyCode) {
       case KeyMappings.Escape:
-        this.exit();
+        // this.exit();
         break;
     }
   };

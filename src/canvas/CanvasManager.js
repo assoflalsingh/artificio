@@ -684,11 +684,11 @@ export class CanvasManager extends CanvasScene {
     }
   };
 
-  notifyLabelCreation() {
+  notifyLabelCreation(addConnectingLine = true) {
     this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
     // setTimeout is required to make the label elements appear as it depends on async setState in LabelContainer
     setTimeout(() => {
-      this.addConnectingLine();
+			addConnectingLine && this.addConnectingLine();
     });
   }
 
