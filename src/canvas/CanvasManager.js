@@ -119,6 +119,17 @@ export class CanvasManager extends CanvasScene {
     });
   }
 
+  selectAnnotationById = (id) => {
+  	const annotation = this.getAnnotationById(id)
+		if (annotation) {
+			if(!this.selectedAnnotation) {
+				this.selectAnnotation(annotation)
+			} else if(this.selectedAnnotation.id !== annotation.id) {
+				this.selectAnnotation(annotation)
+			}
+		}
+	}
+
   getSelectedAnnotation = () => {
     return this.selectedAnnotation;
   };

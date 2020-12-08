@@ -60,6 +60,7 @@ export const LabelsContainer = ({
   getAnnotationData,
   removeConnectingLine,
   addConnectingLine,
+	selectAnnotationById
 }) => {
   const classes = useStyles();
   let wheeling;
@@ -93,6 +94,7 @@ export const LabelsContainer = ({
                   getAnnotationData={getAnnotationData}
                   imageLabels={imageLabels}
                   textAnnotations={textAnnotations}
+									selectAnnotationById={selectAnnotationById}
                 />
               </Box>
             ),
@@ -124,6 +126,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             imageLabels,
             textAnnotations,
             getAnnotationData,
+						selectAnnotationById
           } = this.props;
           const annotations = getAnnotations() || [];
           const labels = [];
@@ -147,6 +150,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
                   labelName={ann.getLabel()}
                   color={ann.color}
                   annotationId={ann.id}
+									selectAnnotationById={selectAnnotationById}
                 />
               );
             }
@@ -176,6 +180,7 @@ const Label = ({
   labelValue,
   setLabelValue,
   annotationId,
+  selectAnnotationById
 }) => {
   const classes = useStyles();
   const [label, setLabel] = React.useState(labelValue);
@@ -204,6 +209,7 @@ const Label = ({
               const value = e.target.value;
               setLabel(value);
               setLabelValue(value);
+							selectAnnotationById(annotationId)
             }}
           />
         </Tooltip>

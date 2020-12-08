@@ -311,6 +311,7 @@ export default class AnnotationTool extends React.Component {
         <Box style={{ width: "25%", display: "flex", flexDirection: "column" }}>
           {this.canvasManager && (
             <LabelsContainer
+							selectAnnotationById={this.canvasManager.selectAnnotationById}
               getAnnotations={this.canvasManager.getAnnotations}
               getAnnotationData={this.canvasManager.getAnnotationData}
               imageLabels={this.state.imageLabels}
