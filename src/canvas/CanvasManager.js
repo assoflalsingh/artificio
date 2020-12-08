@@ -353,7 +353,7 @@ export class CanvasManager extends CanvasScene {
     this.annotationLayer.batchDraw();
   }
 
-  resizeCanvasStroke(scale) {
+  resizeCanvasStroke = (scale) => {
     if (this.activeTool) {
       this.activeTool.resizeCanvasStroke(scale);
       this.toolLayerDraw();

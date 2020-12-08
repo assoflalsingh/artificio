@@ -213,11 +213,15 @@ export class CanvasScene {
     });
   }
 
+  getCenterPosition() {
+  	return {
+			x: this.stage.width() / 2 + this.container.width * paddingFactor,
+			y: this.stage.height() / 2 + this.container.height * paddingFactor,
+		}
+	}
+
   clickZoomInOut = (delta) => {
-    const centerPos = {
-      x: this.stage.width() / 2 + this.container.width * paddingFactor,
-      y: this.stage.height() / 2 + this.container.height * paddingFactor,
-    };
+    const centerPos = this.getCenterPosition();
     this.handleScrollZoom(centerPos, delta);
     // to clear timeout everytime we scroll
     // setting scrollend timeout to 70ms
@@ -367,8 +371,25 @@ export class CanvasScene {
     });
   }
 
+  fitImageToScreen() {
+		this.oldScale = 1 / (1 - 2 * paddingFactor);
+		this.constrainedScale = 1;
+		this.initialScale = 1;
+		const centeredPosition = {
+			x: 0,
+			y: 0
+		}
+		this.stage.position(centeredPosition)
+		this.stage.scale({x: this.initialScale, y: this.initialScale})
+		this.annotationLayer && this.resizeCanvasStroke(this.initialScale)
+		this.scrollLayer.hide()
+		this.stage.draw()
+	}
+
   getSelectedAnnotation = () => {};
 
   handleScrollZoomStart = () => {};
   handleScrollZoomEnd = () => {};
+
+	resizeCanvasStroke = () => {}
 }

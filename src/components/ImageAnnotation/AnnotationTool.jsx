@@ -111,6 +111,8 @@ export default class AnnotationTool extends React.Component {
     this.canvasManager.setTextAnnotations(this.textAnnotations);
     // Set canvas image
     this.canvasManager.setImage(imageData.image_url, () => {
+    	// Fit image to screen
+    	this.canvasManager.fitImageToScreen()
       this.addAnnotations(
         imageData.image_json ? imageData.image_json.user_annotate_data : {}
       );
