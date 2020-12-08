@@ -73,7 +73,14 @@ export class ToolBar extends CanvasEventAttacher {
 		{
 			event: CustomEventType.NOTIFY_PROPOSAL_RESET,
 			func: () => {
-				this.setState({ showProposals: false });
+				this.setState({
+					shapesAnchor: null,
+					selectMode: true,
+					dragMode: true,
+					activeTool: null,
+					showProposals: false,
+					hideAnnotations: false,
+				});
 			},
 		},
   ];
@@ -118,6 +125,7 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           active={this.state.activeTool}
           label="Shapes"
+					disabled={this.state.hideAnnotations}
           icon={<FormatShapesIcon />}
           onClick={(e) => this.setState({ shapesAnchor: e.target })}
         />

@@ -105,7 +105,7 @@ export default class AnnotationTool extends React.Component {
 
   initializeCanvas(imageData) {
     // Clear canvas
-    this.canvasManager.clearAnnotations();
+    this.canvasManager.resetCanvas();
     // Reset undo redo stack
     this.canvasManager.resetUndoRedoStack();
     // set text annotations in canvas manager

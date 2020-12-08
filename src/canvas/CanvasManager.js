@@ -229,17 +229,20 @@ export class CanvasManager extends CanvasScene {
     this.annotationLayer.batchDraw();
   }
 
-  clearAnnotations() {
+  resetCanvas() {
     this.unsetActiveTool();
     this.deSelectActiveAnnotation();
     this.annotationLayer.destroyChildren();
     this.annotations = [];
+    this.annotationLayer.show()
     this.annotationLayer.batchDraw();
     this.proposalLayer.destroyChildren();
     this.proposals = [];
     this.proposalLayer.batchDraw();
     this.toolLayer.destroyChildren();
     this.toolLayerDraw();
+    this.blockAnnotationSelect = false
+		this.setStageDraggable(true)
   }
 
   transformEventDataForTool = (event, eventData) => {
@@ -639,7 +642,7 @@ export class CanvasManager extends CanvasScene {
   }
 
   undo = () => {
-    this.clearAnnotations();
+    this.resetCanvas();
     const annotations = this.undoRedoStack.undo();
     if (annotations && annotations.length > 0) {
       this.addAnnotationsFromData(annotations);
@@ -650,7 +653,7 @@ export class CanvasManager extends CanvasScene {
   redo = () => {
     const annotations = this.undoRedoStack.redo();
     if (annotations && annotations.length > 0) {
-      this.clearAnnotations();
+      this.resetCanvas();
       this.addAnnotationsFromData(annotations);
       this.notifyLabelCreation();
     }
