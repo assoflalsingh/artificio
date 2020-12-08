@@ -12,6 +12,7 @@ import { CustomEventType, ToolType } from "../../canvas/core/constants";
 import { getImageData, saveAnnotationData } from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
 import { generateAnnotationsFromData } from "./utilities";
+import {LeftToolBar} from "./helpers/LeftToolBar";
 
 export const appId = "canvas-annotation-tool";
 
@@ -249,8 +250,7 @@ export default class AnnotationTool extends React.Component {
     const activeImage = images && images[this.state.activeImageIndex];
     return (
       <Box display="flex" style={{ height: "100%" }}>
-        <RegionLeftToolBar
-          dispatch={undefined}
+        <LeftToolBar
           regions={activeImage ? activeImage.regions : []}
           undo={this.canvasManager && this.canvasManager.undo}
           redo={this.canvasManager && this.canvasManager.redo}
