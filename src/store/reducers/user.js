@@ -6,7 +6,20 @@ export default (state={}, action) => {
     case 'SET_USER': {
       return {
         ...state,
-        user: action.payload,
+        user: {
+          ...state.user,
+          ...action.payload,
+          user_set: true,
+        },
+      };
+    }
+    case 'SET_USER_LOADING': {
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          user_set: false,
+        },
       };
     }
     default:
@@ -19,4 +32,8 @@ const setUser = (user)=>({
   payload: user
 });
 
-export {setUser};
+const setUserLoading = ()=>({
+  type: 'SET_USER_LOADING'
+});
+
+export {setUser, setUserLoading};

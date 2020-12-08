@@ -11,8 +11,14 @@ import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './routes/Dashboard';
 import SignUp from './routes/SignUp';
 import Activate from './routes/Activate';
+import ForgotPassword from './routes/ForgotPassword';
+import ResetPassword from './routes/ResetPassword';
 
-const reduxStore = configureStore();
+const reduxStore = configureStore({
+  user: {
+    user_set: false,
+  }
+});
 
 export default function App() {
   return (
@@ -26,6 +32,8 @@ export default function App() {
             <Route path='/signin' component={SignIn} />
             <Route path='/signup' component={SignUp} />
             <Route path='/activate' component={Activate} />
+            <Route path='/forgotpassword' component={ForgotPassword} />
+            <Route path='/resetpassword' component={ResetPassword} />
           </Router>
         </ReduxProvider>
       </StylesProvider>

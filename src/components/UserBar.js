@@ -43,19 +43,19 @@ function UserBar({className, user, history}) {
   return (
     <Box className={clsx(className, classes.root)}>
       {/* <Box><MoreHoriz /><Typography>Menu</Typography></Box> */}
-      {user && <Typography>
-        Role: <strong>{titleCase(user.role_name.replace('_', ' '))} </strong>
+      {user.user_set && <Typography>
+        Role: <strong>{user.role_name} </strong>
         | Account: <strong>{user.account_number}</strong></Typography>}
       <Box className={classes.right}>
         <Box className={classes.rightItem}>
-          <TextFieldRounded
+          {/* <TextFieldRounded
             startAdornment={
                 <InputAdornment position="end">
                   <SearchIcon />
                 </InputAdornment>
             }
             placeholder='Search'
-          />
+          /> */}
         </Box>
         <IconButton>
           <Badge badgeContent={0} max={99} color="primary">
@@ -67,9 +67,9 @@ function UserBar({className, user, history}) {
             <NotificationsNoneIcon />
           </Badge>
         </IconButton>
-        {user &&
+        {user.user_set &&
           <Typography className={classes.rightItem}>Hi, <strong>{user.first_name} {user.last_name}</strong></Typography>}
-        {!user &&
+        {!user.user_set &&
           <CircularProgress size="1.5rem" />}
         <Tooltip title="Logout">
           <IconButton onClick={onLogoutClick}>

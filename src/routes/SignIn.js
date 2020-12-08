@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
   },
   img: {
     maxWidth: '100%',
-    height: '100%',
     padding: '0.5rem'
   },
   root: {
@@ -42,6 +41,8 @@ const useStyles = makeStyles((theme) => ({
   },
   page: {
     minHeight: '100%',
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: theme.palette.common.white
   }
 }));
@@ -115,13 +116,9 @@ export default function SignIn({history, location}) {
     fieldChanged(name, value);
   }
 
-  const onRegisterClick = (e)=>{
+  const goToURL = (e, url)=>{
     e.preventDefault();
-    history.push('/signup');
-  }
-
-  const onForgotClick = (e)=>{
-    e.preventDefault();
+    history.push(url);
   }
 
   const onSubmitClick = (e)=>{
@@ -167,10 +164,10 @@ export default function SignIn({history, location}) {
           </Link>
         </Container>
       </Paper>
-      <Container maxWidth='lg'>
+      <Container maxWidth='lg' style={{flexGrow: 1, display:'flex', alignItems: 'stretch'}}>
         <Grid container>
-          <Grid item lg={7} md={6} sm={12} xs={12}>
-            <img src={SigninImg} className={classes.img} />
+          <Grid item lg={7} md={6} sm={12} xs={12} style={{display:'flex'}}>
+            <img src={SigninImg} className={classes.img} style={{alignSelf: 'center'}}/>
           </Grid>
           <Grid item item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
             <Paper className={classes.formRoot} style={{margin: 'auto'}} elevation={3}>
@@ -193,7 +190,7 @@ export default function SignIn({history, location}) {
                     />
                   </Grid>
                   <Grid item md={6} xs={12} style={{display: 'flex'}}>
-                    <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={onForgotClick}>Forgot password ?</Link>
+                    <Link style={{margin: 'auto', marginRight: 0}} href="#" onClick={(e)=>goToURL(e, '/forgotpassword')}>Forgot password ?</Link>
                   </Grid>
                 </Grid>
                 {formSuccess &&
@@ -208,7 +205,7 @@ export default function SignIn({history, location}) {
                   <Button onClick={onSubmitClick} variant="contained" color="primary" disabled={authorizing}>{authorizing ? 'Authorizing...' : 'Login'}</Button>
                 </Box>
                 <Box className={classes.formRow}>
-                  <Typography><Link href="#" onClick={onRegisterClick}>Register</Link> if you don't have an account ?</Typography>
+                  <Typography><Link href="#" onClick={(e)=>goToURL(e, '/signup')}>Register</Link> if you don't have an account ?</Typography>
                 </Box>
               </form>
               <Divider variant="middle" style={{marginTop: '1rem'}}/>

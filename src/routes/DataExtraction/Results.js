@@ -5,7 +5,7 @@ import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton} from '../../components/CustomButtons';
+import {CompactAddButton, RefreshIconButton} from '../../components/CustomButtons';
 import CreateDataGroup from './CreateDataGroup';
 
 import {Stacked, StackItem} from '../../components/Stacked';
@@ -81,7 +81,7 @@ export default function Results() {
         filter: true,
         sort: true,
         customBodyRender: (value, tableMeta)=>{
-          return <Chip size="small" label={value?.toUpperCase()} variant="outlined" />;
+          return <Chip size="small" label={value?.replace('-', ' ').toUpperCase()} variant="outlined" />;
         }
       },
     },
@@ -238,9 +238,7 @@ export default function Results() {
           </Snackbar>
           <Box display="flex">
             <Typography color="primary" variant="h6">Results</Typography>
-            <Tooltip title="Refresh data list">
-              <IconButton size="small" onClick={()=>{fetchDataList()}}><SyncIcon /></IconButton>
-            </Tooltip>
+            <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
             {/* <CompactAddButton className={classes.ml1} color="secondary" label="Create label"
               onClick={()=>{setStackPath('createlabel')}}
               />

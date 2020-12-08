@@ -31,6 +31,10 @@ const globalTheme = createMuiTheme({
         success: {
           main: '#04b66d',
         },
+        info: {
+          main: '#ffb600',
+          dark: '#dea414'
+        },
         grey: {
           200: '#eff0f0',
         },
@@ -38,7 +42,8 @@ const globalTheme = createMuiTheme({
           main: defaultTheme.palette.common.white,
         },
         background: {
-          default: '#f9fafc'
+          default: '#f9fafc',
+          disabled: '#f0f2f7',
         },
         text: {
           primary: '#383838',
@@ -94,6 +99,12 @@ const theme = createMuiTheme({
           root: {
             backgroundColor: globalTheme.palette.default.main,
           },
+          input: {
+            borderRadius: 'inherit',
+            '&[readonly]': {
+              backgroundColor: globalTheme.palette.background.disabled
+            }
+          }
         },
         MuiListItemIcon :{
           root: {
