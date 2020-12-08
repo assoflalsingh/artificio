@@ -213,6 +213,16 @@ export default class Rectangle extends Annotation {
     // this.rectangle.strokeWidth((this.strokeWidth + 5)/this.scale);
   }
 
+  setColor(color) {
+  	this.annotationData.color = color
+		this.color = color
+  	this.rectangle.stroke(color)
+		this.circles.forEach(c => {
+			c.stroke(color)
+		})
+		this.reCreateLabel()
+	}
+
   deSelect() {
 		this.isSelected = false
     this.circles.forEach((c) => c.hide());

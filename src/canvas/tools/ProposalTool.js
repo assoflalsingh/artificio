@@ -112,7 +112,7 @@ export class ProposalTool extends Tool {
     const proposals = this.canvasManager.proposals.filter((p) => p.isSelected);
     if (this.toolMode === ToolMode.Merge) {
       // Note: push to undo stack not required as add annotation is already carrying out the same
-      this.canvasManager.setAnnotationLabel(label.value);
+      this.canvasManager.setAnnotationLabel(label);
     } else {
       proposals.forEach((proposal) => {
         const coordinates = proposal.getData();

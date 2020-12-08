@@ -268,12 +268,13 @@ const Label = ({
             placeholder="Tags"
             value={labelValue}
             onChange={(label) => {
-              !proposalMode && setAnnotationLabel(label.value);
+              !proposalMode && setAnnotationLabel(label);
               setLabelValue(label);
             }}
             options={labels.map((label) => ({
               value: label.label_name,
               label: label.label_name,
+							color: label.label_color
             }))}
           />
           <Box style={{ marginTop: 4, display: "flex" }}>
