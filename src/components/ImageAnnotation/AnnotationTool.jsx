@@ -42,14 +42,14 @@ export default class AnnotationTool extends React.Component {
     ajaxMessage: null,
   };
 
-	deleteProposalInModelData = (proposal) => {
-		const ids = proposal.id.split("-");
-		const proposalIndex = parseInt(ids[0]);
-		const wordIndex = parseInt(ids[1]);
-		if (this.textAnnotations[proposalIndex]) {
-			this.textAnnotations[proposalIndex].word_details.splice(wordIndex, 1)
-		}
-	}
+  deleteProposalInModelData = (proposal) => {
+    const ids = proposal.id.split("-");
+    const proposalIndex = parseInt(ids[0]);
+    const wordIndex = parseInt(ids[1]);
+    if (this.textAnnotations[proposalIndex]) {
+      this.textAnnotations[proposalIndex].word_details.splice(wordIndex, 1);
+    }
+  };
 
   updateModelAnnotationLabel = (proposals, labelName) => {
     if (proposals && proposals.length > 0) {
@@ -103,22 +103,22 @@ export default class AnnotationTool extends React.Component {
   }
 
   initializeCanvas(imageData) {
-		// Clear canvas
-		this.canvasManager.clearAnnotations();
-		// Reset undo redo stack
-		this.canvasManager.resetUndoRedoStack();
-		// set text annotations in canvas manager
-		this.canvasManager.setTextAnnotations(this.textAnnotations);
-		// Set canvas image
-		this.canvasManager.setImage(imageData.image_url, () => {
-			this.addAnnotations(
-				imageData.image_json ? imageData.image_json.user_annotate_data : {}
-			);
-			this.setLoader(false);
-		});
-		this.canvasManager.notifyLabelCreation();
-		this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
-	}
+    // Clear canvas
+    this.canvasManager.clearAnnotations();
+    // Reset undo redo stack
+    this.canvasManager.resetUndoRedoStack();
+    // set text annotations in canvas manager
+    this.canvasManager.setTextAnnotations(this.textAnnotations);
+    // Set canvas image
+    this.canvasManager.setImage(imageData.image_url, () => {
+      this.addAnnotations(
+        imageData.image_json ? imageData.image_json.user_annotate_data : {}
+      );
+      this.setLoader(false);
+    });
+    this.canvasManager.notifyLabelCreation();
+    this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+  }
 
   async fetchImageData(index) {
     this.setLoader(true);
@@ -138,7 +138,7 @@ export default class AnnotationTool extends React.Component {
         imageLabels: imageData.image_labels,
         imageMetadata: imageData.image_json.metadata,
       });
-			this.initializeCanvas(imageData)
+      this.initializeCanvas(imageData);
     } else {
       this.setLoader(false);
     }
@@ -147,7 +147,7 @@ export default class AnnotationTool extends React.Component {
   saveImageData = () => {
     const selectedImage = this.props.images[this.state.activeImageIndex];
     const annotatedData = this.canvasManager.getData();
-    this.setLoader(true)
+    this.setLoader(true);
     saveAnnotationData(
       this.props.api,
       selectedImage._id,
@@ -157,7 +157,7 @@ export default class AnnotationTool extends React.Component {
       annotatedData
     )
       .then(() => {
-      	this.setLoader(false)
+        this.setLoader(false);
         this.setState({
           ajaxMessage: {
             error: false,
@@ -166,7 +166,7 @@ export default class AnnotationTool extends React.Component {
         });
       })
       .catch((error) => {
-      	this.setLoader(false)
+        this.setLoader(false);
         if (error.response) {
           this.setState({
             ajaxMessage: {
@@ -234,7 +234,7 @@ export default class AnnotationTool extends React.Component {
       { appId },
       this.updateModelAnnotationData,
       this.updateModelAnnotationLabel,
-			this.deleteProposalInModelData
+      this.deleteProposalInModelData
     );
   }
 
@@ -251,7 +251,9 @@ export default class AnnotationTool extends React.Component {
           fetchNextImage={this.fetchNextImage}
           fetchPreviousImage={this.fetchPreviousImage}
           save={this.saveImageData}
-					clickZoomInOut={this.canvasManager && this.canvasManager.clickZoomInOut}
+          clickZoomInOut={
+            this.canvasManager && this.canvasManager.clickZoomInOut
+          }
         />
         <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
           <ToolBar
@@ -266,8 +268,12 @@ export default class AnnotationTool extends React.Component {
             }
             onAnnotationToolClose={onAnnotationToolClose}
             showProposals={this.showProposals}
-						blockAnnotationClick={this.canvasManager && this.canvasManager.blockAnnotationClick}
-						setStageDraggable={this.canvasManager && this.canvasManager.setStageDraggable}
+            blockAnnotationClick={
+              this.canvasManager && this.canvasManager.blockAnnotationClick
+            }
+            setStageDraggable={
+              this.canvasManager && this.canvasManager.setStageDraggable
+            }
           />
           <Box style={{ backgroundColor: "#383838", height: "78%" }}>
             {this.state.loading && <Loader />}
@@ -298,8 +304,8 @@ export default class AnnotationTool extends React.Component {
               getAnnotationData={this.canvasManager.getAnnotationData}
               imageLabels={this.state.imageLabels}
               textAnnotations={this.textAnnotations}
-							removeConnectingLine={this.canvasManager.removeConnectingLine}
-							addConnectingLine={this.canvasManager.addConnectingLine}
+              removeConnectingLine={this.canvasManager.removeConnectingLine}
+              addConnectingLine={this.canvasManager.addConnectingLine}
             />
           )}
           {/*<Box style={{overflow: 'auto', flexGrow: 1}}>*/}

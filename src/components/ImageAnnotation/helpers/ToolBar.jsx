@@ -1,17 +1,28 @@
 import React from "react";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import {Box, Button, ListItemText, makeStyles, Menu, MenuItem, withStyles,} from "@material-ui/core";
+import {
+  Box,
+  Button,
+  ListItemText,
+  makeStyles,
+  Menu,
+  MenuItem,
+  withStyles,
+} from "@material-ui/core";
 import PanToolIcon from "@material-ui/icons/PanTool";
 import FormatShapesIcon from "@material-ui/icons/FormatShapes";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import {CustomEventType, ToolBarItemType} from "../../../canvas/core/constants";
+import {
+  CustomEventType,
+  ToolBarItemType,
+} from "../../../canvas/core/constants";
 import AppsIcon from "@material-ui/icons/Apps";
-import {CanvasEventAttacher} from "../canvas/CanvasEventAttacher";
+import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 
 const useClasses = makeStyles(() => ({
   button: {
     borderRadius: 0,
-		margin: '0 0 0 0.2rem'
+    margin: "0 0 0 0.2rem",
   },
   active: {
     background: "#0575ce",
@@ -43,100 +54,101 @@ const ToolBarButton = withStyles({
 });
 
 export class ToolBar extends CanvasEventAttacher {
-	state = {
-		shapesAnchor: null,
-		selectMode: true,
-		dragMode: true,
-		activeTool: null,
-		showProposals: false
-	}
+  state = {
+    shapesAnchor: null,
+    selectMode: true,
+    dragMode: true,
+    activeTool: null,
+    showProposals: false,
+  };
 
-	eventListeners = [
-		{
-			event: CustomEventType.SET_ACTIVE_TOOL,
-			func: (event) => {
-				this.setState({activeTool: event.detail.toolType})
-			},
-	}]
+  eventListeners = [
+    {
+      event: CustomEventType.SET_ACTIVE_TOOL,
+      func: (event) => {
+        this.setState({ activeTool: event.detail.toolType });
+      },
+    },
+  ];
 
-	onSelectTool = () => {
-		this.props.setActiveTool();
-	};
+  onSelectTool = () => {
+    this.props.setActiveTool();
+  };
 
-	componentDidMount() {
-		this.bindEventListeners()
-	}
+  componentDidMount() {
+    this.bindEventListeners();
+  }
 
-	componentWillUnmount() {
-		this.unbindEventListeners()
-	}
+  componentWillUnmount() {
+    this.unbindEventListeners();
+  }
 
-	renderComponent() {
-		return (
-			<Box>
-				<ToolBarButton
-					label="Select"
-					active={this.state.selectMode}
-					icon={<CheckBoxOutlineBlankIcon />}
-					data-name="select"
-					onClick={() => {
-						const selected = !this.state.selectMode
-						this.setState({selectMode: selected})
-						this.props.blockAnnotationClick(!selected)
-					}}
-				/>
-				<ToolBarButton
-					active={this.state.dragMode}
-					label="Drag/Pan"
-					icon={<PanToolIcon />}
-					data-name="pan"
-					onClick={() => {
-						const dragAllowed = !this.state.dragMode
-						this.setState({dragMode: dragAllowed})
-						this.props.setStageDraggable(dragAllowed)
-					}}
-				/>
-				<ToolBarButton
-					active={this.state.activeTool}
-					label="Shapes"
-					icon={<FormatShapesIcon />}
-					onClick={(e) => this.setState({shapesAnchor: e.target})}
-				/>
-				<Menu
-					open={Boolean(this.state.shapesAnchor)}
-					anchorEl={this.state.shapesAnchor}
-					onClose={(e) => this.setState({shapesAnchor: null})}
-				>
-					<MenuItem
-						data-name="create-box"
-						onClick={(e) => {
-							this.setState({shapesAnchor: null});
-							this.onSelectTool();
-						}}
-					>
-						<ListItemText primary="Bounding Box" />
-					</MenuItem>
-					{/*<MenuItem data-name="create-polygon" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>*/}
-					{/*	<ListItemText primary="Polygon" />*/}
-					{/*</MenuItem>*/}
-				</Menu>
-				<ToolBarButton
-					active={this.state.showProposals}
-					label="Proposals"
-					icon={<AppsIcon />}
-					onClick={() => {
-						const show = !this.state.showProposals;
-						this.setState({showProposals: show});
-						this.props.showProposals(show);
-					}}
-				/>
-				<ToolBarButton
-					style={{ float: "right" }}
-					label="Exit"
-					icon={<ExitToAppIcon />}
-					onClick={this.props.onAnnotationToolClose}
-				/>
-			</Box>
-		)
-	}
+  renderComponent() {
+    return (
+      <Box>
+        <ToolBarButton
+          label="Select"
+          active={this.state.selectMode}
+          icon={<CheckBoxOutlineBlankIcon />}
+          data-name="select"
+          onClick={() => {
+            const selected = !this.state.selectMode;
+            this.setState({ selectMode: selected });
+            this.props.blockAnnotationClick(!selected);
+          }}
+        />
+        <ToolBarButton
+          active={this.state.dragMode}
+          label="Drag/Pan"
+          icon={<PanToolIcon />}
+          data-name="pan"
+          onClick={() => {
+            const dragAllowed = !this.state.dragMode;
+            this.setState({ dragMode: dragAllowed });
+            this.props.setStageDraggable(dragAllowed);
+          }}
+        />
+        <ToolBarButton
+          active={this.state.activeTool}
+          label="Shapes"
+          icon={<FormatShapesIcon />}
+          onClick={(e) => this.setState({ shapesAnchor: e.target })}
+        />
+        <Menu
+          open={Boolean(this.state.shapesAnchor)}
+          anchorEl={this.state.shapesAnchor}
+          onClose={(e) => this.setState({ shapesAnchor: null })}
+        >
+          <MenuItem
+            data-name="create-box"
+            onClick={(e) => {
+              this.setState({ shapesAnchor: null });
+              this.onSelectTool();
+            }}
+          >
+            <ListItemText primary="Bounding Box" />
+          </MenuItem>
+          {/*<MenuItem data-name="create-polygon" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>*/}
+          {/*	<ListItemText primary="Polygon" />*/}
+          {/*</MenuItem>*/}
+        </Menu>
+        <ToolBarButton
+          active={this.state.showProposals}
+          label="Proposals"
+          icon={<AppsIcon />}
+          onClick={() => {
+            const show = !this.state.showProposals;
+            this.setState({ showProposals: show });
+            this.props.showProposals(show);
+          }}
+        />
+        <ToolBarButton
+          style={{ float: "right" }}
+          label="Exit"
+          icon={<ExitToAppIcon />}
+          onClick={this.props.onAnnotationToolClose}
+        />
+      </Box>
+    );
+  }
 }

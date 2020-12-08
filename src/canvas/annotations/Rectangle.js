@@ -196,13 +196,13 @@ export default class Rectangle extends Annotation {
   }
 
   getConnectingLineStartPosition() {
-		const position = this.group.position();
-		const topLeft = this.getTopLeftCoordinates();
-		return {
-			x: position.x + topLeft.x + Math.abs(this.rectangle.width()),
-			y: position.y + topLeft.y + Math.abs(this.rectangle.height() / 2),
-		};
-	}
+    const position = this.group.position();
+    const topLeft = this.getTopLeftCoordinates();
+    return {
+      x: position.x + topLeft.x + Math.abs(this.rectangle.width()),
+      y: position.y + topLeft.y + Math.abs(this.rectangle.height() / 2),
+    };
+  }
 
   select() {
     this.circles.forEach((c) => c.show());

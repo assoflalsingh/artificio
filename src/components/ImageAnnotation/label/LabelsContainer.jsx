@@ -1,14 +1,14 @@
-import {Box, Tooltip, Typography} from "@material-ui/core";
+import { Box, Tooltip, Typography } from "@material-ui/core";
 import * as React from "react";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import CommonTabs from "../../CommonTabs";
-import {CanvasEventAttacher} from "../canvas/CanvasEventAttacher";
-import {CustomEventType} from "../../../canvas/core/constants";
-import {getLabelValueFromTextAnnotations,} from "../utilities";
+import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
+import { CustomEventType } from "../../../canvas/core/constants";
+import { getLabelValueFromTextAnnotations } from "../utilities";
 import TextField from "@material-ui/core/TextField";
 
-export const LabelId = 'label-text-container'
-export const LabelContainerId = 'labels-container'
+export const LabelId = "label-text-container";
+export const LabelContainerId = "labels-container";
 
 const styles = {
   labelContainer: {
@@ -58,23 +58,23 @@ export const LabelsContainer = ({
   imageLabels,
   textAnnotations,
   getAnnotationData,
-	removeConnectingLine,
-	addConnectingLine
+  removeConnectingLine,
+  addConnectingLine,
 }) => {
   const classes = useStyles();
-	let wheeling
-	const onScroll = () => {
-		if (!wheeling) {
-			// Start scrolling
-			removeConnectingLine()
-		}
-		clearTimeout(wheeling);
-		wheeling = setTimeout(() => {
-			// Stop scrolling
-			addConnectingLine()
-			wheeling = undefined;
-		}, 70);
-	}
+  let wheeling;
+  const onScroll = () => {
+    if (!wheeling) {
+      // Start scrolling
+      removeConnectingLine();
+    }
+    clearTimeout(wheeling);
+    wheeling = setTimeout(() => {
+      // Stop scrolling
+      addConnectingLine();
+      wheeling = undefined;
+    }, 70);
+  };
 
   return (
     <Box className={classes.labelContainer}>
@@ -83,7 +83,11 @@ export const LabelsContainer = ({
         <CommonTabs
           tabs={{
             "Custom OCR": (
-              <Box className={classes.scrollableLabelsContainer} id={LabelContainerId} onScroll={onScroll}>
+              <Box
+                className={classes.scrollableLabelsContainer}
+                id={LabelContainerId}
+                onScroll={onScroll}
+              >
                 <ScrollableLabelsContainer
                   getAnnotations={getAnnotations}
                   getAnnotationData={getAnnotationData}
@@ -142,7 +146,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
                   key={ann.id}
                   labelName={ann.getLabel()}
                   color={ann.color}
-									annotationId={ann.id}
+                  annotationId={ann.id}
                 />
               );
             }
@@ -166,7 +170,13 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
   }
 }
 
-const Label = ({ labelName, color, labelValue, setLabelValue, annotationId }) => {
+const Label = ({
+  labelName,
+  color,
+  labelValue,
+  setLabelValue,
+  annotationId,
+}) => {
   const classes = useStyles();
   const [label, setLabel] = React.useState(labelValue);
   React.useEffect(() => {
@@ -177,7 +187,7 @@ const Label = ({ labelName, color, labelValue, setLabelValue, annotationId }) =>
       <Box className={classes.labelName}>{labelName}</Box>
       <Box
         className={classes.label}
-				id={`${LabelId}-${annotationId}`}
+        id={`${LabelId}-${annotationId}`}
         style={{
           borderLeft: `9px solid ${color}`,
         }}

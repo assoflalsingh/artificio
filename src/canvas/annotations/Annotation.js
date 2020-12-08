@@ -8,8 +8,8 @@ export const AnnotationProposalLowConfidenceScoreColor = "red";
 const TextPadding = 8;
 
 export const AnnotationEventType = {
-	Delete: 'Delete'
-}
+  Delete: "Delete",
+};
 
 export default class Annotation {
   annotationData;
@@ -24,7 +24,7 @@ export default class Annotation {
   type;
   labelValue;
   imageLabels = [];
-  events = {}
+  events = {};
 
   /**
 	 * @param data
@@ -128,8 +128,8 @@ export default class Annotation {
   };
 
   on = (eventName, callback) => {
-  	this.events[eventName] = callback
-	}
+    this.events[eventName] = callback;
+  };
 
   draw() {
     this.group.draw();
