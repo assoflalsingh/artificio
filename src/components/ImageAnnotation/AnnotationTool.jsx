@@ -160,7 +160,8 @@ export default class AnnotationTool extends React.Component {
       selectedImage.page_no,
       this.state.imageMetadata,
       this.textAnnotations,
-      annotatedData
+      annotatedData,
+			this.props.inReview
     )
       .then(() => {
         this.setLoader(false);
@@ -261,6 +262,7 @@ export default class AnnotationTool extends React.Component {
             this.canvasManager && this.canvasManager.clickZoomInOut
           }
 					inReview={this.props.inReview}
+					saveImageData={this.saveImageData}
         />
         <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
           <ToolBar

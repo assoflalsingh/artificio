@@ -49,7 +49,8 @@ export function LeftToolBar(
 		fetchNextImage,
 		fetchPreviousImage,
 		save,
-		clickZoomInOut
+		clickZoomInOut,
+		saveImageData
 	}) {
 	const classes = useStyles();
 
@@ -78,7 +79,7 @@ export function LeftToolBar(
 			</Tooltip>
 			{inReview &&
 			<Tooltip title="Push to done">
-				<IconButton data-name="done-save" onClick={() => {}} className={classes.leftBarButton}>
+				<IconButton data-name="done-save" onClick={saveImageData} className={classes.leftBarButton}>
 					<AssignmentTurnedInIcon />
 				</IconButton>
 			</Tooltip>}
