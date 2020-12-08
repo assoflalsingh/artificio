@@ -1,5 +1,6 @@
 import React from "react";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import {
   Box,
   Button,
@@ -89,7 +90,7 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           label="Select"
           active={this.state.selectMode}
-          icon={<CheckBoxOutlineBlankIcon />}
+          icon={this.state.selectMode ? <CheckBoxIcon/> : <CheckBoxOutlineBlankIcon />}
           data-name="select"
           onClick={() => {
             const selected = !this.state.selectMode;
