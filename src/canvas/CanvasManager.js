@@ -308,6 +308,7 @@ export class CanvasManager extends CanvasScene {
     this.activeTool = new tool(this, data, imageLabels);
     this.addEventListeners(this.activeTool.eventListeners);
     this.deSelectActiveAnnotation();
+    this.dispatch(CustomEventType.SET_ACTIVE_TOOL, {toolType: this.activeTool.toolType})
   };
 
   setProposalTool = (toolType, data, imageLabels) => {
@@ -332,7 +333,8 @@ export class CanvasManager extends CanvasScene {
       this.removeEventListeners(this.activeTool.eventListeners);
       this.activeTool.exitTool();
       this.activeTool = null;
-    }
+			this.dispatch(CustomEventType.SET_ACTIVE_TOOL, {toolType: null})
+		}
   };
 
   toolLayerDraw() {

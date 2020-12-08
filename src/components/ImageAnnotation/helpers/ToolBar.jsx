@@ -4,8 +4,9 @@ import {Box, Button, ListItemText, makeStyles, Menu, MenuItem, withStyles,} from
 import PanToolIcon from "@material-ui/icons/PanTool";
 import FormatShapesIcon from "@material-ui/icons/FormatShapes";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import {ToolBarItemType} from "../../../canvas/core/constants";
+import {CustomEventType, ToolBarItemType} from "../../../canvas/core/constants";
 import AppsIcon from "@material-ui/icons/Apps";
+import {CanvasEventAttacher} from "../canvas/CanvasEventAttacher";
 
 const useClasses = makeStyles(() => ({
   button: {
@@ -41,84 +42,101 @@ const ToolBarButton = withStyles({
   );
 });
 
+export class ToolBar extends CanvasEventAttacher {
+	state = {
+		shapesAnchor: null,
+		selectMode: true,
+		dragMode: true,
+		activeTool: null,
+		showProposals: false
+	}
 
-export function ToolBar(props) {
-  const [shapesAnchor, setShapesAnchor] = React.useState(null);
-	const [selectMode, setSelectMode] = React.useState(true);
-	const [dragMode, setDragMode] = React.useState(true);
-  const [activeTool, setActiveTool] = React.useState(undefined);
-  const [showProposals, setProposals] = React.useState(false);
-  const {blockAnnotationClick, setStageDraggable} = props
+	eventListeners = [
+		{
+			event: CustomEventType.SET_ACTIVE_TOOL,
+			func: (event) => {
+				this.setState({activeTool: event.detail.toolType})
+			},
+	}]
 
-  const onSelectTool = (e) => {
-    props.setActiveTool();
-  };
+	onSelectTool = () => {
+		this.props.setActiveTool();
+	};
 
-  return (
-    <Box>
-      <ToolBarButton
-        label="Select"
-				active={selectMode}
-        icon={<CheckBoxOutlineBlankIcon />}
-        data-name="select"
-        onClick={() => {
-					const selected = !selectMode
-					setSelectMode(selected)
-					blockAnnotationClick(!selected)
-				}}
-      />
-      <ToolBarButton
-				active={dragMode}
-        label="Drag/Pan"
-        icon={<PanToolIcon />}
-        data-name="pan"
-        onClick={() => {
-        	const dragAllowed = !dragMode
-					setDragMode(dragAllowed)
-					setStageDraggable(dragAllowed)
-				}}
-      />
-      <ToolBarButton
-        active={activeTool === ToolBarItemType.Shape}
-        label="Shapes"
-        icon={<FormatShapesIcon />}
-        onClick={(e) => setShapesAnchor(e.target)}
-      />
-      <Menu
-        open={Boolean(shapesAnchor)}
-        anchorEl={shapesAnchor}
-        onClose={(e) => setShapesAnchor(null)}
-      >
-        <MenuItem
-          data-name="create-box"
-          onClick={(e) => {
-            setShapesAnchor(null);
-            onSelectTool(e);
-            setActiveTool(ToolBarItemType.Shape);
-          }}
-        >
-          <ListItemText primary="Bounding Box" />
-        </MenuItem>
-        {/*<MenuItem data-name="create-polygon" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>*/}
-        {/*	<ListItemText primary="Polygon" />*/}
-        {/*</MenuItem>*/}
-      </Menu>
-      <ToolBarButton
-        active={showProposals}
-        label="Proposals"
-        icon={<AppsIcon />}
-        onClick={() => {
-          const show = !showProposals;
-          setProposals(show);
-          props.showProposals(show);
-        }}
-      />
-      <ToolBarButton
-        style={{ float: "right" }}
-        label="Exit"
-        icon={<ExitToAppIcon />}
-        onClick={props.onAnnotationToolClose}
-      />
-    </Box>
-  );
+	componentDidMount() {
+		this.bindEventListeners()
+	}
+
+	componentWillUnmount() {
+		this.unbindEventListeners()
+	}
+
+	renderComponent() {
+		return (
+			<Box>
+				<ToolBarButton
+					label="Select"
+					active={this.state.selectMode}
+					icon={<CheckBoxOutlineBlankIcon />}
+					data-name="select"
+					onClick={() => {
+						const selected = !this.state.selectMode
+						this.setState({selectMode: selected})
+						this.props.blockAnnotationClick(!selected)
+					}}
+				/>
+				<ToolBarButton
+					active={this.state.dragMode}
+					label="Drag/Pan"
+					icon={<PanToolIcon />}
+					data-name="pan"
+					onClick={() => {
+						const dragAllowed = !this.state.dragMode
+						this.setState({dragMode: dragAllowed})
+						this.props.setStageDraggable(dragAllowed)
+					}}
+				/>
+				<ToolBarButton
+					active={this.state.activeTool}
+					label="Shapes"
+					icon={<FormatShapesIcon />}
+					onClick={(e) => this.setState({shapesAnchor: e.target})}
+				/>
+				<Menu
+					open={Boolean(this.state.shapesAnchor)}
+					anchorEl={this.state.shapesAnchor}
+					onClose={(e) => this.setState({shapesAnchor: null})}
+				>
+					<MenuItem
+						data-name="create-box"
+						onClick={(e) => {
+							this.setState({shapesAnchor: null});
+							this.onSelectTool();
+						}}
+					>
+						<ListItemText primary="Bounding Box" />
+					</MenuItem>
+					{/*<MenuItem data-name="create-polygon" onClick={(e)=>{ setShapesAnchor(null);onClickIconSidebarItem(e);}}>*/}
+					{/*	<ListItemText primary="Polygon" />*/}
+					{/*</MenuItem>*/}
+				</Menu>
+				<ToolBarButton
+					active={this.state.showProposals}
+					label="Proposals"
+					icon={<AppsIcon />}
+					onClick={() => {
+						const show = !this.state.showProposals;
+						this.setState({showProposals: show});
+						this.props.showProposals(show);
+					}}
+				/>
+				<ToolBarButton
+					style={{ float: "right" }}
+					label="Exit"
+					icon={<ExitToAppIcon />}
+					onClick={this.props.onAnnotationToolClose}
+				/>
+			</Box>
+		)
+	}
 }
