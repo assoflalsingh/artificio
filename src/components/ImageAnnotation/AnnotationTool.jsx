@@ -274,6 +274,9 @@ export default class AnnotationTool extends React.Component {
             setStageDraggable={
               this.canvasManager && this.canvasManager.setStageDraggable
             }
+            showAnnotationLayer={
+              this.canvasManager && this.canvasManager.showAnnotationLayer
+            }
           />
           <Box style={{ backgroundColor: "#383838", height: "78%" }}>
             {this.state.loading && <Loader />}

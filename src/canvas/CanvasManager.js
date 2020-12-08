@@ -701,6 +701,13 @@ export class CanvasManager extends CanvasScene {
     this.addConnectingLine();
   };
 
+  showAnnotationLayer = (value) => {
+    this.unsetActiveTool();
+    this.deSelectActiveAnnotation();
+    value ? this.annotationLayer.show() : this.annotationLayer.hide();
+    this.annotationLayerDraw();
+  };
+
   /**
    * @param eventType -> type string
    * @param payload -> type any

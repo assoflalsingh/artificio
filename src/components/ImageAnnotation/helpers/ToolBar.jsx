@@ -12,11 +12,10 @@ import {
 import PanToolIcon from "@material-ui/icons/PanTool";
 import FormatShapesIcon from "@material-ui/icons/FormatShapes";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import {
-  CustomEventType,
-  ToolBarItemType,
-} from "../../../canvas/core/constants";
+import { CustomEventType } from "../../../canvas/core/constants";
 import AppsIcon from "@material-ui/icons/Apps";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import VisibilityIcon from "@material-ui/icons/Visibility";
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 
 const useClasses = makeStyles(() => ({
@@ -60,6 +59,7 @@ export class ToolBar extends CanvasEventAttacher {
     dragMode: true,
     activeTool: null,
     showProposals: false,
+    hideAnnotations: false,
   };
 
   eventListeners = [
@@ -140,6 +140,22 @@ export class ToolBar extends CanvasEventAttacher {
             const show = !this.state.showProposals;
             this.setState({ showProposals: show });
             this.props.showProposals(show);
+          }}
+        />
+        <ToolBarButton
+          active={this.state.hideAnnotations}
+          label={`${this.state.hideAnnotations ? "Show" : "Hide"} Annotations`}
+          icon={
+            this.state.hideAnnotations ? (
+              <VisibilityIcon />
+            ) : (
+              <VisibilityOffIcon />
+            )
+          }
+          onClick={() => {
+            const hide = !this.state.hideAnnotations;
+            this.setState({ hideAnnotations: hide });
+            this.props.showAnnotationLayer(!hide);
           }}
         />
         <ToolBarButton
