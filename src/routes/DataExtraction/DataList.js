@@ -14,7 +14,6 @@ import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
-import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -76,7 +75,6 @@ export default function DataList() {
   const classes = useStyles();
   const [stackPath, setStackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
-	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -316,8 +314,7 @@ export default function DataList() {
               />
             <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} />
             <Box className={classes.rightAlign}>
-							<Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
-							<Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation V2</Button>
+              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
               {/* <ButtonGroup className={classes.ml1}>
                 <Button>Date range</Button>
                 <Button>Search data</Button>
@@ -357,15 +354,8 @@ export default function DataList() {
       </StackItem>
       </Stacked>
     </Box>
-		<AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}
-							getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>
-
-		<ImageAnnotationDialog
-			open={annotateOpenV2}
-			onClose={()=>{setAnnotateOpenV2(false)}}
-			api={api}
-			getImages={()=>rowsSelected.map((i)=>datalist[i])}
-		/>
+    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}
+      getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>
     </>
   )
 }
