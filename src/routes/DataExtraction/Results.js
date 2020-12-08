@@ -14,6 +14,7 @@ import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
+import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -35,6 +36,7 @@ export default function Results() {
   const classes = useStyles();
   const [stackPath, setStackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
+	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -247,6 +249,7 @@ export default function Results() {
                 <Button>Date range</Button>
                 <Button>Search data</Button>
               </ButtonGroup> */}
+							<Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review V2</Button>
             </Box>
           </Box>
           {/* <AsssignDataGroup open={showAssignDG} onClose={()=>{setShowAssignDG(false)}}
@@ -283,6 +286,13 @@ export default function Results() {
       </Stacked>
     </Box>
     <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={true} />
+		<ImageAnnotationDialog
+			open={annotateOpenV2}
+			onClose={()=>{setAnnotateOpenV2(false)}}
+			api={api}
+			getImages={()=>rowsSelected.map((i)=>datalist[i])}
+			inReview={true}
+		/>
     </>
   )
 }
