@@ -58,6 +58,7 @@ export default class ImageAnnotation extends React.Component {
   }
 
   render() {
+  	debugger
     return (
       <>
         <Backdrop
@@ -91,6 +92,7 @@ export default class ImageAnnotation extends React.Component {
             api={this.props.api}
             images={Object.values(this.state.images)}
             onAnnotationToolClose={this.props.onClose}
+						inReview={this.props.inReview}
           />
         )}
       </>

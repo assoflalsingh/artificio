@@ -132,7 +132,8 @@ export default class AnnotationTool extends React.Component {
       const imageData = await getImageData(
         this.props.api,
         selectedImage._id,
-        selectedImage.page_no
+        selectedImage.page_no,
+				this.props.inReview
       );
       this.textAnnotations = imageData.image_json
         ? imageData.image_json.text_annotations
@@ -243,6 +244,7 @@ export default class AnnotationTool extends React.Component {
   }
 
   render() {
+  	debugger
     const { images, onAnnotationToolClose } = this.props;
     const activeImage = images && images[this.state.activeImageIndex];
     return (
@@ -258,6 +260,7 @@ export default class AnnotationTool extends React.Component {
           clickZoomInOut={
             this.canvasManager && this.canvasManager.clickZoomInOut
           }
+					inReview={this.props.inReview}
         />
         <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
           <ToolBar

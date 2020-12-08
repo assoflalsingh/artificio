@@ -76,12 +76,11 @@ export function RegionLeftToolBar(
 			<Tooltip title="Previous Image">
 				<IconButton data-name="previous Image" onClick={fetchPreviousImage} className={classes.leftBarButton}><ArrowBackIcon/></IconButton>
 			</Tooltip>
-
-      {/* <IconButton data-name="zoom-in" onClick={onClickItem} className={classes.leftBarButton}><ZoomInIcon fontSize="large" /></IconButton>
-      <IconButton data-name="zoom-out" onClick={onClickItem} className={classes.leftBarButton}><ZoomOutIcon fontSize="large" /></IconButton> */}
       {inReview &&
       <Tooltip title="Push to done">
-        <IconButton data-name="done-save" onClick={() => {}} className={classes.leftBarButton}><AssignmentTurnedInIcon fontSize="large" /></IconButton>
+        <IconButton data-name="done-save" onClick={() => {}} className={classes.leftBarButton}>
+					<AssignmentTurnedInIcon />
+        </IconButton>
       </Tooltip>}
     </Box>
   )

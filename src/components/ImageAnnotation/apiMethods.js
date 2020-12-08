@@ -1,11 +1,12 @@
 import { URL_MAP } from "../../others/artificio_api.instance";
 
-export async function getImageData(api, imageId, pageNo) {
+export async function getImageData(api, imageId, pageNo, inReview) {
   // setProcessMsg('Fetching image file information...');
   try {
     const response = await api.post(URL_MAP.GET_ANNOTATION_DETAILS, {
       document_id: imageId,
       page_no: pageNo,
+			"status": inReview ? ["in-process"] : ["ready"]
     });
     // setProcessMsg(null);
     return response.data.data;
