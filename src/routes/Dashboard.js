@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme)=>({
     width: '100%',
     paddingLeft: '0.5rem',
     paddingRight: '0.5rem',
+    minWidth: 0,
   },
   bottomSide: {
     flexGrow: 1,
@@ -79,7 +80,7 @@ const Dashboard = (props) => {
                     <img src={Logo} className={classes.logoImg}></img>
                   </Box>
                 </Paper>
-                <UserBar className={classes.rightSide} userDispName={'Paul Doe'}/>
+                <UserBar className={classes.rightSide}/>
             </Box>
             <Box display="flex" className={classes.bottomSide}>
                 <Paper item className={classes.leftSide}><SideMenuBar /></Paper>

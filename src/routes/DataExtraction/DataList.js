@@ -160,6 +160,7 @@ export default function DataList() {
       name: 'timestamp',
       direction: 'desc'
     },
+    responsive: 'vertical',
     setTableProps: () => {
       return {
         size: 'small',
@@ -308,7 +309,7 @@ export default function DataList() {
               {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
             </Alert>}
           </Snackbar>
-          <Box display="flex">
+          <Box style={{display: 'flex', flexWrap: 'wrap'}}>
             <Typography color="primary" variant="h6">Data List</Typography>
             <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDataList()}}/>
             <CompactAddButton className={classes.ml1} color="secondary" label="Create label"
