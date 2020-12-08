@@ -58,7 +58,6 @@ export default class ImageAnnotation extends React.Component {
   }
 
   render() {
-  	debugger
     return (
       <>
         <Backdrop

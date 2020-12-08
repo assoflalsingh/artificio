@@ -246,7 +246,6 @@ export default class AnnotationTool extends React.Component {
   }
 
   render() {
-  	debugger
     const { images, onAnnotationToolClose } = this.props;
     const activeImage = images && images[this.state.activeImageIndex];
     return (
