@@ -1,15 +1,15 @@
 import Konva from "konva";
-import { CanvasImage } from "./core/CanvasImage";
-import { getScaledImageCoordinates } from "./core/utilities";
+import {CanvasImage} from "./core/CanvasImage";
+import {getScaledImageCoordinates} from "./core/utilities";
 import {
 	getHorizontalScrollbar,
 	getStageBounds,
 	getVerticalScrollBar,
 	scrollBarHeight,
 	scrollBarWidth,
-	scrollPadding, verticalScrollPadding,
+	scrollPadding,
+	verticalScrollPadding,
 } from "../components/ImageAnnotation/utilities";
-import { CustomEventType } from "./core/constants";
 
 export const paddingFactor = 0.02;
 const callBackTimeout = 100;
@@ -78,6 +78,7 @@ export class CanvasScene {
     this.proposalLayer.hide();
     this.stage.add(this.annotationLayer);
     this.stage.add(this.proposalLayer);
+		this.addScrollbars();
     this.stage.add(this.toolLayer);
     this.stageDimensions = {
       width: this.stage.width(),
@@ -88,7 +89,6 @@ export class CanvasScene {
       height: element.clientHeight,
     };
     this.attachEventListeners();
-    this.addScrollbars();
   }
 
   setStageDraggable = (value) => {
@@ -189,20 +189,17 @@ export class CanvasScene {
     this.stage.on("wheel", (e) => {
       e.evt.preventDefault();
       if (!wheeling) {
+      	// Start scrolling
         // Hide label selector dropdown
-        this.getSelectedAnnotation() &&
-          this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+        this.getSelectedAnnotation() && this.handleScrollZoomStart()
       }
       this.handleScrollZoom(this.stage.getPointerPosition(), -e.evt.deltaY);
       clearTimeout(wheeling);
       wheeling = setTimeout(() => {
+				// Stop scrolling
         this.handleStopZoom();
-
         // Show label selector dropdown
-        this.getSelectedAnnotation() &&
-          this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-            position: this.getLabelSelectorPosition(),
-          });
+        this.getSelectedAnnotation() && this.handleScrollZoomEnd()
         wheeling = undefined;
       }, wheelingTimeout);
     });
@@ -368,7 +365,6 @@ export class CanvasScene {
 
   getSelectedAnnotation = () => {};
 
-  getLabelSelectorPosition = () => {};
-
-  dispatch = (eventType, payload) => {};
+  handleScrollZoomStart = () => {}
+	handleScrollZoomEnd = () => {}
 }

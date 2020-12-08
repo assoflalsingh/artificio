@@ -1,19 +1,16 @@
-import { CanvasScene } from "./CanvasScene";
-import {
-  AnnotationType,
-  CustomEventType,
-  ToolTypeClassNameMap,
-} from "./core/constants";
-import { getScaledCoordinates, getUnScaledCoordinates } from "./core/utilities";
+import {CanvasScene} from "./CanvasScene";
+import {AnnotationType, CustomEventType, ToolTypeClassNameMap,} from "./core/constants";
+import {getScaledCoordinates, getUnScaledCoordinates} from "./core/utilities";
 import Proposal from "./annotations/Proposal";
 import {
 	AnnotationEventType,
 	AnnotationProposalColor,
 	AnnotationProposalLowConfidenceScoreColor,
 } from "./annotations/Annotation";
-import { UndoRedoStack } from "./core/UndoRedoStack";
+import {UndoRedoStack} from "./core/UndoRedoStack";
 import Rectangle from "./annotations/Rectangle";
-import { getLabelValueFromTextAnnotations } from "../components/ImageAnnotation/utilities";
+import {getLabelValueFromTextAnnotations} from "../components/ImageAnnotation/utilities";
+import {ConnectingLine} from "./core/connectingLine";
 
 export class CanvasManager extends CanvasScene {
   activeTool;
@@ -32,6 +29,7 @@ export class CanvasManager extends CanvasScene {
   updateModelAnnotationLabel;
   textAnnotations;
   blockAnnotationSelect = false
+	connectingLine
 
   // ApplicationConfig is of type {appId: string}
   constructor(
@@ -111,6 +109,7 @@ export class CanvasManager extends CanvasScene {
     annotation.select();
     this.addSelectedAnnotationEventListeners();
     this.annotationLayerDraw();
+		this.addConnectingLine()
     this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
       position: this.getLabelSelectorPosition(),
     });
@@ -122,6 +121,7 @@ export class CanvasManager extends CanvasScene {
 
   addSelectedAnnotationEventListeners() {
     this.selectedAnnotation.getShape().on("dragstart.select", () => {
+			this.removeConnectingLine()
       // Hide label selector dropdown
       this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
     });
@@ -138,7 +138,7 @@ export class CanvasManager extends CanvasScene {
       this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
         position: this.getLabelSelectorPosition(),
       });
-      this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+      this.notifyLabelCreation();
       this.updateUndoStack();
     });
   }
@@ -154,6 +154,7 @@ export class CanvasManager extends CanvasScene {
       this.removeAnnotationEventListeners();
       this.selectedAnnotation = undefined;
       this.annotationLayerDraw();
+      this.removeConnectingLine()
       this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
     }
   };
@@ -187,7 +188,7 @@ export class CanvasManager extends CanvasScene {
     this.annotationLayer.batchDraw();
     this.annotations.splice(index, 1);
     this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
-    this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+    this.notifyLabelCreation();
     this.updateUndoStack();
   }
 
@@ -225,6 +226,7 @@ export class CanvasManager extends CanvasScene {
   }
 
   clearAnnotations() {
+  	this.unsetActiveTool()
     this.deSelectActiveAnnotation();
     this.annotationLayer.destroyChildren();
     this.annotations = [];
@@ -391,7 +393,7 @@ export class CanvasManager extends CanvasScene {
   setAnnotationLabel = (label) => {
     this.selectedAnnotation.setLabel(label);
     this.selectedAnnotation.draw();
-    this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+    this.notifyLabelCreation();
     this.updateUndoStack();
   };
 
@@ -635,7 +637,7 @@ export class CanvasManager extends CanvasScene {
     const annotations = this.undoRedoStack.undo();
     if (annotations && annotations.length > 0) {
       this.addAnnotationsFromData(annotations);
-      this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+      this.notifyLabelCreation();
     }
   };
 
@@ -644,13 +646,54 @@ export class CanvasManager extends CanvasScene {
     if (annotations && annotations.length > 0) {
       this.clearAnnotations();
       this.addAnnotationsFromData(annotations);
-      this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+      this.notifyLabelCreation();
     }
   };
 
   resetUndoRedoStack = () => {
     this.undoRedoStack.reset();
   };
+
+  removeConnectingLine = () => {
+  	if (this.connectingLine && this.connectingLine.getShape()) {
+  		this.connectingLine.getShape().destroy()
+			this.connectingLine.getShape().destroyChildren()
+			this.connectingLine = null
+			this.toolLayerDraw()
+		}
+	}
+
+  addConnectingLine = () => {
+		const selectedAnnotation = this.getSelectedAnnotation()
+		if(selectedAnnotation) {
+			this.connectingLine = new ConnectingLine(this)
+			const line = this.connectingLine.getShape()
+			if (line) {
+				this.toolLayer.add(line)
+				this.toolLayerDraw()
+			}
+		}
+	}
+
+  notifyLabelCreation() {
+		this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+		// setTimeout is required to make the label elements appear as it depends on async setState in LabelContainer
+		setTimeout(() => {
+			this.addConnectingLine()
+		})
+	}
+
+	handleScrollZoomStart = () => {
+		this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+		this.removeConnectingLine()
+	}
+
+	handleScrollZoomEnd = () => {
+		this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+			position: this.getLabelSelectorPosition(),
+		});
+		this.addConnectingLine()
+	}
 
   /**
    * @param eventType -> type string

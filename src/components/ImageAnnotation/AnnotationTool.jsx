@@ -98,7 +98,7 @@ export default class AnnotationTool extends React.Component {
         }
       );
       this.canvasManager.addAnnotationsFromData(annotations);
-      this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+      this.canvasManager.notifyLabelCreation();
     }
   }
 
@@ -116,7 +116,7 @@ export default class AnnotationTool extends React.Component {
 			);
 			this.setLoader(false);
 		});
-		this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+		this.canvasManager.notifyLabelCreation();
 		this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
 	}
 
@@ -298,6 +298,8 @@ export default class AnnotationTool extends React.Component {
               getAnnotationData={this.canvasManager.getAnnotationData}
               imageLabels={this.state.imageLabels}
               textAnnotations={this.textAnnotations}
+							removeConnectingLine={this.canvasManager.removeConnectingLine}
+							addConnectingLine={this.canvasManager.addConnectingLine}
             />
           )}
           {/*<Box style={{overflow: 'auto', flexGrow: 1}}>*/}

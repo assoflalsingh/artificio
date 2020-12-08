@@ -36,7 +36,7 @@ export class ProposalTool extends Tool {
 
   exitTool() {
     this.canvasManager.hideProposals();
-    this.canvasManager.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+    this.canvasManager.notifyLabelCreation();
   }
 
   createAnnotation = () => {
