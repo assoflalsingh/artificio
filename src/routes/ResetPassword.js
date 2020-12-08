@@ -9,7 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import SignUpImg from '../assets/images/signup.png';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { doValidation, FormHeader, FormInputPhoneNo, FormInputText } from '../components/FormElements';
+import { doValidation, FormHeader, FormInputPhoneNo, FormInputText, PasswordPolicy } from '../components/FormElements';
 import Logo from '../assets/images/Logo-final.svg';
 import {getQueryParam} from '../others/utils';
 
@@ -72,8 +72,8 @@ export default function ResetPassword({location, history}) {
 
   const formValidators = {
     password: {
-      validators: ['required'],
-      messages: ['This field is required'],
+      validators: ['required', 'password'],
+      messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
       validators: ['required', function(value) { return formData.password == value}],
@@ -170,7 +170,7 @@ export default function ResetPassword({location, history}) {
           <Grid item xs={12} sm={12} md={6}>
             <FormHeader title="Reset password" />
             <Box className={classes.formRow}>
-              <FormInputText name="password" value={formData.password} label="Password"
+              <FormInputText name="password" value={formData.password} label="Password" info={<PasswordPolicy />}
                 InputIcon={LockOutlinedIcon} type='password' onChange={onTextChange} errorMsg={formDataErr.password} required />
             </Box>
             <Box className={classes.formRow}>
