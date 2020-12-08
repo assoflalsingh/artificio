@@ -2,12 +2,12 @@ import Konva from "konva";
 import { CanvasImage } from "./core/CanvasImage";
 import { getScaledImageCoordinates } from "./core/utilities";
 import {
-  getHorizontalScrollbar,
-  getStageBounds,
-  getVerticalScrollBar,
-  scrollBarHeight,
-  scrollBarWidth,
-  scrollPadding,
+	getHorizontalScrollbar,
+	getStageBounds,
+	getVerticalScrollBar,
+	scrollBarHeight,
+	scrollBarWidth,
+	scrollPadding, verticalScrollPadding,
 } from "../components/ImageAnnotation/utilities";
 import { CustomEventType } from "./core/constants";
 
@@ -91,7 +91,7 @@ export class CanvasScene {
     this.addScrollbars();
   }
 
-  setStageDraggable(value) {
+  setStageDraggable = (value) => {
     this.stage.draggable(value);
   }
 
@@ -279,10 +279,9 @@ export class CanvasScene {
       const scaledStageWidth = stage.width() / scaleX;
       const scrollHeight = scrollBarHeight / scaleY;
       const scaledStageHeight = stage.height() / scaleY;
-
       // Reposition vertical scroll bar
       this.verticalBar.x(
-        x + scaledStageWidth - scrollWidth - scrollPadding / scaleX
+        x + scaledStageWidth - scrollWidth - scrollPadding / scaleX - verticalScrollPadding / scaleX
       );
       this.verticalBar.y(
         y +

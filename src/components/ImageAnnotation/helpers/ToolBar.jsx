@@ -1,24 +1,16 @@
 import React from "react";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import {
-  Box,
-  Button,
-  ListItemText,
-  makeStyles,
-  Menu,
-  MenuItem,
-  withStyles,
-} from "@material-ui/core";
-import useEventCallback from "react-image-annotate/hooks/use-event-callback";
+import {Box, Button, ListItemText, makeStyles, Menu, MenuItem, withStyles,} from "@material-ui/core";
 import PanToolIcon from "@material-ui/icons/PanTool";
 import FormatShapesIcon from "@material-ui/icons/FormatShapes";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import { ToolBarItemType, ToolType } from "../../../canvas/core/constants";
+import {ToolBarItemType} from "../../../canvas/core/constants";
 import AppsIcon from "@material-ui/icons/Apps";
 
 const useClasses = makeStyles(() => ({
   button: {
     borderRadius: 0,
+		margin: '0 0 0 0.2rem'
   },
   active: {
     background: "#0575ce",
@@ -49,11 +41,14 @@ const ToolBarButton = withStyles({
   );
 });
 
+
 export function ToolBar(props) {
   const [shapesAnchor, setShapesAnchor] = React.useState(null);
+	const [selectMode, setSelectMode] = React.useState(true);
+	const [dragMode, setDragMode] = React.useState(true);
   const [activeTool, setActiveTool] = React.useState(undefined);
   const [showProposals, setProposals] = React.useState(false);
-  const onClickIconSidebarItem = useEventCallback((event) => {});
+  const {blockAnnotationClick, setStageDraggable} = props
 
   const onSelectTool = (e) => {
     props.setActiveTool();
@@ -63,15 +58,25 @@ export function ToolBar(props) {
     <Box>
       <ToolBarButton
         label="Select"
+				active={selectMode}
         icon={<CheckBoxOutlineBlankIcon />}
         data-name="select"
-        onClick={(e) => onClickIconSidebarItem(e)}
+        onClick={() => {
+					const selected = !selectMode
+					setSelectMode(selected)
+					blockAnnotationClick(!selected)
+				}}
       />
       <ToolBarButton
+				active={dragMode}
         label="Drag/Pan"
         icon={<PanToolIcon />}
         data-name="pan"
-        onClick={(e) => onClickIconSidebarItem(e)}
+        onClick={() => {
+        	const dragAllowed = !dragMode
+					setDragMode(dragAllowed)
+					setStageDraggable(dragAllowed)
+				}}
       />
       <ToolBarButton
         active={activeTool === ToolBarItemType.Shape}
@@ -99,14 +104,13 @@ export function ToolBar(props) {
         {/*</MenuItem>*/}
       </Menu>
       <ToolBarButton
-        active={activeTool === ToolBarItemType.Proposals}
-        // disabled={activeTool === ToolBarItemType.Shape}
+        active={showProposals}
         label="Proposals"
         icon={<AppsIcon />}
         onClick={() => {
           const show = !showProposals;
-          props.showProposals(show);
           setProposals(show);
+          props.showProposals(show);
         }}
       />
       <ToolBarButton

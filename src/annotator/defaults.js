@@ -48,7 +48,8 @@ export function RegionLeftToolBar(
 		redo,
 		fetchNextImage,
 		fetchPreviousImage,
-		save
+		save,
+		clickZoomInOut
 }) {
   const classes = useStyles();
 
@@ -58,10 +59,10 @@ export function RegionLeftToolBar(
         <IconButton data-name="save" onClick={save} className={classes.leftBarButton}><SaveIcon/></IconButton>
       </Tooltip>
 			<Tooltip title="Zoom In">
-				<IconButton data-name="zoom in" className={classes.leftBarButton}><ZoomInIcon/></IconButton>
+				<IconButton data-name="zoom in" onClick={() => clickZoomInOut(5)} className={classes.leftBarButton}><ZoomInIcon/></IconButton>
 			</Tooltip>
 			<Tooltip title="Zoom Out">
-				<IconButton data-name="zoom out" className={classes.leftBarButton}><ZoomOutIcon/></IconButton>
+				<IconButton data-name="zoom out" onClick={() => clickZoomInOut(-5)} className={classes.leftBarButton}><ZoomOutIcon/></IconButton>
 			</Tooltip>
 			<Tooltip title="Undo">
 				<IconButton data-name="undo" onClick={undo} className={classes.leftBarButton}><ReplayIcon/></IconButton>

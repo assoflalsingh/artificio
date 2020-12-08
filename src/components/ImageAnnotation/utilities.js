@@ -2,6 +2,7 @@ import Konva from "konva";
 import * as uuid from "uuid";
 import {generateRandomColor, getIntersectingRectangle} from "../../canvas/core/utilities";
 export const scrollPadding = 5;
+export const verticalScrollPadding = 8;
 export const scrollBarWidth = 10;
 export const scrollBarHeight = 10;
 

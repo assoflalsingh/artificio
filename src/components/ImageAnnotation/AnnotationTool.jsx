@@ -251,6 +251,7 @@ export default class AnnotationTool extends React.Component {
           fetchNextImage={this.fetchNextImage}
           fetchPreviousImage={this.fetchPreviousImage}
           save={this.saveImageData}
+					clickZoomInOut={this.canvasManager && this.canvasManager.clickZoomInOut}
         />
         <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
           <ToolBar
@@ -265,6 +266,8 @@ export default class AnnotationTool extends React.Component {
             }
             onAnnotationToolClose={onAnnotationToolClose}
             showProposals={this.showProposals}
+						blockAnnotationClick={this.canvasManager && this.canvasManager.blockAnnotationClick}
+						setStageDraggable={this.canvasManager && this.canvasManager.setStageDraggable}
           />
           <Box style={{ backgroundColor: "#383838", height: "78%" }}>
             {this.state.loading && <Loader />}

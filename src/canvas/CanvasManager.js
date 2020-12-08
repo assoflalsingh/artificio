@@ -31,6 +31,7 @@ export class CanvasManager extends CanvasScene {
   updateModelAnnotationData;
   updateModelAnnotationLabel;
   textAnnotations;
+  blockAnnotationSelect = false
 
   // ApplicationConfig is of type {appId: string}
   constructor(
@@ -50,6 +51,10 @@ export class CanvasManager extends CanvasScene {
     this.deleteProposalInModelData = deleteProposalInModelData;
     window.canvas = this;
   }
+
+  blockAnnotationClick = (value) => {
+  	this.blockAnnotationSelect = value
+	}
 
   setTextAnnotations(textAnnotations) {
     this.textAnnotations = textAnnotations;
@@ -87,7 +92,7 @@ export class CanvasManager extends CanvasScene {
   }
 
   findAndSelectAnnotation(pointer) {
-    if (this.annotationLayer.visible()) {
+    if (this.annotationLayer.visible() && !this.blockAnnotationSelect) {
       const intersectedAnnotation = this.getIntersectedAnnotation(
         pointer,
         this.annotationLayer,
