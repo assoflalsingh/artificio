@@ -41,6 +41,7 @@ export default class AnnotationTool extends React.Component {
     textAnnotations: [],
     imageMetadata: null,
     ajaxMessage: null,
+		imageName: null
   };
 
   deleteProposalInModelData = (proposal) => {
@@ -143,6 +144,7 @@ export default class AnnotationTool extends React.Component {
       this.setState({
         imageLabels: imageData.image_labels,
         imageMetadata: imageData.image_json.metadata,
+				imageName: imageData.document_file_name
       });
       this.initializeCanvas(imageData);
     } else {
@@ -298,7 +300,7 @@ export default class AnnotationTool extends React.Component {
             {/*}*/}
             {activeImage && (
               <Typography style={{ margin: "auto" }}>
-                Select an image....
+								{this.state.imageName || 'Select an image....'}
               </Typography>
             )}
           </Box>
