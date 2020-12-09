@@ -189,6 +189,7 @@ export function findTextAnnotations(annotation, proposals) {
           (intersectingRectangle.x2 - intersectingRectangle.x1) *
           (intersectingRectangle.y2 - intersectingRectangle.y1);
         const ratio = intersectingRectArea / rectArea;
+        // if intersected area is greater then 50% then select those boxes
         if (ratio >= 0.5) {
           if (
             !words.find(
