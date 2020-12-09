@@ -14,6 +14,7 @@ export default class Proposal extends Annotation {
   circles = [];
   isSelected;
   deleteIconGroup;
+  word;
   /**
 	 * @param annotationData
 	 * {
@@ -23,11 +24,13 @@ export default class Proposal extends Annotation {
 			label: string;
 		}
 	 * @param scale
+	 * @param word
 	 */
-  constructor(annotationData, scale) {
+  constructor(annotationData, scale, word) {
     super(annotationData, scale);
     this.group.draggable(false);
     this.type = AnnotationType.Proposal;
+    this.word = word;
     this.initialize();
   }
 

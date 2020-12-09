@@ -6,7 +6,7 @@ export async function getImageData(api, imageId, pageNo, inReview) {
     const response = await api.post(URL_MAP.GET_ANNOTATION_DETAILS, {
       document_id: imageId,
       page_no: pageNo,
-			"status": inReview ? ["in-process"] : ["ready"]
+      status: inReview ? ["in-process"] : ["ready"],
     });
     // setProcessMsg(null);
     return response.data.data;

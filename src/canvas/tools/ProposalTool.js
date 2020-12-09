@@ -142,9 +142,9 @@ export class ProposalTool extends Tool {
       // push to undo stack
       this.canvasManager.updateUndoStack();
     }
-		this.canvasManager.notifyLabelCreation(false);
-		this.canvasManager.proposals.forEach((p) => p.deSelect());
-		this.canvasManager.proposalLayer.batchDraw();
+    this.canvasManager.notifyLabelCreation(false);
+    this.canvasManager.proposals.forEach((p) => p.deSelect());
+    this.canvasManager.proposalLayer.batchDraw();
     this.canvasManager.updateModelAnnotationLabel(proposals, label.value);
     this.toolMode = null;
   };
