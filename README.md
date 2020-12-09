@@ -31,7 +31,7 @@ scp -i aml.pem -pr * ec2-user@artificio.ai:/home/ec2-user/app
 
 ssh -i aml.pem ec2-user@artificio.ai
 
-cd /var/www/artificio.ai/
+cd /var/www/artificio.ai/app
 
 sudo rm -rf *
 
@@ -56,7 +56,7 @@ server {
 	ssl_certificate /etc/ssl/certs/artificio.cert;
 	ssl_certificate_key /etc/ssl/certs/artificio.key;
 
-        root /var/www/artificio.ai;
+        root /var/www/artificio.ai/web;
         index index.html index.htm;
 
         server_name artificio.ai www.artificio.ai;
@@ -67,9 +67,15 @@ server {
                 add_header Content-Type text/html;
         }
 
-        location / {
-                try_files $uri $uri/ /index.html;
+        location /app {
+                alias /var/www/artificio.ai/app;
+                index  index.html;
+                try_files $uri $uri/ /app/index.html;
         }
+	location /blog {
+		proxy_pass  http://artificio.ai:8090;
+		proxy_set_header X-Forwarded-Proto https;
+	}
 }
 
 
