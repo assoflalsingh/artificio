@@ -119,6 +119,17 @@ export class CanvasManager extends CanvasScene {
     });
   }
 
+  selectAnnotationById = (id) => {
+  	const annotation = this.getAnnotationById(id)
+		if (annotation) {
+			if(!this.selectedAnnotation) {
+				this.selectAnnotation(annotation)
+			} else if(this.selectedAnnotation.id !== annotation.id) {
+				this.selectAnnotation(annotation)
+			}
+		}
+	}
+
   getSelectedAnnotation = () => {
     return this.selectedAnnotation;
   };
@@ -400,8 +411,10 @@ export class CanvasManager extends CanvasScene {
   };
 
   setAnnotationLabel = (label) => {
-    this.selectedAnnotation.setLabel(label);
+    this.selectedAnnotation.setLabel(label.value);
+		this.selectedAnnotation.setColor(label.color)
     this.selectedAnnotation.draw();
+    this.removeConnectingLine()
     this.notifyLabelCreation();
     this.updateUndoStack();
   };
@@ -684,11 +697,11 @@ export class CanvasManager extends CanvasScene {
     }
   };
 
-  notifyLabelCreation() {
+  notifyLabelCreation(addConnectingLine = true) {
     this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
     // setTimeout is required to make the label elements appear as it depends on async setState in LabelContainer
     setTimeout(() => {
-      this.addConnectingLine();
+			addConnectingLine && this.addConnectingLine();
     });
   }
 

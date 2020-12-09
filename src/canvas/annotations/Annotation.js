@@ -95,13 +95,17 @@ export default class Annotation {
     }
   }
 
+  destroyLabel() {
+		if (this.label) {
+			this.label.destroy();
+			this.label.destroyChildren();
+			this.group.getLayer() && this.group.getLayer().draw();
+		}
+	}
+
   reCreateLabel() {
     // Recreate Label
-    if (this.label) {
-      this.label.destroy();
-      this.label.destroyChildren();
-      this.group.getLayer() && this.group.getLayer().draw();
-    }
+    this.destroyLabel()
     this.addLabel();
   }
 

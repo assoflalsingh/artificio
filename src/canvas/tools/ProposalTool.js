@@ -36,7 +36,6 @@ export class ProposalTool extends Tool {
 
   exitTool() {
     this.canvasManager.hideProposals();
-    this.canvasManager.notifyLabelCreation();
   }
 
   createAnnotation = () => {
@@ -113,7 +112,7 @@ export class ProposalTool extends Tool {
     const proposals = this.canvasManager.proposals.filter((p) => p.isSelected);
     if (this.toolMode === ToolMode.Merge) {
       // Note: push to undo stack not required as add annotation is already carrying out the same
-      this.canvasManager.setAnnotationLabel(label.value);
+      this.canvasManager.setAnnotationLabel(label);
     } else {
       proposals.forEach((proposal) => {
         const coordinates = proposal.getData();
@@ -143,8 +142,9 @@ export class ProposalTool extends Tool {
       // push to undo stack
       this.canvasManager.updateUndoStack();
     }
-
-    this.canvasManager.addOrResetProposals();
+		this.canvasManager.notifyLabelCreation(false);
+		this.canvasManager.proposals.forEach((p) => p.deSelect());
+		this.canvasManager.proposalLayer.batchDraw();
     this.canvasManager.updateModelAnnotationLabel(proposals, label.value);
     this.toolMode = null;
   };
