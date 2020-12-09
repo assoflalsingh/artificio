@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SideMenuBar() {
+export default function SideMenuBar({baseurl}) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
 
@@ -37,8 +37,8 @@ export default function SideMenuBar() {
   return (
     <>
       <List component="nav" className={classes.root}>
-        <ListItemLink icon={<StorageIcon />} primary='Create Model' to='/createModel'/>
-        <ListItemLink icon={<FormatShapesIcon />} primary='Annotation' to='/annotation'/>
+        <ListItemLink icon={<StorageIcon />} primary='Create Model' to={`${baseurl}/createModel`}/>
+        <ListItemLink icon={<FormatShapesIcon />} primary='Annotation' to={`${baseurl}/annotation`}/>
         {/* <MenuItem button onClick={handleClick}>
           <ListItemIcon>
             <InboxIcon />
@@ -57,7 +57,7 @@ export default function SideMenuBar() {
           </List>
         </Collapse> */}
         <Divider />
-          <ListItemLink icon={<SettingsIcon />} primary='Admin' to='/admin'/>
+          <ListItemLink icon={<SettingsIcon />} primary='Admin' to={`${baseurl}/admin`}/>
         <Divider />
       </List>
     </>

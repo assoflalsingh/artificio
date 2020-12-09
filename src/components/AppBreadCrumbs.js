@@ -1,8 +1,8 @@
 import React from 'react';
-import { makeStyles, Box, Paper, Breadcrumbs, Typography } from '@material-ui/core';
+import { makeStyles, Box, Paper, Breadcrumbs, Typography, Link } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { useLocation } from 'react-router-dom';
-
+import { Link as RouterLink } from 'react-router-dom';
 
 const useStylesContent = makeStyles((theme)=>({
   root: {
@@ -33,7 +33,8 @@ const breadcrumbNameMap = {
   'dataManager': 'Data Manager',
   'annotation': 'Annotation',
   'dataExtraction': 'Data extraction',
-  'admin': 'Admin'
+  'admin': 'Admin',
+  'dashboard': 'Dashboard',
 }
 
 function AppBreadCrumbs({children, className, ...props}) {
@@ -44,19 +45,16 @@ function AppBreadCrumbs({children, className, ...props}) {
   return (
       <Paper className={classes.breadcrumbs}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small"/>} aria-label="breadcrumb">
-          <Box className={classes.breadcrumbsDashboard}>
-            Dashboard
-          </Box>
           {pathnames.map((value, index) => {
             const last = index === pathnames.length - 1;
             const to = `/${pathnames.slice(0, index + 1).join('/')}`;
             return last ? (
-              <Typography key={to}>
+              <Typography key={to} >
                 {breadcrumbNameMap[value]}
               </Typography>
             ) : (
-              <Typography color="primary" to={to} key={to}>
-                {breadcrumbNameMap[value]}
+              <Typography color="primary"  key={to}>
+                <Link component={RouterLink} to={to}>{breadcrumbNameMap[value]}</Link>
               </Typography>
             );
           })}

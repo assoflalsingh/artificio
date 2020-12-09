@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme)=>({
   },
 }));
 
-const Dashboard = (props) => {
+const Dashboard = ({match, ...props}) => {
   const classes = useStyles();
 
   useEffect(()=>{
@@ -70,7 +70,6 @@ const Dashboard = (props) => {
   }, []);
 
   return (
-    <Router basename='/dashboard'>
       <Box className={classes.root}>
         <Container maxWidth="lg" className={classes.container}>
           <Box display="flex" flexDirection="column" className={classes.container}>
@@ -83,13 +82,12 @@ const Dashboard = (props) => {
                 <UserBar className={classes.rightSide}/>
             </Box>
             <Box display="flex" className={classes.bottomSide}>
-                <Paper item className={classes.leftSide}><SideMenuBar /></Paper>
-                <MainContent className={classes.rightSide} />
+                <Paper item className={classes.leftSide}><SideMenuBar baseurl={match.url}/></Paper>
+                <MainContent className={classes.rightSide} baseurl={match.url} />
             </Box>
           </Box>
         </Container>
       </Box>
-    </Router>
   )
 }
 
