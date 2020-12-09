@@ -11,7 +11,7 @@ export default class Rectangle extends Annotation {
   rectangle;
   circles = [];
   strokeWidth = AnnotationStrokeWidth;
-  isSelected = false
+  isSelected = false;
   /**
 	 * @param annotationData
 	 * {
@@ -147,7 +147,7 @@ export default class Rectangle extends Annotation {
       circle.strokeWidth(AnnotationCircleStrokeWidth / this.scale);
     });
 
-		this.isSelected && this.reCreateLabel();
+    this.isSelected && this.reCreateLabel();
   }
 
   getTopLeftCoordinates() {
@@ -205,29 +205,29 @@ export default class Rectangle extends Annotation {
   }
 
   select() {
-  	this.isSelected = true
+    this.isSelected = true;
     this.circles.forEach((c) => c.show());
     this.group.draggable(true);
     this.group.moveToTop();
-    this.addLabel()
+    this.addLabel();
     // this.rectangle.strokeWidth((this.strokeWidth + 5)/this.scale);
   }
 
   setColor(color) {
-  	this.annotationData.color = color
-		this.color = color
-  	this.rectangle.stroke(color)
-		this.circles.forEach(c => {
-			c.stroke(color)
-		})
-		this.reCreateLabel()
-	}
+    this.annotationData.color = color;
+    this.color = color;
+    this.rectangle.stroke(color);
+    this.circles.forEach((c) => {
+      c.stroke(color);
+    });
+    this.reCreateLabel();
+  }
 
   deSelect() {
-		this.isSelected = false
+    this.isSelected = false;
     this.circles.forEach((c) => c.hide());
     this.group.draggable(false);
-    this.destroyLabel()
+    this.destroyLabel();
     // this.rectangle.strokeWidth((this.strokeWidth - 5)/this.scale);
   }
 

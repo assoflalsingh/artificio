@@ -1,6 +1,6 @@
 import React from "react";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import {
   Box,
   Button,
@@ -70,19 +70,19 @@ export class ToolBar extends CanvasEventAttacher {
         this.setState({ activeTool: event.detail.toolType });
       },
     },
-		{
-			event: CustomEventType.NOTIFY_PROPOSAL_RESET,
-			func: () => {
-				this.setState({
-					shapesAnchor: null,
-					selectMode: true,
-					dragMode: true,
-					activeTool: null,
-					showProposals: false,
-					hideAnnotations: false,
-				});
-			},
-		},
+    {
+      event: CustomEventType.NOTIFY_PROPOSAL_RESET,
+      func: () => {
+        this.setState({
+          shapesAnchor: null,
+          selectMode: true,
+          dragMode: true,
+          activeTool: null,
+          showProposals: false,
+          hideAnnotations: false,
+        });
+      },
+    },
   ];
 
   onSelectTool = () => {
@@ -103,7 +103,13 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           label="Select"
           active={this.state.selectMode}
-          icon={this.state.selectMode ? <CheckBoxIcon/> : <CheckBoxOutlineBlankIcon />}
+          icon={
+            this.state.selectMode ? (
+              <CheckBoxIcon />
+            ) : (
+              <CheckBoxOutlineBlankIcon />
+            )
+          }
           data-name="select"
           onClick={() => {
             const selected = !this.state.selectMode;
@@ -125,7 +131,7 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           active={this.state.activeTool}
           label="Shapes"
-					disabled={this.state.hideAnnotations}
+          disabled={this.state.hideAnnotations}
           icon={<FormatShapesIcon />}
           onClick={(e) => this.setState({ shapesAnchor: e.target })}
         />

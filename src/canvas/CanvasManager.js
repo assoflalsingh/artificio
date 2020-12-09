@@ -13,7 +13,7 @@ import {
 } from "./annotations/Annotation";
 import { UndoRedoStack } from "./core/UndoRedoStack";
 import Rectangle from "./annotations/Rectangle";
-import { getLabelValueFromTextAnnotations } from "../components/ImageAnnotation/utilities";
+import { getLabelValueFromProposals } from "../components/ImageAnnotation/utilities";
 import { ConnectingLine } from "./core/connectingLine";
 
 export class CanvasManager extends CanvasScene {
@@ -120,15 +120,15 @@ export class CanvasManager extends CanvasScene {
   }
 
   selectAnnotationById = (id) => {
-  	const annotation = this.getAnnotationById(id)
-		if (annotation) {
-			if(!this.selectedAnnotation) {
-				this.selectAnnotation(annotation)
-			} else if(this.selectedAnnotation.id !== annotation.id) {
-				this.selectAnnotation(annotation)
-			}
-		}
-	}
+    const annotation = this.getAnnotationById(id);
+    if (annotation) {
+      if (!this.selectedAnnotation) {
+        this.selectAnnotation(annotation);
+      } else if (this.selectedAnnotation.id !== annotation.id) {
+        this.selectAnnotation(annotation);
+      }
+    }
+  };
 
   getSelectedAnnotation = () => {
     return this.selectedAnnotation;
@@ -142,10 +142,9 @@ export class CanvasManager extends CanvasScene {
     });
     this.selectedAnnotation.getShape().on("dragend.select", () => {
       // set label value
-      const annotationData = this.getAnnotationData(this.selectedAnnotation);
-      const labelValue = getLabelValueFromTextAnnotations(
-        annotationData.label_points,
-        this.textAnnotations
+      const labelValue = getLabelValueFromProposals(
+        this.selectedAnnotation,
+        this.proposals
       );
       this.selectedAnnotation.setLabelValue(labelValue);
 
@@ -245,15 +244,15 @@ export class CanvasManager extends CanvasScene {
     this.deSelectActiveAnnotation();
     this.annotationLayer.destroyChildren();
     this.annotations = [];
-    this.annotationLayer.show()
+    this.annotationLayer.show();
     this.annotationLayer.batchDraw();
     this.proposalLayer.destroyChildren();
     this.proposals = [];
     this.proposalLayer.batchDraw();
     this.toolLayer.destroyChildren();
     this.toolLayerDraw();
-    this.blockAnnotationSelect = false
-		this.setStageDraggable(true)
+    this.blockAnnotationSelect = false;
+    this.setStageDraggable(true);
   }
 
   transformEventDataForTool = (event, eventData) => {
@@ -319,6 +318,10 @@ export class CanvasManager extends CanvasScene {
     return this.activeTool;
   };
 
+  getProposals = () => {
+    return this.proposals;
+  };
+
   getProposalTool = () => {
     return this.proposalTool;
   };
@@ -380,7 +383,7 @@ export class CanvasManager extends CanvasScene {
       ann.resizeCanvasStroke(this.stage.scaleX());
     });
     this.annotationLayerDraw();
-  }
+  };
 
   getLabelSelectorPosition = () => {
     const annotation = this.selectedAnnotation;
@@ -412,9 +415,9 @@ export class CanvasManager extends CanvasScene {
 
   setAnnotationLabel = (label) => {
     this.selectedAnnotation.setLabel(label.value);
-		this.selectedAnnotation.setColor(label.color)
+    this.selectedAnnotation.setColor(label.color);
     this.selectedAnnotation.draw();
-    this.removeConnectingLine()
+    this.removeConnectingLine();
     this.notifyLabelCreation();
     this.updateUndoStack();
   };
@@ -462,7 +465,7 @@ export class CanvasManager extends CanvasScene {
 				}
 			}
 	 */
-  addOrResetProposals(proposals) {
+  addOrResetProposals(proposals, showProposals = true) {
     if (this.proposals.length === 0 && proposals) {
       const imagePosition = this.konvaImage.position();
       proposals.forEach((proposal, proposalIndex) => {
@@ -496,7 +499,11 @@ export class CanvasManager extends CanvasScene {
                 ? AnnotationProposalColor
                 : AnnotationProposalLowConfidenceScoreColor,
           };
-          const proposal = new Proposal(annotationData, this.stage.scaleX());
+          const proposal = new Proposal(
+            annotationData,
+            this.stage.scaleX(),
+            word
+          );
           this.addProposalEventListeners(proposal);
 
           this.proposals.push(proposal);
@@ -506,8 +513,10 @@ export class CanvasManager extends CanvasScene {
     } else {
       this.proposals.forEach((p) => p.deSelect());
     }
-    this.proposalLayer.show();
-    this.proposalLayer.batchDraw();
+    if (showProposals) {
+      this.proposalLayer.show();
+      this.proposalLayer.batchDraw();
+    }
   }
 
   hideProposals() {
@@ -701,7 +710,7 @@ export class CanvasManager extends CanvasScene {
     this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
     // setTimeout is required to make the label elements appear as it depends on async setState in LabelContainer
     setTimeout(() => {
-			addConnectingLine && this.addConnectingLine();
+      addConnectingLine && this.addConnectingLine();
     });
   }
 

@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CommonTabs from "../../CommonTabs";
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 import { CustomEventType } from "../../../canvas/core/constants";
-import { getLabelValueFromTextAnnotations } from "../utilities";
+import { getLabelValueFromProposals } from "../utilities";
 import TextField from "@material-ui/core/TextField";
 
 export const LabelId = "label-text-container";
@@ -60,7 +60,8 @@ export const LabelsContainer = ({
   getAnnotationData,
   removeConnectingLine,
   addConnectingLine,
-	selectAnnotationById
+  selectAnnotationById,
+  getProposals,
 }) => {
   const classes = useStyles();
   let wheeling;
@@ -94,7 +95,8 @@ export const LabelsContainer = ({
                   getAnnotationData={getAnnotationData}
                   imageLabels={imageLabels}
                   textAnnotations={textAnnotations}
-									selectAnnotationById={selectAnnotationById}
+                  selectAnnotationById={selectAnnotationById}
+                  getProposals={getProposals}
                 />
               </Box>
             ),
@@ -126,16 +128,13 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             imageLabels,
             textAnnotations,
             getAnnotationData,
-						selectAnnotationById
+            selectAnnotationById,
+            getProposals,
           } = this.props;
           const annotations = getAnnotations() || [];
           const labels = [];
           annotations.forEach((ann) => {
-            const scaledData = getAnnotationData(ann);
-            const labelValue = getLabelValueFromTextAnnotations(
-              scaledData.label_points,
-              textAnnotations
-            );
+            const labelValue = getLabelValueFromProposals(ann, getProposals());
             if (!ann.getLabelValue()) {
               ann.setLabelValue(labelValue);
             }
@@ -150,7 +149,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
                   labelName={ann.getLabel()}
                   color={ann.color}
                   annotationId={ann.id}
-									selectAnnotationById={selectAnnotationById}
+                  selectAnnotationById={selectAnnotationById}
                 />
               );
             }
@@ -180,7 +179,7 @@ const Label = ({
   labelValue,
   setLabelValue,
   annotationId,
-  selectAnnotationById
+  selectAnnotationById,
 }) => {
   const classes = useStyles();
   const [label, setLabel] = React.useState(labelValue);
@@ -209,7 +208,7 @@ const Label = ({
               const value = e.target.value;
               setLabel(value);
               setLabelValue(value);
-							selectAnnotationById(annotationId)
+              selectAnnotationById(annotationId);
             }}
           />
         </Tooltip>

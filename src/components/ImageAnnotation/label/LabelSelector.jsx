@@ -274,7 +274,7 @@ const Label = ({
             options={labels.map((label) => ({
               value: label.label_name,
               label: label.label_name,
-							color: label.label_color
+              color: label.label_color,
             }))}
           />
           <Box style={{ marginTop: 4, display: "flex" }}>

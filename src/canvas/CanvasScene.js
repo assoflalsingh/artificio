@@ -14,8 +14,8 @@ import {
 export const paddingFactor = 0.02;
 const callBackTimeout = 100;
 const wheelingTimeout = 70;
-const defaultStageScale = 2.3487984729585016
-const defaultStagePosition = {x: -712.0618025695535, y: 0}
+const defaultStageScale = 2.3487984729585016;
+const defaultStagePosition = { x: -712.0618025695535, y: 0 };
 
 export class CanvasScene {
   appId;
@@ -216,11 +216,11 @@ export class CanvasScene {
   }
 
   getCenterPosition() {
-  	return {
-			x: this.stage.width() / 2 + this.container.width * paddingFactor,
-			y: this.stage.height() / 2 + this.container.height * paddingFactor,
-		}
-	}
+    return {
+      x: this.stage.width() / 2 + this.container.width * paddingFactor,
+      y: this.stage.height() / 2 + this.container.height * paddingFactor,
+    };
+  }
 
   clickZoomInOut = (delta) => {
     const centerPos = this.getCenterPosition();
@@ -374,18 +374,18 @@ export class CanvasScene {
   }
 
   fitImageToScreen() {
-		this.stage.scale({x: defaultStageScale, y: defaultStageScale})
-		this.stage.position(defaultStagePosition)
-		this.oldScale = defaultStageScale;
-		this.repositionScrollBars()
-		this.annotationLayer && this.resizeCanvasStroke(this.initialScale)
-		this.stage.draw()
-	}
+    this.stage.scale({ x: defaultStageScale, y: defaultStageScale });
+    this.stage.position(defaultStagePosition);
+    this.oldScale = defaultStageScale;
+    this.repositionScrollBars();
+    this.annotationLayer && this.resizeCanvasStroke(this.initialScale);
+    this.stage.draw();
+  }
 
   getSelectedAnnotation = () => {};
 
   handleScrollZoomStart = () => {};
   handleScrollZoomEnd = () => {};
 
-	resizeCanvasStroke = () => {}
+  resizeCanvasStroke = () => {};
 }

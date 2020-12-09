@@ -151,80 +151,66 @@ function sortWordsColumnWise(words) {
   });
 }
 
-/**
- *
- * @param points: number[][]
- * @param textAnnotations
- * {
- * 		block_details: [],
-			word_details: {
-				word_description: string;
-				entity_label: string;
-				bounding_box: {
-					vertices: {
-						x: number;
-						y: number
-					}[]
-				}
-			}[]
-		}[]
- */
-export function findTextAnnotations(points, textAnnotations) {
+export function findTextAnnotations(annotation, proposals) {
   let words = [];
-  const px1 = points[0][0];
-  const py1 = points[0][1];
-  const px2 = points[2][0];
-  const py2 = points[2][1];
-  textAnnotations &&
-    textAnnotations.forEach((textAnnotation) => {
-      textAnnotation.word_details.forEach((word) => {
-        const vertices = word.bounding_box.vertices;
-        const x1 = vertices[0].x;
-        const y1 = vertices[0].y;
-        const x2 = vertices[2].x;
-        const y2 = vertices[2].y;
+  if (proposals.length > 0) {
+    const annotationCoordinates = annotation.getData().coordinates;
+    const px1 = annotationCoordinates[0];
+    const py1 = annotationCoordinates[1];
+    const px2 = annotationCoordinates[2];
+    const py2 = annotationCoordinates[3];
 
-        if (x1 >= px1 && y1 >= py1 && x2 <= px2 && y2 <= py2) {
-          words.push({
-            confidence_score: word.confidence_score,
-            entity_label: word.entity_label,
-            word_description: word.word_description,
-            vertices,
-          });
-        }
+    proposals.forEach((proposal) => {
+      const vertices = proposal.getData();
+      const x1 = vertices[0];
+      const y1 = vertices[1];
+      const x2 = vertices[2];
+      const y2 = vertices[3];
 
-        const intersectingRectangle = getIntersectingRectangle(
-          { x1: px1, y1: py1, x2: px2, y2: py2 },
-          { x1, y1, x2, y2 }
-        );
-        if (intersectingRectangle) {
-          const rectArea = (x2 - x1) * (y2 - y1);
-          const intersectingRectArea =
-            (intersectingRectangle.x2 - intersectingRectangle.x1) *
-            (intersectingRectangle.y2 - intersectingRectangle.y1);
-          const ratio = intersectingRectArea / rectArea;
-          if (ratio >= 0.5) {
-            if (
-              !words.find((w) => w.word_description === word.word_description)
-            ) {
-              words.push({
-                confidence_score: word.confidence_score,
-                entity_label: word.entity_label,
-                word_description: word.word_description,
-                vertices,
-              });
-            }
+      // Containing boxes logic
+      if (x1 >= px1 && y1 >= py1 && x2 <= px2 && y2 <= py2) {
+        words.push({
+          confidence_score: proposal.word.confidence_score,
+          entity_label: proposal.word.entity_label,
+          word_description: proposal.word.word_description,
+          vertices,
+        });
+      }
+
+      // Intersecting boxes logic
+      const intersectingRectangle = getIntersectingRectangle(
+        { x1: px1, y1: py1, x2: px2, y2: py2 },
+        { x1, y1, x2, y2 }
+      );
+
+      if (intersectingRectangle) {
+        const rectArea = (x2 - x1) * (y2 - y1);
+        const intersectingRectArea =
+          (intersectingRectangle.x2 - intersectingRectangle.x1) *
+          (intersectingRectangle.y2 - intersectingRectangle.y1);
+        const ratio = intersectingRectArea / rectArea;
+        if (ratio >= 0.5) {
+          if (
+            !words.find(
+              (w) => w.word_description === proposal.word.word_description
+            )
+          ) {
+            words.push({
+              confidence_score: proposal.word.confidence_score,
+              entity_label: proposal.word.entity_label,
+              word_description: proposal.word.word_description,
+              vertices,
+            });
           }
         }
-      });
+      }
     });
-  // words = words.filter(w => w.confidence_score > 0.5)
-
+  }
   return words;
 }
 
-export function getLabelValueFromTextAnnotations(labelPoints, textAnnotations) {
-  const words = findTextAnnotations(labelPoints, textAnnotations);
+export function getLabelValueFromProposals(annotation, proposals) {
+  const words = findTextAnnotations(annotation, proposals);
   let labelValue = "";
   words.forEach((w) => {
     labelValue = labelValue.concat(w.word_description + " ");
