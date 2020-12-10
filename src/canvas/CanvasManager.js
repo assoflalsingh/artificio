@@ -440,14 +440,14 @@ export class CanvasManager extends CanvasScene {
         this.proposalLayer.batchDraw();
       }
     });
-    proposal.getShape().on('click', () => {
-			if (proposal.isSelected) {
-				proposal.deSelect();
-			} else {
-				proposal.select();
-			}
-			proposal.draw()
-		})
+    proposal.getShape().on("click", () => {
+      if (proposal.isSelected) {
+        proposal.deSelect();
+      } else {
+        proposal.select();
+      }
+      proposal.draw();
+    });
     proposal.getShape().on("dragend", () => {
       this.updateModelAnnotationData(proposal);
     });

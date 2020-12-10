@@ -14,8 +14,8 @@ import {
 export const paddingFactor = 0.02;
 const callBackTimeout = 100;
 const wheelingTimeout = 70;
-const defaultStageScale = 2.3487984729585016;
-const defaultStagePosition = { x: -712.0618025695535, y: 0 };
+const defaultStageScale = 0.97;
+const defaultStagePadding = 10;
 
 export class CanvasScene {
   appId;
@@ -374,9 +374,17 @@ export class CanvasScene {
   }
 
   fitImageToScreen() {
-    this.stage.scale({ x: defaultStageScale, y: defaultStageScale });
-    this.stage.position(defaultStagePosition);
-    this.oldScale = defaultStageScale;
+    const scale = this.stage.width() / this.konvaImage.width();
+    this.stage.scale({
+      x: scale * defaultStageScale,
+      y: scale * defaultStageScale,
+    });
+    const position = this.konvaImage.position();
+    this.stage.position({
+      x: -position.x * this.stage.scaleX() + defaultStagePadding,
+      y: -position.y * this.stage.scaleX() + defaultStagePadding,
+    });
+		this.oldScale = scale * defaultStageScale;
     this.repositionScrollBars();
     this.annotationLayer && this.resizeCanvasStroke(this.initialScale);
     this.stage.draw();
