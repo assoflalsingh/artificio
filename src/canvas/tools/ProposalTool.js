@@ -157,9 +157,9 @@ export class ProposalTool extends Tool {
   }
 
   eventListeners = [
-    {
-      event: "click",
-      func: this.findAndSelectProposal.bind(this),
-    },
+  //   {
+  //     event: "click",
+  //     func: this.findAndSelectProposal.bind(this),
+  //   },
   ];
 }
