@@ -28,21 +28,19 @@ const useStylesContent = makeStyles((theme)=>({
   }
 }));
 
-export default function MainContent({children, className, ...props}) {
+export default function MainContent({children, className, baseurl, ...props}) {
   const classes = useStylesContent();
   return (
-    // <BrowserRouter>
     <Box className={clsx(classes.root, className)}>
       <AppBreadCrumbs />
       <Box className={classes.content}>
-        <Route path="/createModel" component={CreateModel} />
-        <Route path="/annotation" component={Annotation} />
-        <Route path="/admin" component={Admin} />
+        <Route path={`${baseurl}/createModel`} component={CreateModel} />
+        <Route path={`${baseurl}/annotation`} component={Annotation} />
+        <Route path={`${baseurl}/admin`} component={Admin} />
       </Box>
       <Box className={classes.copyrights}>
         <CopyrightIcon />&nbsp;<Typography>2020 Copyrights - Artificio</Typography>
       </Box>
     </Box>
-    // </BrowserRouter>
   )
 }

@@ -27,7 +27,7 @@ export default function App() {
       <StylesProvider injectFirst>
         <CssBaseline />
         <ReduxProvider store={reduxStore}>
-          <Router>
+          <Router basename="/app">
             <PrivateRoute path='/dashboard' component={Dashboard} />
             <Route path='/signin' component={SignIn} />
             <Route path='/signup' component={SignUp} />
