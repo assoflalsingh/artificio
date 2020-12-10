@@ -84,55 +84,6 @@ export function getStageBounds(
       );
 }
 
-export function getVerticalScrollBar(stage) {
-  const stageWidth = stage.width(),
-    stageHeight = stage.height();
-  return new Konva.Rect({
-    width: 0,
-    height: 0,
-    fill: "grey",
-    opacity: 0.8,
-    x: stageWidth - scrollPadding - 10,
-    y: scrollPadding,
-    cornerRadius: 4,
-    draggable: true,
-    dragBoundFunc: function (pos) {
-      const scaleY = stage.scale().y;
-      pos.x = stageWidth - scrollPadding - 18;
-      pos.y = Math.max(
-        Math.min(pos.y, stageHeight - scrollPadding - this.height() * scaleY),
-        scrollPadding
-      );
-      return pos;
-    },
-  });
-}
-
-export function getHorizontalScrollbar(stage) {
-  const stageWidth = stage.width(),
-    stageHeight = stage.height();
-  return new Konva.Rect({
-    width: 0,
-    height: 0,
-    fill: "grey",
-    opacity: 0.8,
-    x: scrollPadding,
-    y: stageHeight - scrollPadding - 10,
-    draggable: true,
-    cornerRadius: 4,
-    dragBoundFunc: function (pos) {
-      const scaleX = stage.scale().x;
-      pos.x = Math.max(
-        Math.min(pos.x, stageWidth - this.width() * scaleX - scrollPadding),
-        scrollPadding
-      );
-      pos.y = stageHeight - scrollPadding - 10;
-
-      return pos;
-    },
-  });
-}
-
 /**
  * @param words
  * {
