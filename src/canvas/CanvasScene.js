@@ -1,29 +1,22 @@
 import Konva from "konva";
 import { CanvasImage } from "./core/CanvasImage";
 import { getScaledImageCoordinates } from "./core/utilities";
-import {
-  getHorizontalScrollbar,
-  getStageBounds,
-  getVerticalScrollBar,
-  scrollBarHeight,
-  scrollBarWidth,
-  scrollPadding,
-  verticalScrollPadding,
-} from "../components/ImageAnnotation/utilities";
+import { getStageBounds } from "../components/ImageAnnotation/utilities";
+import { VerticalScrollBar } from "./scroll/verticalScrollBar";
+import { HorizontalScrollBar } from "./scroll/horizontalScrollBar";
 
 export const paddingFactor = 0.02;
 const callBackTimeout = 100;
 const wheelingTimeout = 70;
-const defaultStageScale = 2.3487984729585016;
-const defaultStagePosition = { x: -712.0618025695535, y: 0 };
+const defaultStageScale = 0.97;
+const defaultStagePadding = 10;
 
 export class CanvasScene {
   appId;
   // Konva.Stage
   stage;
   // ------------- Scrollbars variables ------------- //
-  scrollLayer = new Konva.Layer();
-  verticalBar;
+  verticalScrollBar;
   horizontalScrollBar;
   // ------------- End Scrollbars variables ----------//
 
@@ -80,7 +73,6 @@ export class CanvasScene {
     this.proposalLayer.hide();
     this.stage.add(this.annotationLayer);
     this.stage.add(this.proposalLayer);
-    this.addScrollbars();
     this.stage.add(this.toolLayer);
     this.stageDimensions = {
       width: this.stage.width(),
@@ -139,11 +131,11 @@ export class CanvasScene {
         this.oldScale = newScale;
         this.stage.scale({ x: newScale, y: newScale });
         this.stage.position(newPos);
+        this.repositionScrollBars();
       },
       [
         this.imageLayer,
         this.annotationLayer,
-        this.scrollLayer,
         this.toolLayer,
         this.proposalLayer,
       ]
@@ -171,8 +163,6 @@ export class CanvasScene {
     if (!this.zoomAnime.isRunning()) {
       this.zoomAnime.start();
     }
-    // Hide scroll layer when zoom start called
-    this.scrollLayer.isVisible() && this.scrollLayer.hide();
   }
 
   // This method will be overriden by child class
@@ -182,7 +172,6 @@ export class CanvasScene {
     this.zoomAnime.stop();
     this.stage.batchDraw();
     this.repositionStageAsPerScale();
-    this.repositionScrollBars();
     this.resizeCanvasStroke(this.stage.scaleX());
   }
 
@@ -205,12 +194,11 @@ export class CanvasScene {
         wheeling = undefined;
       }, wheelingTimeout);
     });
-    this.stage.on("dragstart", (e) => {
-      e.target.getClassName &&
-        e.target.getClassName() === "Stage" &&
-        this.scrollLayer.hide();
+    this.stage.on("dragstart.reposition", () => {
+      this.handleScrollZoomStart();
     });
-    this.stage.on("dragend", () => {
+    this.stage.on("dragend.reposition", () => {
+      this.handleScrollZoomEnd();
       this.repositionScrollBars();
     });
   }
@@ -237,81 +225,38 @@ export class CanvasScene {
 
   // ------------- Scrollbar methods ------------- //
   addScrollbars() {
-    const stage = this.stage;
-    stage.add(this.scrollLayer);
-    this.verticalBar = getVerticalScrollBar(stage);
-    // let verticalBarDragStartPos
-    this.verticalBar.on("dragstart", () => {
-      // verticalBarDragStartPos = this.verticalBar.position()
-      this.setStageDraggable(false);
-    });
-    this.verticalBar.on("dragend", () => {
-      // const scaleY = stage.scale().y
-      // const availableHeight = stage.height() - scrollPadding * 2 - this.verticalBar.height();
-      //
-      // const diffY = this.verticalBar.position().y - verticalBarDragStartPos.y
-      // const ratio = stage.height() / availableHeight
-      // console.log('delta', availableHeight, stage.height(), diffY, ratio)
-      // this.stage.y(this.stage.y() - diffY * ratio)
-      // this.stage.batchDraw()
-      this.setStageDraggable(true);
-    });
-
-    this.horizontalScrollBar = getHorizontalScrollbar(stage);
-    this.horizontalScrollBar.on("dragstart", () => {
-      this.setStageDraggable(false);
-    });
-    this.horizontalScrollBar.on("dragend", () => {
-      this.setStageDraggable(true);
-    });
-
-    this.scrollLayer.add(this.verticalBar, this.horizontalScrollBar);
-    this.scrollLayer.draw();
+    this.verticalScrollBar = new VerticalScrollBar(
+      this.onDragMoveStageWithScrollbar,
+      this.onDragStartStageWithScrollbar,
+      this.onDragEndStageWithScrollBar,
+      this.stage
+    );
+    this.horizontalScrollBar = new HorizontalScrollBar(
+      this.onDragMoveStageWithScrollbar,
+      this.onDragStartStageWithScrollbar,
+      this.onDragEndStageWithScrollBar,
+      this.stage
+    );
   }
 
+  onDragStartStageWithScrollbar = () => {
+    this.handleScrollZoomStart();
+  };
+
+  onDragEndStageWithScrollBar = () => {
+    this.handleScrollZoomEnd();
+  };
+
+  onDragMoveStageWithScrollbar = (position) => {
+    this.stage.position(position);
+    this.stage.draw();
+  };
+
   repositionScrollBars() {
-    const stage = this.stage;
-    const scaleX = stage.scale().x;
-    const scaleY = stage.scale().y;
-    const stagePosition = this.stage.position();
-    if (!(scaleX === 1 && scaleY === 1)) {
-      this.scrollLayer.show();
-      const x = Math.abs(stage.position().x) / scaleX;
-      const y = Math.abs(stage.position().y) / scaleY;
-      const scrollWidth = scrollBarWidth / scaleX;
-      const scaledStageWidth = stage.width() / scaleX;
-      const scrollHeight = scrollBarHeight / scaleY;
-      const scaledStageHeight = stage.height() / scaleY;
-      // Reposition vertical scroll bar
-      this.verticalBar.x(
-        x +
-          scaledStageWidth -
-          scrollWidth -
-          scrollPadding / scaleX -
-          verticalScrollPadding / scaleX
-      );
-      this.verticalBar.y(
-        y +
-          scrollPadding / scaleY +
-          (Math.abs(stagePosition.y) / scaleY / scaleY) * 0.98
-      );
-      this.verticalBar.width(scrollWidth);
-      this.verticalBar.height((scaledStageHeight * 0.98) / scaleY);
-
-      // Reposition horizontal scroll bar
-      this.horizontalScrollBar.x(
-        x +
-          scrollPadding / scaleX +
-          (Math.abs(stagePosition.x) / scaleX / scaleX) * 0.98
-      );
-      this.horizontalScrollBar.y(
-        y + scaledStageHeight - scrollHeight - scrollPadding / scaleY
-      );
-      this.horizontalScrollBar.height(scrollHeight);
-      this.horizontalScrollBar.width((scaledStageWidth * 0.98) / scaleX);
-
-      this.scrollLayer.draw();
-    }
+    this.verticalScrollBar &&
+      this.verticalScrollBar.reposition(this.stage.scaleX());
+    this.horizontalScrollBar &&
+      this.horizontalScrollBar.reposition(this.stage.scaleX());
   }
   // ------------- End Scrollbar methods ------------- //
 
@@ -368,15 +313,24 @@ export class CanvasScene {
 
       // Timeout for smooth loader hide
       setTimeout(() => {
+        this.addScrollbars();
         callback();
       }, callBackTimeout);
     });
   }
 
   fitImageToScreen() {
-    this.stage.scale({ x: defaultStageScale, y: defaultStageScale });
-    this.stage.position(defaultStagePosition);
-    this.oldScale = defaultStageScale;
+    const scale = this.stage.width() / this.konvaImage.width();
+    this.stage.scale({
+      x: scale * defaultStageScale,
+      y: scale * defaultStageScale,
+    });
+    const position = this.konvaImage.position();
+    this.stage.position({
+      x: -position.x * this.stage.scaleX() + defaultStagePadding,
+      y: -position.y * this.stage.scaleX() + defaultStagePadding,
+    });
+    this.oldScale = scale * defaultStageScale;
     this.repositionScrollBars();
     this.annotationLayer && this.resizeCanvasStroke(this.initialScale);
     this.stage.draw();
@@ -386,6 +340,4 @@ export class CanvasScene {
 
   handleScrollZoomStart = () => {};
   handleScrollZoomEnd = () => {};
-
-  resizeCanvasStroke = () => {};
 }

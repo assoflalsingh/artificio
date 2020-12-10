@@ -1,5 +1,4 @@
 import * as React from "react";
-import { RegionLeftToolBar } from "../../annotator/defaults";
 import { Box, Snackbar, Typography } from "@material-ui/core";
 import CanvasWrapper from "./canvas/CanvasWrapper";
 import { CanvasManager } from "../../canvas/CanvasManager";
@@ -123,7 +122,7 @@ export default class AnnotationTool extends React.Component {
     });
     this.canvasManager.notifyLabelCreation();
     this.canvasManager.unsetProposalTool();
-    this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+    this.canvasManager.hideLabelSelectorDropdown();
     this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
   }
 
