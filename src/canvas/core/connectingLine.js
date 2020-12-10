@@ -94,7 +94,9 @@ export class ConnectingLine {
         stroke: selectedAnnotation.color,
         strokeWidth: AnnotationStrokeWidth / scale,
       });
-      this.connectingLine = new Konva.Group();
+      this.connectingLine = new Konva.Group({
+        id: "connectingLine",
+      });
       this.connectingLine.add(c1, c2, line);
     }
   }

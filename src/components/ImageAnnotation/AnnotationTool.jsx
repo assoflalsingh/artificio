@@ -1,17 +1,17 @@
 import * as React from "react";
-import {Box, Snackbar, Typography} from "@material-ui/core";
+import { Box, Snackbar, Typography } from "@material-ui/core";
 import CanvasWrapper from "./canvas/CanvasWrapper";
-import {CanvasManager} from "../../canvas/CanvasManager";
+import { CanvasManager } from "../../canvas/CanvasManager";
 import Thumbnails from "./helpers/Thumbnails";
 import Loader from "./helpers/Loader";
-import {ToolBar} from "./helpers/ToolBar";
-import {LabelSelector} from "./label/LabelSelector";
-import {LabelsContainer} from "./label/LabelsContainer";
-import {CustomEventType, ToolType} from "../../canvas/core/constants";
-import {getImageData, saveAnnotationData} from "./apiMethods";
+import { ToolBar } from "./helpers/ToolBar";
+import { LabelSelector } from "./label/LabelSelector";
+import { LabelsContainer } from "./label/LabelsContainer";
+import { CustomEventType, ToolType } from "../../canvas/core/constants";
+import { getImageData, saveAnnotationData } from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
-import {generateAnnotationsFromData} from "./utilities";
-import {LeftToolBar} from "./helpers/LeftToolBar";
+import { generateAnnotationsFromData } from "./utilities";
+import { LeftToolBar } from "./helpers/LeftToolBar";
 
 export const appId = "canvas-annotation-tool";
 
@@ -122,7 +122,7 @@ export default class AnnotationTool extends React.Component {
     });
     this.canvasManager.notifyLabelCreation();
     this.canvasManager.unsetProposalTool();
-    this.canvasManager.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+    this.canvasManager.hideLabelSelectorDropdown();
     this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
   }
 

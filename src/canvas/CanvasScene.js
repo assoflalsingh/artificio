@@ -1,9 +1,9 @@
 import Konva from "konva";
-import {CanvasImage} from "./core/CanvasImage";
-import {getScaledImageCoordinates} from "./core/utilities";
-import {getStageBounds,} from "../components/ImageAnnotation/utilities";
-import {VerticalScrollBar} from "./scroll/verticalScrollBar";
-import {HorizontalScrollBar} from "./scroll/horizontalScrollBar";
+import { CanvasImage } from "./core/CanvasImage";
+import { getScaledImageCoordinates } from "./core/utilities";
+import { getStageBounds } from "../components/ImageAnnotation/utilities";
+import { VerticalScrollBar } from "./scroll/verticalScrollBar";
+import { HorizontalScrollBar } from "./scroll/horizontalScrollBar";
 
 export const paddingFactor = 0.02;
 const callBackTimeout = 100;
@@ -131,7 +131,7 @@ export class CanvasScene {
         this.oldScale = newScale;
         this.stage.scale({ x: newScale, y: newScale });
         this.stage.position(newPos);
-				this.repositionScrollBars();
+        this.repositionScrollBars();
       },
       [
         this.imageLayer,
@@ -194,7 +194,11 @@ export class CanvasScene {
         wheeling = undefined;
       }, wheelingTimeout);
     });
-    this.stage.on("dragend", () => {
+    this.stage.on("dragstart.reposition", () => {
+      this.handleScrollZoomStart();
+    });
+    this.stage.on("dragend.reposition", () => {
+      this.handleScrollZoomEnd();
       this.repositionScrollBars();
     });
   }
@@ -221,18 +225,38 @@ export class CanvasScene {
 
   // ------------- Scrollbar methods ------------- //
   addScrollbars() {
-  	this.verticalScrollBar = new VerticalScrollBar(this.moveStage, this.stage)
-  	this.horizontalScrollBar = new HorizontalScrollBar(this.moveStage, this.stage)
+    this.verticalScrollBar = new VerticalScrollBar(
+      this.onDragMoveStageWithScrollbar,
+      this.onDragStartStageWithScrollbar,
+      this.onDragEndStageWithScrollBar,
+      this.stage
+    );
+    this.horizontalScrollBar = new HorizontalScrollBar(
+      this.onDragMoveStageWithScrollbar,
+      this.onDragStartStageWithScrollbar,
+      this.onDragEndStageWithScrollBar,
+      this.stage
+    );
   }
 
-  moveStage = (position) => {
-		this.stage.position(position)
-		this.stage.draw()
-	}
+  onDragStartStageWithScrollbar = () => {
+    this.handleScrollZoomStart();
+  };
+
+  onDragEndStageWithScrollBar = () => {
+    this.handleScrollZoomEnd();
+  };
+
+  onDragMoveStageWithScrollbar = (position) => {
+    this.stage.position(position);
+    this.stage.draw();
+  };
 
   repositionScrollBars() {
-  	this.verticalScrollBar && this.verticalScrollBar.reposition(this.stage.scaleX())
-		this.horizontalScrollBar && this.horizontalScrollBar.reposition(this.stage.scaleX())
+    this.verticalScrollBar &&
+      this.verticalScrollBar.reposition(this.stage.scaleX());
+    this.horizontalScrollBar &&
+      this.horizontalScrollBar.reposition(this.stage.scaleX());
   }
   // ------------- End Scrollbar methods ------------- //
 
@@ -289,7 +313,7 @@ export class CanvasScene {
 
       // Timeout for smooth loader hide
       setTimeout(() => {
-				this.addScrollbars();
+        this.addScrollbars();
         callback();
       }, callBackTimeout);
     });
@@ -306,7 +330,7 @@ export class CanvasScene {
       x: -position.x * this.stage.scaleX() + defaultStagePadding,
       y: -position.y * this.stage.scaleX() + defaultStagePadding,
     });
-		this.oldScale = scale * defaultStageScale;
+    this.oldScale = scale * defaultStageScale;
     this.repositionScrollBars();
     this.annotationLayer && this.resizeCanvasStroke(this.initialScale);
     this.stage.draw();
@@ -316,6 +340,4 @@ export class CanvasScene {
 
   handleScrollZoomStart = () => {};
   handleScrollZoomEnd = () => {};
-
-  resizeCanvasStroke = () => {};
 }

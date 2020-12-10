@@ -114,9 +114,7 @@ export class CanvasManager extends CanvasScene {
     this.addSelectedAnnotationEventListeners();
     this.annotationLayerDraw();
     this.addConnectingLine();
-    this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-      position: this.getLabelSelectorPosition(),
-    });
+    this.showLabelSelectorDropdown();
   }
 
   selectAnnotationById = (id) => {
@@ -138,7 +136,7 @@ export class CanvasManager extends CanvasScene {
     this.selectedAnnotation.getShape().on("dragstart.select", () => {
       this.removeConnectingLine();
       // Hide label selector dropdown
-      this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+      this.hideLabelSelectorDropdown();
     });
     this.selectedAnnotation.getShape().on("dragend.select", () => {
       // set label value
@@ -147,15 +145,24 @@ export class CanvasManager extends CanvasScene {
         this.proposals
       );
       this.selectedAnnotation.setLabelValue(labelValue);
-
-      // Show label selector dropdown
-      this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-        position: this.getLabelSelectorPosition(),
-      });
+      this.showLabelSelectorDropdown();
       this.notifyLabelCreation();
       this.updateUndoStack();
     });
   }
+
+  hideLabelSelectorDropdown = () => {
+    this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+  };
+
+  showLabelSelectorDropdown = () => {
+    if (this.selectedAnnotation) {
+      // Show label selector dropdown
+      this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
+        position: this.getLabelSelectorPosition(),
+      });
+    }
+  };
 
   removeAnnotationEventListeners() {
     this.selectedAnnotation.getShape().off("dragstart.select");
@@ -169,7 +176,7 @@ export class CanvasManager extends CanvasScene {
       this.selectedAnnotation = undefined;
       this.annotationLayerDraw();
       this.removeConnectingLine();
-      this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+      this.hideLabelSelectorDropdown();
     }
   };
 
@@ -201,7 +208,7 @@ export class CanvasManager extends CanvasScene {
     annotation.getShape().destroy();
     this.annotationLayer.batchDraw();
     this.annotations.splice(index, 1);
-    this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+    this.hideLabelSelectorDropdown();
     this.notifyLabelCreation();
     this.updateUndoStack();
   }
@@ -694,15 +701,18 @@ export class CanvasManager extends CanvasScene {
   };
 
   removeConnectingLine = () => {
-    if (this.connectingLine && this.connectingLine.getShape()) {
-      this.connectingLine.getShape().destroy();
-      this.connectingLine.getShape().destroyChildren();
+    const connectingLineArray = this.toolLayer.find("#connectingLine");
+    if (this.connectingLine && connectingLineArray.length > 0) {
+      connectingLineArray.getChildren().forEach((c) => {
+        c.destroy();
+        c.destroyChildren();
+      });
       this.connectingLine = null;
       this.toolLayerDraw();
     }
   };
 
-  addConnectingLine = () => {
+  addConnectingLine() {
     const selectedAnnotation = this.getSelectedAnnotation();
     if (selectedAnnotation) {
       this.connectingLine = new ConnectingLine(this);
@@ -712,7 +722,7 @@ export class CanvasManager extends CanvasScene {
         this.toolLayerDraw();
       }
     }
-  };
+  }
 
   notifyLabelCreation(addConnectingLine = true) {
     this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
@@ -723,14 +733,12 @@ export class CanvasManager extends CanvasScene {
   }
 
   handleScrollZoomStart = () => {
-    this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
+    this.hideLabelSelectorDropdown();
     this.removeConnectingLine();
   };
 
   handleScrollZoomEnd = () => {
-    this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
-      position: this.getLabelSelectorPosition(),
-    });
+    this.showLabelSelectorDropdown();
     this.addConnectingLine();
   };
 
