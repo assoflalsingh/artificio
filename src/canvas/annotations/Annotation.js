@@ -64,9 +64,7 @@ export default class Annotation {
   getLabelPosition() {}
 
   shouldLabelBeAdded() {
-    return !!this.imageLabels.find(
-      (label) => label.label_name === this.annotationData.label
-    );
+    return this.annotationData.label !== 'arto_others'
   }
 
   addLabel() {

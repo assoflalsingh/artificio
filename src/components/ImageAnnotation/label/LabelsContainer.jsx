@@ -138,9 +138,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             if (!ann.getLabelValue()) {
               ann.setLabelValue(labelValue);
             }
-            if (
-              imageLabels.find((label) => label.label_name === ann.getLabel())
-            ) {
+            if (ann.getLabelValue() !== 'arto_others') {
               labels.push(
                 <Label
                   labelValue={ann.getLabelValue()}
