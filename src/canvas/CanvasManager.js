@@ -712,7 +712,7 @@ export class CanvasManager extends CanvasScene {
     }
   };
 
-  addConnectingLine() {
+  addConnectingLine = () => {
     const selectedAnnotation = this.getSelectedAnnotation();
     if (selectedAnnotation) {
       this.connectingLine = new ConnectingLine(this);
@@ -722,7 +722,7 @@ export class CanvasManager extends CanvasScene {
         this.toolLayerDraw();
       }
     }
-  }
+  };
 
   notifyLabelCreation(addConnectingLine = true) {
     this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
