@@ -138,7 +138,7 @@ export default class AnnotationTool extends React.Component {
         this.props.inReview
       );
       this.textAnnotations = imageData.image_json
-        ? imageData.image_json.text_annotations
+        ? imageData.image_json.text_annotations || imageData.image_json.initial_model_data.text_annotations
         : [];
       this.setState({
         imageLabels: imageData.image_labels,

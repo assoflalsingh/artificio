@@ -6,7 +6,8 @@ import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 import { CustomEventType } from "../../../canvas/core/constants";
 import { getLabelValueFromProposals } from "../utilities";
 import TextField from "@material-ui/core/TextField";
-
+import {DefaultLabel} from "./LabelSelector";
+import * as uuid from "uuid";
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
 
@@ -125,25 +126,22 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
         func: (event) => {
           const {
             getAnnotations,
-            imageLabels,
-            textAnnotations,
-            getAnnotationData,
             selectAnnotationById,
             getProposals,
           } = this.props;
           const annotations = getAnnotations() || [];
           const labels = [];
-          annotations.forEach((ann) => {
+          annotations.forEach((ann, index) => {
             const labelValue = getLabelValueFromProposals(ann, getProposals());
             if (!ann.getLabelValue()) {
               ann.setLabelValue(labelValue);
             }
-            if (ann.getLabelValue() !== 'arto_others') {
+            if (ann.getLabel() !== DefaultLabel.label_name) {
               labels.push(
                 <Label
                   labelValue={ann.getLabelValue()}
                   setLabelValue={ann.setLabelValue}
-                  key={ann.id}
+                  key={uuid.v4()}
                   labelName={ann.getLabel()}
                   color={ann.color}
                   annotationId={ann.id}

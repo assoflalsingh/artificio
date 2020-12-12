@@ -1,5 +1,6 @@
 import Konva from "konva";
 import * as uuid from "uuid";
+import { DefaultLabel } from "../../components/ImageAnnotation/label/LabelSelector";
 export const AnnotationStrokeWidth = 2;
 export const AnnotationCircleRadius = 4;
 export const AnnotationCircleStrokeWidth = 1;
@@ -64,7 +65,7 @@ export default class Annotation {
   getLabelPosition() {}
 
   shouldLabelBeAdded() {
-    return this.annotationData.label !== 'arto_others'
+    return this.annotationData.label !== DefaultLabel.label_name;
   }
 
   addLabel() {
@@ -122,7 +123,9 @@ export default class Annotation {
   }
 
   setLabelValue = (labelValue) => {
-    this.labelValue = labelValue;
+    if (this.getLabel() !== DefaultLabel.label_name) {
+      this.labelValue = labelValue;
+    }
   };
 
   getLabelValue = () => {
