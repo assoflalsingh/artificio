@@ -57,6 +57,7 @@ export class ToolBar extends CanvasEventAttacher {
   state = {
     shapesAnchor: null,
     selectMode: true,
+    disableSelectMode: false,
     dragMode: true,
     activeTool: null,
     showProposals: false,
@@ -76,6 +77,7 @@ export class ToolBar extends CanvasEventAttacher {
         this.setState({
           shapesAnchor: null,
           selectMode: true,
+          disableSelectMode: false,
           dragMode: true,
           activeTool: null,
           showProposals: false,
@@ -87,6 +89,8 @@ export class ToolBar extends CanvasEventAttacher {
 
   onSelectTool = () => {
     this.props.setActiveTool();
+    this.props.blockAnnotationClick(true);
+    this.setState({ disableSelectMode: true });
   };
 
   componentDidMount() {
@@ -103,6 +107,7 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           label="Select"
           active={this.state.selectMode}
+          disabled={this.state.disableSelectMode}
           icon={
             this.state.selectMode ? (
               <CheckBoxIcon />
@@ -133,7 +138,15 @@ export class ToolBar extends CanvasEventAttacher {
           label="Shapes"
           disabled={this.state.hideAnnotations}
           icon={<FormatShapesIcon />}
-          onClick={(e) => this.setState({ shapesAnchor: e.target })}
+          onClick={(e) => {
+            if (this.state.activeTool) {
+              this.props.unsetActiveTool();
+              this.props.blockAnnotationClick(!this.state.selectMode);
+              this.setState({ disableSelectMode: false });
+            } else {
+              this.setState({ shapesAnchor: e.target });
+            }
+          }}
         />
         <Menu
           open={Boolean(this.state.shapesAnchor)}

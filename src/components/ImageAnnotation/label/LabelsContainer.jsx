@@ -6,7 +6,7 @@ import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 import { CustomEventType } from "../../../canvas/core/constants";
 import { getLabelValueFromProposals } from "../utilities";
 import TextField from "@material-ui/core/TextField";
-import {DefaultLabel} from "./LabelSelector";
+import { DefaultLabel } from "./LabelSelector";
 import * as uuid from "uuid";
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
@@ -151,6 +151,29 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             }
           });
           this.setState({ labels });
+        },
+      },
+      {
+        event: CustomEventType.ON_ANNOTATION_SELECT,
+        func: (event) => {
+          const id = event.detail.id;
+          const element = document.getElementById(`${LabelId}-${id}`);
+          const labelContainer = document.getElementById(LabelContainerId);
+          if (element) {
+            const elementBounds = element.getBoundingClientRect();
+            const labelContainerBounds = labelContainer.getBoundingClientRect();
+            if (
+              elementBounds.y < labelContainerBounds.y ||
+              elementBounds.y + elementBounds.height >
+                labelContainerBounds.y + labelContainerBounds.height
+            ) {
+              const scrollDifference = elementBounds.y - labelContainerBounds.y;
+              labelContainer.scrollTo({
+                top: scrollDifference,
+                behavior: "smooth",
+              });
+            }
+          }
         },
       },
     ];

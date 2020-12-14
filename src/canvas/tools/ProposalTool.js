@@ -87,7 +87,6 @@ export class ProposalTool extends Tool {
       this.canvasManager.addAnnotation(rectangle);
       this.toolMode = ToolMode.Merge;
       this.showLabelDropDown();
-      // this.exitTool()
     } else {
     }
   };

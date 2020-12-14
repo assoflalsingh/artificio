@@ -194,13 +194,15 @@ export function generateAnnotationsFromData(
     const y1 =
       (y / imageDimensions.height) * imageWrapperDimensions.height +
       imageWrapperPosition.y;
-
+    const label = imageLabels.find(
+      (l) => l.label_name === annotationData.label_name
+    );
     return {
       coordinates: [x1, y1, x1 + width, y1 + height],
       label: annotationData.label_name,
       imageLabels,
       labelValue: annotationData.label_value,
-      color: generateRandomColor(),
+      color: label ? label.label_color : generateRandomColor(),
       id: uuid.v4(),
     };
   });

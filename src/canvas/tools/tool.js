@@ -26,9 +26,8 @@ export class Tool {
   // will be overriden by child class
   exitTool() {}
 
-  exit() {
-    this.exitTool();
-    window.removeEventListener("keydown", this.onKeyDown);
-    this.canvasManager.unsetActiveTool();
-  }
+  // exit() {
+  //   this.exitTool();
+  //   window.removeEventListener("keydown", this.onKeyDown);
+  // }
 }

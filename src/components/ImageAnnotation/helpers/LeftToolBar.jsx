@@ -48,7 +48,6 @@ export function LeftToolBar({
   fetchPreviousImage,
   save,
   clickZoomInOut,
-  saveImageData,
 }) {
   const classes = useStyles();
 
@@ -57,7 +56,7 @@ export function LeftToolBar({
       <Tooltip title="Save progress">
         <IconButton
           data-name="save"
-          onClick={save}
+          onClick={() => save(false)}
           className={classes.leftBarButton}
         >
           <SaveIcon />
@@ -121,7 +120,7 @@ export function LeftToolBar({
         <Tooltip title="Push to done">
           <IconButton
             data-name="done-save"
-            onClick={saveImageData}
+            onClick={() => save(true)}
             className={classes.leftBarButton}
           >
             <AssignmentTurnedInIcon />

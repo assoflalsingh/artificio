@@ -115,6 +115,7 @@ export class CanvasManager extends CanvasScene {
     this.annotationLayerDraw();
     this.addConnectingLine();
     this.showLabelSelectorDropdown();
+    this.dispatch(CustomEventType.ON_ANNOTATION_SELECT, { id: annotation.id });
   }
 
   selectAnnotationById = (id) => {
