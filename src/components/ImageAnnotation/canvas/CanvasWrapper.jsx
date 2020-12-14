@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Box } from "@material-ui/core";
-import { grey } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
+
 export const verticalScrollbarId = "vertical-scrollbar";
 export const horizontalScrollbarId = "horizontal-scrollbar";
 const styles = {

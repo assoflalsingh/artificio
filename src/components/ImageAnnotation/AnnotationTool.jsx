@@ -138,7 +138,8 @@ export default class AnnotationTool extends React.Component {
         this.props.inReview
       );
       this.textAnnotations = imageData.image_json
-        ? imageData.image_json.text_annotations || imageData.image_json.initial_model_data.text_annotations
+        ? imageData.image_json.text_annotations ||
+          imageData.image_json.initial_model_data.text_annotations
         : [];
       this.setState({
         imageLabels: imageData.image_labels,
@@ -151,7 +152,7 @@ export default class AnnotationTool extends React.Component {
     }
   }
 
-  saveImageData = () => {
+  saveImageData = (inReview) => {
     const selectedImage = this.props.images[this.state.activeImageIndex];
     const annotatedData = this.canvasManager.getData();
     this.setLoader(true);
@@ -162,7 +163,7 @@ export default class AnnotationTool extends React.Component {
       this.state.imageMetadata,
       this.textAnnotations,
       annotatedData,
-      this.props.inReview
+      inReview
     )
       .then(() => {
         this.setLoader(false);
@@ -262,7 +263,6 @@ export default class AnnotationTool extends React.Component {
             this.canvasManager && this.canvasManager.clickZoomInOut
           }
           inReview={this.props.inReview}
-          saveImageData={this.saveImageData}
         />
         <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
           <ToolBar
@@ -274,6 +274,9 @@ export default class AnnotationTool extends React.Component {
                 null,
                 this.state.imageLabels
               )
+            }
+            unsetActiveTool={
+              this.canvasManager && this.canvasManager.unsetActiveTool
             }
             onAnnotationToolClose={onAnnotationToolClose}
             showProposals={this.showProposals}

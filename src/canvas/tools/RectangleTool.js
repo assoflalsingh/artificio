@@ -110,7 +110,8 @@ export class RectangleTool extends Tool {
     );
     this.canvasManager.addAnnotation(rectangle);
     this.canvasManager.setStageDraggable(true);
-    this.exit();
+    this.tempRectangle &&
+      this.canvasManager.removeToolShape(this.tempRectangle);
   }
 
   onDragStart(pointer) {
