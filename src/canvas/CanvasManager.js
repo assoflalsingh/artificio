@@ -145,7 +145,7 @@ export class CanvasManager extends CanvasScene {
         this.selectedAnnotation,
         this.proposals
       );
-      this.selectedAnnotation.setLabelValue(labelValue);
+      this.selectedAnnotation.setLabelValue(labelValue?.value);
       this.showLabelSelectorDropdown();
       this.notifyLabelCreation();
       this.updateUndoStack();
@@ -427,6 +427,9 @@ export class CanvasManager extends CanvasScene {
     this.selectedAnnotation.draw();
     this.removeConnectingLine();
     this.notifyLabelCreation();
+		setTimeout(() =>
+			this.dispatch(CustomEventType.ON_ANNOTATION_SELECT, { id: this.selectedAnnotation.id })
+		);
     this.updateUndoStack();
   };
 

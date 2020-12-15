@@ -164,10 +164,14 @@ export function findTextAnnotations(annotation, proposals) {
 export function getLabelValueFromProposals(annotation, proposals) {
   const words = findTextAnnotations(annotation, proposals);
   let labelValue = "";
+  let confidence = 0;
+  let count = 0;
   words.forEach((w) => {
     labelValue = labelValue.concat(w.word_description + " ");
+    confidence += w.confidence_score;
+    count++;
   });
-  return labelValue;
+  return { value: labelValue, confidence: confidence / count };
 }
 
 export function generateAnnotationsFromData(
