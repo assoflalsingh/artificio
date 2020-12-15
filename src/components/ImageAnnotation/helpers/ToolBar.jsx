@@ -17,6 +17,7 @@ import { CustomEventType } from "../../../canvas/core/constants";
 import AppsIcon from "@material-ui/icons/Apps";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import VisibilityIcon from "@material-ui/icons/Visibility";
+import CachedIcon from '@material-ui/icons/Cached';
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 
 const useClasses = makeStyles(() => ({
@@ -192,6 +193,11 @@ export class ToolBar extends CanvasEventAttacher {
             this.props.showAnnotationLayer(!hide);
           }}
         />
+				<ToolBarButton
+					label={'Reset/Clear Data'}
+					icon={<CachedIcon/>}
+					onClick={this.props.reset}
+				/>
         <ToolBarButton
           style={{ float: "right" }}
           label="Exit"

@@ -8,6 +8,7 @@ import { getLabelValueFromProposals } from "../utilities";
 import TextField from "@material-ui/core/TextField";
 import { DefaultLabel } from "./LabelSelector";
 import * as uuid from "uuid";
+import Chip from "@material-ui/core/Chip";
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
 
@@ -41,6 +42,19 @@ const styles = {
   labelName: {
     marginLeft: "0.5rem",
     fontWeight: "bold",
+  },
+  red: {
+    color: "red",
+  },
+  green: {
+    color: "green",
+  },
+  h4: {
+    color: "#0575ce",
+  },
+  tag: {
+    marginBottom: "0.2rem",
+    marginRight: "0.1rem",
   },
 };
 
@@ -134,13 +148,14 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
           annotations.forEach((ann, index) => {
             const labelValue = getLabelValueFromProposals(ann, getProposals());
             if (!ann.getLabelValue()) {
-              ann.setLabelValue(labelValue);
+              ann.setLabelValue(labelValue?.value);
             }
             if (ann.getLabel() !== DefaultLabel.label_name) {
               labels.push(
                 <Label
                   labelValue={ann.getLabelValue()}
                   setLabelValue={ann.setLabelValue}
+                  confidence={labelValue.confidence}
                   key={uuid.v4()}
                   labelName={ann.getLabel()}
                   color={ann.color}
@@ -188,9 +203,37 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
   }
 
   renderComponent() {
-    return <Box>{this.state.labels}</Box>;
+    return (
+      <Box>
+        {this.props.imageLabels && this.props.imageLabels.length > 0 && (
+          <Box>
+            <h4 style={{ color: "#0575ce", margin: "0.5rem 0 0.5rem 0" }}>
+              <b>LABELS</b>
+            </h4>
+            <Tags tags={this.props.imageLabels} />
+          </Box>
+        )}
+        <Box>
+          <h4 style={{ color: "#0575ce", margin: "0.5rem 0 0.5rem 0" }}>
+            <b>DATA INFORMATION</b>
+          </h4>
+          {this.state.labels}
+        </Box>
+      </Box>
+    );
   }
 }
+
+const Tags = ({ tags }) => {
+  const classes = useStyles();
+  return (
+    <Box>
+      {tags.map((tag, index) => (
+        <Chip key={index} size={"small"} className={classes.tag} label={tag.label_name} />
+      ))}
+    </Box>
+  );
+};
 
 const Label = ({
   labelName,
@@ -199,6 +242,7 @@ const Label = ({
   setLabelValue,
   annotationId,
   selectAnnotationById,
+  confidence,
 }) => {
   const classes = useStyles();
   const [label, setLabel] = React.useState(labelValue);
@@ -220,6 +264,9 @@ const Label = ({
             id="outlined-basic"
             variant="outlined"
             value={label}
+            inputProps={{
+              className: confidence > 0.5 ? classes.green : classes.red,
+            }}
             style={{
               width: "100%",
             }}
