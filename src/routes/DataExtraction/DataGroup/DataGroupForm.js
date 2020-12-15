@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Typography } from '@material-ui/core';
-import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../components/FormElements';
+import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
+import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 
-export default function CreateDataGroup({onCancel, ...props}) {
+export default function DataGroupForm({initFormData, ...props}) {
   const defaults = {
     name: '',
     desc: '',
@@ -13,7 +13,8 @@ export default function CreateDataGroup({onCancel, ...props}) {
     assign_label: [],
     data_struct: '',
   }
-  const [formData, setFormData] = useState(defaults);
+  const editMode = (initFormData != null);
+  const [formData, setFormData] = useState(editMode ? initFormData : defaults);
   const [formDataErr, setFormDataErr] = useState({});
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -123,7 +124,7 @@ export default function CreateDataGroup({onCancel, ...props}) {
       }
       api.post(URL_MAP.CREATE_DATA_GROUP, newFormData).then((resp)=>{
         setFormSuccess('Data group created sucessfully.');
-        setFormData(defaults);
+        if(!editMode) setFormData(defaults);
       }).catch((err)=>{
         if (err.response) {
           // client received an error response (5xx, 4xx)
@@ -190,7 +191,7 @@ export default function CreateDataGroup({onCancel, ...props}) {
       <FormRow>
         <FormRowItem>
           <Button color="secondary" variant="contained" onClick={onSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-          <Button style={{marginLeft: '1rem'}} variant="outlined" onClick={onCancel}>Cancel</Button>
+          {/* <Button style={{marginLeft: '1rem'}} variant="outlined" onClick={onCancel}>Cancel</Button> */}
         </FormRowItem>
       </FormRow>
     </Form>

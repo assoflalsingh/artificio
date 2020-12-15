@@ -6,13 +6,10 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import SyncIcon from '@material-ui/icons/Sync';
 import {CompactAddButton, RefreshIconButton} from '../../components/CustomButtons';
-import CreateDataGroup from './CreateDataGroup';
 
 import {Stacked, StackItem} from '../../components/Stacked';
-import CreateLabel from './CreateLabel';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
-import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 
@@ -220,12 +217,6 @@ export default function Results() {
     <>
     <Box className={classes.root}>
       <Stacked to={stackPath}>
-        {/* <StackItem path='createlabel' hasBack onBack={()=>{setStackPath('home')}}>
-          <CreateLabel onCancel={()=>{setStackPath('home')}}/>
-        </StackItem>
-        <StackItem path='createdg' hasBack onBack={()=>{setStackPath('home')}}>
-          <CreateDataGroup onCancel={()=>{setStackPath('home')}}/>
-        </StackItem> */}
         <StackItem main path='home'>
           <Backdrop className={classes.backdrop} open={Boolean(pageMessage)}>
             <CircularProgress color="inherit" />
