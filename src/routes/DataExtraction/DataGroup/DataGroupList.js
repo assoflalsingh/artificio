@@ -27,6 +27,7 @@ export default function DataGroupList({setFormData, ...props}) {
   const [stackPath, setStackPath] = useState('home');
   const api = getInstance(localStorage.getItem('token'));
   const [dglistMessage, setDglistMessage] = useState(null);
+  const [labelsDict, setLabelsDict] = useState([]);
   const [dglist, setDgList] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
 
@@ -36,6 +37,7 @@ export default function DataGroupList({setFormData, ...props}) {
     showDGForm();
   };
   const onNameClick = (dataIndex)=>{
+
     setFormData(dglist[dataIndex]);
     showDGForm();
   };
@@ -47,13 +49,13 @@ export default function DataGroupList({setFormData, ...props}) {
       options: {
         filter: true,
         sort: true,
-        draggable: true
+        draggable: true,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          return (
+            <Link href="#" onClick={(e)=>{e.preventDefault();onNameClick(dataIndex)}}>{dglist[dataIndex].name}</Link>
+          );
+        }
       },
-      customBodyRenderLite: (dataIndex, rowIndex) => {
-        return (
-          <Link href="#" onClick={()=>onNameClick(dataIndex)}>{dglist[dataIndex].name}</Link>
-        );
-      }
     },
     {
       name: "desc",
@@ -70,13 +72,19 @@ export default function DataGroupList({setFormData, ...props}) {
       options: {
         filter: true,
         sort: true,
-        draggable: true
+        draggable: true,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          console.log(labelsDict);
+          return dglist[dataIndex].assign_label.map((label_id)=>{
+            return labelsDict[label_id];
+          }).join(', ');
+        }
       }
     },
   ];
 
   const options = {
-    selectableRows: false,
+    selectableRows: "none",
     filterType: 'checkbox',
     filterType: 'dropdown',
     elevation: 0,
@@ -101,8 +109,13 @@ export default function DataGroupList({setFormData, ...props}) {
     setDgList([]);
 
     try {
-      const resp = await api.get(URL_MAP.GET_DATAGROUPS_LIST);
-      setDgList(resp.data.data);
+      let resp = await api.get(URL_MAP.GET_DATAGROUPS);
+      let labelsDict = {};
+      resp.data.data.labels.forEach((label)=>{
+        labelsDict[label._id] = label.name;
+      });
+      setLabelsDict(labelsDict);
+      setDgList(resp.data.data.datagroups);
     } catch (error) {
       if(error.response) {
         setAjaxMessage({

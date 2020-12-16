@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Typography } from '@material-ui/core';
+import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
 import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
@@ -14,7 +14,7 @@ export default function DataGroupForm({initFormData, ...props}) {
     data_struct: '',
   }
   const editMode = (initFormData != null);
-  const [formData, setFormData] = useState(editMode ? initFormData : defaults);
+  const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
@@ -57,6 +57,16 @@ export default function DataGroupForm({initFormData, ...props}) {
       setPtmOpts(data.ptms);
       setLabelOpts(data.labels);
       setDataStructOpts(data.data_structs);
+
+      if(editMode) {
+        let formLabels = data.labels.filter((label)=>{
+          return initFormData.assign_label.indexOf(label._id) > -1;
+        });
+        setFormData({
+          ...initFormData,
+          assign_label: formLabels,
+        });
+      }
     }).catch((err)=>{
       if (err.response) {
         // client received an error response (5xx, 4xx)
@@ -122,7 +132,8 @@ export default function DataGroupForm({initFormData, ...props}) {
         ...formData,
         assign_label: formData.assign_label.map((label)=>label._id),
       }
-      api.post(URL_MAP.CREATE_DATA_GROUP, newFormData).then((resp)=>{
+      let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
+      api.post(url, newFormData).then((resp)=>{
         setFormSuccess('Data group created sucessfully.');
         if(!editMode) setFormData(defaults);
       }).catch((err)=>{
@@ -147,12 +158,15 @@ export default function DataGroupForm({initFormData, ...props}) {
 
   return (
     <>
-    <Typography color="primary" variant="h6" gutterBottom>Create data group</Typography>
+    <Box display="flex">
+      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} data group</Typography>
+      {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
+    </Box>
     <Form>
       <FormRow>
         <FormRowItem>
           <FormInputText label="Data group Name" required name='name'
-            value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange}/>
+            value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange} disabled={editMode}/>
         </FormRowItem>
         <FormRowItem>
           <FormInputText label="Description" name='desc'

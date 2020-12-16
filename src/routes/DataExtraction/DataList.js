@@ -43,7 +43,7 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
   useEffect(()=>{
     if(open) {
       setOpLoading(true);
-      api.get(URL_MAP.GET_DATAGROUPS)
+      api.get(URL_MAP.GET_DATAGROUP_NAMES)
         .then((res)=>{
           let data = res.data.data;
           setDatagroupOpts(data);
