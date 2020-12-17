@@ -53,6 +53,7 @@ export const URL_MAP = {
   UPLOAD_TO_S3: 'upload-to-s3/',
 
   CREATE_LABEL: 'label/post-labels/',
+  UPDATE_LABEL: 'label/update-labels/',
   GET_LABELS: 'label/get-labels/',
   GET_LABEL_PREQUISITE: 'label/get-label-prequisites/',
 

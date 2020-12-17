@@ -5,6 +5,7 @@ import MUIDataTable from "mui-datatables";
 import {CompactAddButton, CompactButton, RefreshIconButton} from '../../../components/CustomButtons';
 import { getInstance, URL_MAP } from '../../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
+import { ColorPalette, ColorButton } from 'material-ui-color';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -20,26 +21,27 @@ const useStyles = makeStyles((theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
   },
+  listColorButton: {
+    pointerEvents: 'none'
+  }
 }));
 
-export default function DataGroupList({setFormData, ...props}) {
+export default function LabelList({setFormData, ...props}) {
   const classes = useStyles();
   const [stackPath, setStackPath] = useState('home');
   const api = getInstance(localStorage.getItem('token'));
-  const [dglistMessage, setDglistMessage] = useState(null);
-  const [labelsDict, setLabelsDict] = useState([]);
-  const [dglist, setDgList] = useState([]);
+  const [listMessage, setListMessage] = useState(null);
+  const [labelList, setLabelList] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
 
-  const showDGForm = ()=>{history.push(`${match.url}/createdg`)};
-  const onCreateDGClick = ()=>{
+  const showLabelForm = ()=>{history.push(`${match.url}/create`)};
+  const onCreateClick = ()=>{
     setFormData(null);
-    showDGForm();
+    showLabelForm();
   };
   const onNameClick = (dataIndex)=>{
-
-    setFormData(dglist[dataIndex]);
-    showDGForm();
+    setFormData(labelList[dataIndex]);
+    showLabelForm();
   };
 
   const columns = [
@@ -52,7 +54,7 @@ export default function DataGroupList({setFormData, ...props}) {
         draggable: true,
         customBodyRenderLite: (dataIndex, rowIndex) => {
           return (
-            <Link href="#" onClick={(e)=>{e.preventDefault();onNameClick(dataIndex)}}>{dglist[dataIndex].name}</Link>
+            <Link href="#" onClick={(e)=>{e.preventDefault();onNameClick(dataIndex)}}>{labelList[dataIndex].name}</Link>
           );
         }
       },
@@ -67,16 +69,28 @@ export default function DataGroupList({setFormData, ...props}) {
       }
     },
     {
-      name: "assign_label",
-      label: "Labels",
+      name: "shape",
+      label: "Shape",
       options: {
         filter: true,
         sort: true,
         draggable: true,
-        customBodyRenderLite: (dataIndex, rowIndex) => {
-          return dglist[dataIndex].assign_label.map((label_id)=>{
-            return labelsDict[label_id];
-          }).join(', ');
+      }
+    },
+    {
+      name: "color",
+      label: "Color",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true,
+        customBodyRenderLite: (dataIndex) => {
+          return (
+            <Box display="flex">
+              <ColorButton color={labelList[dataIndex].color} className={classes.listColorButton} />
+              &nbsp;<Typography>{labelList[dataIndex].color}</Typography>
+            </Box>
+          )
         }
       }
     },
@@ -91,10 +105,6 @@ export default function DataGroupList({setFormData, ...props}) {
     print: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
-    sortOrder: {
-      name: 'timestamp',
-      direction: 'desc'
-    },
     responsive: 'vertical',
     setTableProps: () => {
       return {
@@ -103,18 +113,13 @@ export default function DataGroupList({setFormData, ...props}) {
     },
   };
 
-  const fetchDgList = async () => {
-    setDglistMessage('Loading data...');
-    setDgList([]);
+  const fetchLabelList = async () => {
+    setListMessage('Loading data...');
+    setLabelList([]);
 
     try {
-      let resp = await api.get(URL_MAP.GET_DATAGROUPS);
-      let labelsDict = {};
-      resp.data.data.labels.forEach((label)=>{
-        labelsDict[label._id] = label.name;
-      });
-      setLabelsDict(labelsDict);
-      setDgList(resp.data.data.datagroups);
+      let resp = await api.get(URL_MAP.GET_LABELS);
+      setLabelList(resp.data.data);
     } catch (error) {
       if(error.response) {
         setAjaxMessage({
@@ -124,12 +129,12 @@ export default function DataGroupList({setFormData, ...props}) {
         console.error(error);
       }
     } finally {
-      setDglistMessage(null);
+      setListMessage(null);
     }
   }
 
   useEffect(()=>{
-    fetchDgList();
+    fetchLabelList();
   },[]);
 
   const {match, history} = props;
@@ -142,17 +147,17 @@ export default function DataGroupList({setFormData, ...props}) {
         </Alert>}
       </Snackbar>
       <Box style={{display: 'flex', flexWrap: 'wrap'}}>
-        <Typography color="primary" variant="h6">Data groups</Typography>
-        <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDgList()}}/>
-        <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={onCreateDGClick} />
+        <Typography color="primary" variant="h6">Labels</Typography>
+        <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchLabelList()}}/>
+        <CompactAddButton className={classes.ml1} color="secondary" label="Create label" onClick={onCreateClick} />
       </Box>
       <MUIDataTable
         title={<>
           <Box display="flex">
-          {dglistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{dglistMessage}</Typography></>}
+          {listMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{listMessage}</Typography></>}
           </Box>
         </>}
-        data={dglist}
+        data={labelList}
         columns={columns}
         options={options}
       />

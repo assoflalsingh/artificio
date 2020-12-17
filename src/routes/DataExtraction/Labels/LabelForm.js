@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Typography } from '@material-ui/core';
-import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation } from '../../components/FormElements';
+import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
+import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
+import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, FormInputColor } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
-import {getEpochNow} from '../../others/utils';
 
-export default function CreateLabel({onCancel, ...props}) {
-  const account = 12345;
+export default function LabelForm({initFormData, ...props}) {
   const defaults = {
     name: '',
     desc: '',
@@ -14,6 +12,7 @@ export default function CreateLabel({onCancel, ...props}) {
     data_type: '',
     color: '#FF6633',
   }
+  const editMode = (initFormData != null);
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
   const [formError, setFormError] = useState('');
@@ -40,6 +39,10 @@ export default function CreateLabel({onCancel, ...props}) {
       let data = resp.data.data;
       setAssignShapeOpts(data.shapes);
       setDataTypeOpts(data.data_types);
+
+      if(editMode) {
+        setFormData(initFormData);
+      }
     }).catch((err)=>{
       setOpLoading(false);
       if (err.response) {
@@ -103,9 +106,10 @@ export default function CreateLabel({onCancel, ...props}) {
     if(isFormValid) {
       setSaving(true);
 
-      api.post(URL_MAP.CREATE_LABEL, formData).then((resp)=>{
+      let url = editMode ? URL_MAP.UPDATE_LABEL : URL_MAP.CREATE_LABEL;
+      api.post(url, formData).then((resp)=>{
         setFormSuccess('Label created sucessfully.');
-        setFormData(defaults);
+        if(!editMode) setFormData(defaults);
       }).catch((err)=>{
         if (err.response) {
           // client received an error response (5xx, 4xx)
@@ -128,12 +132,15 @@ export default function CreateLabel({onCancel, ...props}) {
 
   return (
     <>
-    <Typography color="primary" variant="h6" gutterBottom>Create label</Typography>
+    <Box display="flex">
+      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} label</Typography>
+      {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
+    </Box>
     <Form>
       <FormRow>
         <FormRowItem>
           <FormInputText label="Label ID" required name='name'
-            value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange}/>
+            value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange} disabled={editMode}/>
         </FormRowItem>
         <FormRowItem>
           <FormInputText label="Label Description" name='desc'
@@ -168,7 +175,6 @@ export default function CreateLabel({onCancel, ...props}) {
       <FormRow>
         <FormRowItem>
           <Button color="secondary" variant="contained" onClick={onSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-          <Button style={{marginLeft: '1rem'}} variant="outlined" onClick={onCancel}>Cancel</Button>
         </FormRowItem>
       </FormRow>
     </Form>

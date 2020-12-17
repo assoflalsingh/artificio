@@ -6,17 +6,14 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import SyncIcon from '@material-ui/icons/Sync';
 import {CompactAddButton, CompactButton, RefreshIconButton} from '../../components/CustomButtons';
-import DataGroupForm from './DataGroup/DataGroupForm';
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
-
-import {Stacked, StackItem} from '../../components/Stacked';
-import CreateLabel from './CreateLabel';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 import DataGroup from './DataGroup';
+import Labels from './Labels';
 import { MemoryRouter, Route, Switch as RouteSwitch, useHistory, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -306,9 +303,8 @@ function DataList({history}) {
       <Box style={{display: 'flex', flexWrap: 'wrap'}}>
         <Typography color="primary" variant="h6">Data List</Typography>
         <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDataList()}}/>
-        <CompactAddButton className={classes.ml1} color="secondary" label="Create label"
-          onClick={()=>{history.push('createlabel')}}
-          />
+        <CompactButton className={classes.ml1} label="Labels" variant="contained" color="primary"
+          onClick={()=>{history.push('labels')}} />
         <CompactButton className={classes.ml1} label="Data groups" variant="contained" color="primary"
           onClick={()=>{history.push('dg')}} />
         <Box className={classes.rightAlign}>
@@ -383,7 +379,7 @@ export default function() {
         <RouterBackButton />
         <RouteSwitch>
           <Route exact path="/" component={DataList}></Route>
-          <Route path="/createlabel" component={CreateLabel}></Route>
+          <Route path="/labels" component={Labels}></Route>
           <Route path="/dg" component={DataGroup}></Route>
         </RouteSwitch>
       </MemoryRouter>
