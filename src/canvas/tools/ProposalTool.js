@@ -77,7 +77,7 @@ export class ProposalTool extends Tool {
         },
         id: uuid.v4(),
         color: generateRandomColor(),
-        label: DefaultLabel.label_name,
+        label: DefaultLabel.label_value,
       };
       const rectangle = new Rectangle(
         annotationData,

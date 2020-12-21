@@ -1,24 +1,25 @@
 import * as React from "react";
-import { Box, Snackbar, Typography } from "@material-ui/core";
+import {Box, Snackbar, Typography} from "@material-ui/core";
 import CanvasWrapper from "./canvas/CanvasWrapper";
-import { CanvasManager } from "../../canvas/CanvasManager";
+import {CanvasManager} from "../../canvas/CanvasManager";
 import Thumbnails from "./helpers/Thumbnails";
 import Loader from "./helpers/Loader";
-import { ToolBar } from "./helpers/ToolBar";
-import { LabelSelector } from "./label/LabelSelector";
-import { LabelsContainer } from "./label/LabelsContainer";
-import { CustomEventType, ToolType } from "../../canvas/core/constants";
-import { getImageData, saveAnnotationData } from "./apiMethods";
+import {ToolBar} from "./helpers/ToolBar";
+import {LabelSelector} from "./label/LabelSelector";
+import {LabelsContainer} from "./label/LabelsContainer";
+import {CustomEventType, ToolType} from "../../canvas/core/constants";
+import {getImageData, saveAnnotationData} from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
-import { generateAnnotationsFromData } from "./utilities";
-import { LeftToolBar } from "./helpers/LeftToolBar";
+import {findTextAnnotations, generateAnnotationsFromData,} from "./utilities";
+import {LeftToolBar} from "./helpers/LeftToolBar";
 
 export const appId = "canvas-annotation-tool";
 
 export default class AnnotationTool extends React.Component {
   canvasManager;
   textAnnotations;
-	imageData;
+  annotationAccuracy = {};
+  imageData;
   state = {
     activeImageIndex: 0,
     loading: false,
@@ -53,16 +54,34 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
+  updateModelLabelsForAllAnnotations = () => {
+    const annotations = this.canvasManager.getAnnotations();
+    annotations.forEach((ann) => {
+      const proposals = this.canvasManager.getProposals();
+      const words = findTextAnnotations(ann, proposals);
+      const label = ann.getLabel();
+      words.forEach((w) => {
+        const index = w.index;
+        const proposal = proposals[index];
+        const ids = proposal.id.split("-");
+        const proposalIndex = parseInt(ids[0]);
+        const wordIndex = parseInt(ids[1]);
+        this.textAnnotations[proposalIndex].word_details[
+          wordIndex
+        ].entity_label = label;
+      });
+    });
+  };
+
   updateModelAnnotationLabel = (proposals, labelName) => {
     if (proposals && proposals.length > 0) {
       proposals.forEach((proposal) => {
         const ids = proposal.id.split("-");
         const proposalIndex = parseInt(ids[0]);
         const wordIndex = parseInt(ids[1]);
-        const word = this.textAnnotations[proposalIndex].word_details[
+        this.textAnnotations[proposalIndex].word_details[
           wordIndex
-        ];
-        word.entity_label = labelName;
+        ].entity_label = labelName;
       });
     }
   };
@@ -80,6 +99,35 @@ export default class AnnotationTool extends React.Component {
         });
       }
     }
+  };
+
+  setWordsAccuracyInModel = () => {
+    for (let annotationId in this.annotationAccuracy) {
+      const confidence = this.annotationAccuracy[annotationId];
+      const annotation = this.canvasManager.getAnnotationById(annotationId);
+      const proposals = this.canvasManager.getProposals();
+      const words = findTextAnnotations(annotation, proposals);
+      if (words.some((w) => w.confidence_score < 0.5) && confidence === 1) {
+        words.forEach((w) => {
+          const index = w.index;
+          const proposal = proposals[index];
+          const ids = proposal.id.split("-");
+          const proposalIndex = parseInt(ids[0]);
+          const wordIndex = parseInt(ids[1]);
+          this.textAnnotations[proposalIndex].word_details[
+            wordIndex
+          ].confidence_score = 1.00;
+        });
+      }
+    }
+  };
+
+  getAnnotationAccuracy = (annotationId) => {
+    return this.annotationAccuracy[annotationId];
+  };
+
+  setAnnotationAccuracy = (annotationId, confidence) => {
+    this.annotationAccuracy[annotationId] = confidence;
   };
 
   addAnnotations(userAnnotatedData) {
@@ -105,8 +153,8 @@ export default class AnnotationTool extends React.Component {
   }
 
   initializeCanvas = () => {
-  	const imageData = this.imageData
-		const proposals = this.textAnnotations
+    const imageData = this.imageData;
+    const proposals = this.textAnnotations;
     // Clear canvas
     this.canvasManager.resetCanvas();
     // Reset undo redo stack
@@ -121,13 +169,13 @@ export default class AnnotationTool extends React.Component {
         imageData.image_json ? imageData.image_json.user_annotate_data : {}
       );
       this.canvasManager.addOrResetProposals(proposals, false);
+      this.canvasManager.notifyLabelCreation();
       this.setLoader(false);
     });
-    this.canvasManager.notifyLabelCreation();
     this.canvasManager.unsetProposalTool();
     this.canvasManager.hideLabelSelectorDropdown();
     this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
-  }
+  };
 
   async fetchImageData(index) {
     this.setLoader(true);
@@ -159,6 +207,8 @@ export default class AnnotationTool extends React.Component {
     const selectedImage = this.props.images[this.state.activeImageIndex];
     const annotatedData = this.canvasManager.getData();
     this.setLoader(true);
+    this.updateModelLabelsForAllAnnotations();
+    this.setWordsAccuracyInModel();
     saveAnnotationData(
       this.props.api,
       selectedImage._id,
@@ -292,9 +342,9 @@ export default class AnnotationTool extends React.Component {
             showAnnotationLayer={
               this.canvasManager && this.canvasManager.showAnnotationLayer
             }
-						reset={() => this.fetchImageData(this.state.activeImageIndex)}
+            reset={() => this.fetchImageData(this.state.activeImageIndex)}
           />
-          <Box style={{ backgroundColor: "#383838", height: "78%" }}>
+          <Box style={{ backgroundColor: "#383838", height: "80%" }}>
             {this.state.loading && <Loader />}
             <CanvasWrapper id={appId} />
           </Box>
@@ -327,6 +377,8 @@ export default class AnnotationTool extends React.Component {
               removeConnectingLine={this.canvasManager.removeConnectingLine}
               addConnectingLine={this.canvasManager.addConnectingLine}
               getProposals={this.canvasManager.getProposals}
+              setAnnotationAccuracy={this.setAnnotationAccuracy}
+              getAnnotationAccuracy={this.getAnnotationAccuracy}
             />
           )}
           {/*<Box style={{overflow: 'auto', flexGrow: 1}}>*/}

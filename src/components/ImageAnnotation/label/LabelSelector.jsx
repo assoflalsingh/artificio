@@ -16,7 +16,8 @@ import { CreateModalDialog } from "../helpers/CreateModalDialog";
 import MenuItem from "@material-ui/core/MenuItem";
 
 export const DefaultLabel = {
-  label_name: "arto_others",
+  label_name: "Label",
+  label_value: "arto_others",
 };
 
 const styles = {
@@ -223,8 +224,12 @@ const Label = ({
   const annotation = getSelectedAnnotation();
   const labels = Object.assign([], imageLabels);
   const [labelValue, setLabelValue] = React.useState({
-    value: !proposalMode ? annotation.getLabel() : DefaultLabel.label_name,
-    label: !proposalMode ? annotation.getLabel() : DefaultLabel.label_name,
+    value: !proposalMode ? annotation.getLabel() : DefaultLabel.label_value,
+    label: !proposalMode
+      ? annotation.getLabel() === DefaultLabel.label_value
+        ? DefaultLabel.label_name
+        : annotation.getLabel()
+      : DefaultLabel.label_name,
   });
   const [modalOpen, setModalOpen] = React.useState(false);
   return (

@@ -68,9 +68,9 @@ export class CanvasManager extends CanvasScene {
   }
 
   // Return type Rectangle
-  getAnnotationById(id) {
+  getAnnotationById = (id) => {
     return this.annotations.find((ann) => ann.id === id);
-  }
+  };
 
   getIntersectedAnnotation(pointer, layer, annotations) {
     let minArea = Infinity;
@@ -427,9 +427,11 @@ export class CanvasManager extends CanvasScene {
     this.selectedAnnotation.draw();
     this.removeConnectingLine();
     this.notifyLabelCreation();
-		setTimeout(() =>
-			this.dispatch(CustomEventType.ON_ANNOTATION_SELECT, { id: this.selectedAnnotation.id })
-		);
+    setTimeout(() =>
+      this.dispatch(CustomEventType.ON_ANNOTATION_SELECT, {
+        id: this.selectedAnnotation.id,
+      })
+    );
     this.updateUndoStack();
   };
 

@@ -101,7 +101,7 @@ export class RectangleTool extends Tool {
       dimensions,
       id: uuid.v4(),
       color: generateRandomColor(),
-      label: DefaultLabel.label_name,
+      label: DefaultLabel.label_value,
     };
     const rectangle = new Rectangle(
       annotationData,

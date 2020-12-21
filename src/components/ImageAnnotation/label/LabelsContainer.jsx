@@ -9,6 +9,12 @@ import TextField from "@material-ui/core/TextField";
 import { DefaultLabel } from "./LabelSelector";
 import * as uuid from "uuid";
 import Chip from "@material-ui/core/Chip";
+import TreeView from "@material-ui/lab/TreeView";
+import TreeItem from "@material-ui/lab/TreeItem";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import Checkbox from "@material-ui/core/Checkbox";
+import withStyles from "@material-ui/core/styles/withStyles";
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
 
@@ -56,6 +62,9 @@ const styles = {
     marginBottom: "0.2rem",
     marginRight: "0.1rem",
   },
+  tagContainer: {
+    marginTop: "0.2rem",
+  },
 };
 
 const useStyles = makeStyles(styles);
@@ -77,6 +86,8 @@ export const LabelsContainer = ({
   addConnectingLine,
   selectAnnotationById,
   getProposals,
+  setAnnotationAccuracy,
+  getAnnotationAccuracy,
 }) => {
   const classes = useStyles();
   let wheeling;
@@ -112,6 +123,8 @@ export const LabelsContainer = ({
                   textAnnotations={textAnnotations}
                   selectAnnotationById={selectAnnotationById}
                   getProposals={getProposals}
+                  setAnnotationAccuracy={setAnnotationAccuracy}
+                  getAnnotationAccuracy={getAnnotationAccuracy}
                 />
               </Box>
             ),
@@ -142,6 +155,8 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             getAnnotations,
             selectAnnotationById,
             getProposals,
+            setAnnotationAccuracy,
+            getAnnotationAccuracy,
           } = this.props;
           const annotations = getAnnotations() || [];
           const labels = [];
@@ -150,17 +165,20 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             if (!ann.getLabelValue()) {
               ann.setLabelValue(labelValue?.value);
             }
-            if (ann.getLabel() !== DefaultLabel.label_name) {
+            if (ann.getLabel() !== DefaultLabel.label_value) {
               labels.push(
                 <Label
                   labelValue={ann.getLabelValue()}
                   setLabelValue={ann.setLabelValue}
                   confidence={labelValue.confidence}
+                  words={labelValue.words}
                   key={uuid.v4()}
                   labelName={ann.getLabel()}
                   color={ann.color}
                   annotationId={ann.id}
                   selectAnnotationById={selectAnnotationById}
+                  setAnnotationAccuracy={setAnnotationAccuracy}
+                  getAnnotationAccuracy={getAnnotationAccuracy}
                 />
               );
             }
@@ -207,10 +225,25 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
       <Box>
         {this.props.imageLabels && this.props.imageLabels.length > 0 && (
           <Box>
-            <h4 style={{ color: "#0575ce", margin: "0.5rem 0 0.5rem 0" }}>
-              <b>LABELS</b>
-            </h4>
-            <Tags tags={this.props.imageLabels} />
+            <TreeView>
+              <TreeItem
+                nodeId="1"
+                label={
+                  <Box style={{ display: "inline-flex", marginLeft: -21 }}>
+                    <h4
+                      style={{ color: "#0575ce", margin: "0.5rem 0 0.5rem 0" }}
+                    >
+                      <b>LABELS</b>
+                    </h4>
+                    <ChevronRightIcon
+                      style={{ marginTop: "0.35rem", color: "#0575ce" }}
+                    />
+                  </Box>
+                }
+              >
+                <Tags tags={this.props.imageLabels} />
+              </TreeItem>
+            </TreeView>
           </Box>
         )}
         <Box>
@@ -227,9 +260,14 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
 const Tags = ({ tags }) => {
   const classes = useStyles();
   return (
-    <Box>
+    <Box className={classes.tagContainer}>
       {tags.map((tag, index) => (
-        <Chip key={index} size={"small"} className={classes.tag} label={tag.label_name} />
+        <Chip
+          key={index}
+          size={"small"}
+          className={classes.tag}
+          label={tag.label_name}
+        />
       ))}
     </Box>
   );
@@ -243,15 +281,40 @@ const Label = ({
   annotationId,
   selectAnnotationById,
   confidence,
+  words,
+  setAnnotationAccuracy,
+  getAnnotationAccuracy
 }) => {
   const classes = useStyles();
   const [label, setLabel] = React.useState(labelValue);
   React.useEffect(() => {
     setLabel(labelValue);
   }, [labelValue]);
+  const redTicked = words.some((w) => w.confidence_score < 0.5);
+  const accuracy = getAnnotationAccuracy(annotationId);
+  const [isRedTicked, setGreenTicked] = React.useState(
+    accuracy === undefined ? redTicked : accuracy !== 1
+  );
+  const tick = (type) => {
+    if (type === "green") {
+      // 1 or revert
+      setAnnotationAccuracy(annotationId, 0);
+    } else {
+      // 0 or revert
+      setAnnotationAccuracy(annotationId, 1);
+    }
+    setGreenTicked(!isRedTicked);
+  };
   return (
     <Box>
-      <Box className={classes.labelName}>{labelName}</Box>
+      <Box className={classes.labelName}>
+        {labelName}
+        {isRedTicked ? (
+          <RedCheckbox checked={true} onClick={() => tick("red")} />
+        ) : (
+          <Checkbox checked={true} onClick={() => tick("green")} />
+        )}
+      </Box>
       <Box
         className={classes.label}
         id={`${LabelId}-${annotationId}`}
@@ -282,3 +345,13 @@ const Label = ({
     </Box>
   );
 };
+
+const RedCheckbox = withStyles({
+  root: {
+    color: "red",
+    "&$checked": {
+      color: "red",
+    },
+  },
+  checked: {},
+})((props) => <Checkbox color="default" {...props} />);
