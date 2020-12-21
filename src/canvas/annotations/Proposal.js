@@ -254,11 +254,13 @@ export default class Proposal extends Annotation {
   select() {
     this.group.moveToTop();
     this.rectangle.stroke(ProposalHoverColor);
+		this.rectangle.fill('rgba(0, 256 , 0, 0.5)')
     this.isSelected = true;
   }
 
   deSelect() {
     this.rectangle.stroke(this.annotationData.color);
+		this.rectangle.fill('rgba(0, 256 , 0, 0)')
     this.isSelected = false;
   }
 

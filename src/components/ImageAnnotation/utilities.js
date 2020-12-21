@@ -111,7 +111,7 @@ export function findTextAnnotations(annotation, proposals) {
     const px2 = annotationCoordinates[2];
     const py2 = annotationCoordinates[3];
 
-    proposals.forEach((proposal) => {
+    proposals.forEach((proposal, index) => {
       const vertices = proposal.getData();
       const x1 = vertices[0];
       const y1 = vertices[1];
@@ -124,6 +124,7 @@ export function findTextAnnotations(annotation, proposals) {
           confidence_score: proposal.word.confidence_score,
           entity_label: proposal.word.entity_label,
           word_description: proposal.word.word_description,
+          index,
           vertices,
         });
       }
@@ -166,12 +167,12 @@ export function getLabelValueFromProposals(annotation, proposals) {
   let labelValue = "";
   let confidence = 0;
   let count = 0;
-  words.forEach((w) => {
+  words.forEach((w, index) => {
     labelValue = labelValue.concat(w.word_description + " ");
     confidence += w.confidence_score;
     count++;
   });
-  return { value: labelValue, confidence: confidence / count };
+  return { value: labelValue, confidence: confidence / count, words };
 }
 
 export function generateAnnotationsFromData(

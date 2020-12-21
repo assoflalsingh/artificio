@@ -65,7 +65,7 @@ export default class Annotation {
   getLabelPosition() {}
 
   shouldLabelBeAdded() {
-    return this.annotationData.label !== DefaultLabel.label_name;
+    return this.annotationData.label !== DefaultLabel.label_value;
   }
 
   addLabel() {
@@ -123,7 +123,7 @@ export default class Annotation {
   }
 
   setLabelValue = (labelValue) => {
-    if (this.getLabel() !== DefaultLabel.label_name) {
+    if (this.getLabel() !== DefaultLabel.label_value) {
       this.labelValue = labelValue;
     }
   };
