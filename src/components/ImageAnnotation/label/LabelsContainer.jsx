@@ -327,9 +327,9 @@ const Label = ({
             id="outlined-basic"
             variant="outlined"
             value={label}
-            inputProps={{
-              className: confidence > 0.5 ? classes.green : classes.red,
-            }}
+            // inputProps={{
+            //   className: confidence > 0.5 ? classes.green : classes.red,
+            // }}
             style={{
               width: "100%",
             }}

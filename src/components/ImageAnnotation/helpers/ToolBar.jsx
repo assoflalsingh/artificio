@@ -69,7 +69,12 @@ export class ToolBar extends CanvasEventAttacher {
     {
       event: CustomEventType.SET_ACTIVE_TOOL,
       func: (event) => {
-        this.setState({ activeTool: event.detail.toolType });
+      	const activeTool = event.detail.toolType
+				if (!activeTool) {
+					this.setState({ disableSelectMode: false });
+				}
+				this.setState({ activeTool: event.detail.toolType });
+
       },
     },
     {
@@ -198,11 +203,6 @@ export class ToolBar extends CanvasEventAttacher {
 					icon={<CachedIcon/>}
 					onClick={this.props.reset}
 				/>
-        <ToolBarButton
-          label={"Reset/Clear Data"}
-          icon={<CachedIcon />}
-          onClick={this.props.reset}
-        />
         <ToolBarButton
           style={{ float: "right" }}
           label="Exit"
