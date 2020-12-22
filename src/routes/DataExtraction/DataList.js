@@ -197,7 +197,7 @@ function DataList({history}) {
       setAjaxMessage({
         error: false, text: 'Data group assigned successfully !!',
       });
-      let newDatalist = datalist;
+      let newDatalist = [...datalist];
       rowsSelected.forEach((i)=>{
         newDatalist[i].datagroup_name = name;
       });
@@ -213,6 +213,43 @@ function DataList({history}) {
     }).then(()=>{
       setPageMessage(null);
     })
+  }
+
+  const onDeleteFiles = async () => {
+    setMassAnchorEl(null);
+    setPageMessage('Deleting the files...');
+    let allResp = await Promise.all(
+      rowsSelected.map(async(i)=>{
+        let row = datalist[i];
+        try {
+          await api.post(URL_MAP.UPDATE_FILE_STATUS, {
+            "document_id": row._id,
+            "page_no": row.page_no,
+            status: "deleted"
+          });
+          return {success: true, dataIndex: i};
+        } catch (error) {
+          return {success: false, dataIndex: i, error: error};
+        }
+      })
+    );
+    let newDatalist = [...datalist];
+    allResp.forEach((resp) => {
+      if(resp.success) {
+        newDatalist.splice(resp.dataIndex, 1);
+      } else {
+        if(resp.error.response) {
+          setAjaxMessage({
+            error: true, text: resp.error.response.data.message,
+          });
+        } else {
+          console.error(resp.error);
+        }
+      }
+    });
+    setRowsSelected([]);
+    setDatalist(newDatalist);
+    setPageMessage(null);
   }
 
   const parseGetDataList = (data) => {
@@ -340,6 +377,7 @@ function DataList({history}) {
             }}
           >
             <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignDG(true)}}>Assign datagroup</MenuItem>
+            <MenuItem onClick={onDeleteFiles}>Delete files</MenuItem>
           </Popover>
         </>}
         data={datalist}
