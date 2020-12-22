@@ -227,26 +227,26 @@ function DataList({history}) {
             "page_no": row.page_no,
             status: "deleted"
           });
-          return {success: true, dataIndex: i};
+          return i;
         } catch (error) {
-          return {success: false, dataIndex: i, error: error};
+          return error;
         }
       })
     );
-    let newDatalist = [...datalist];
-    allResp.forEach((resp) => {
-      if(resp.success) {
-        newDatalist.splice(resp.dataIndex, 1);
-      } else {
-        if(resp.error.response) {
+    let newDatalist = datalist.filter((v, i)=>allResp.indexOf(i) == -1);
+
+    for(let i=0; i<allResp.length; i++) {
+      if(typeof(allResp[i]) != 'number') {
+        let error = allResp[i];
+        if(error.response) {
           setAjaxMessage({
-            error: true, text: resp.error.response.data.message,
+            error: true, text: error.response.data.message,
           });
         } else {
-          console.error(resp.error);
+          console.error(error);
         }
       }
-    });
+    }
     setRowsSelected([]);
     setDatalist(newDatalist);
     setPageMessage(null);
