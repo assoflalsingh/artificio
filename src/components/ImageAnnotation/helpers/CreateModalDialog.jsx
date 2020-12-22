@@ -14,9 +14,9 @@ import {
 } from "../../FormElements";
 import Alert from "@material-ui/lab/Alert";
 
-export const CreateModalDialog = ({ modalOpen, onClose, createLabel }) => {
+export const CreateModalDialog = ({ modalOpen, onClose, createLabel, typedText }) => {
   const defaults = {
-    name: "",
+    name: typedText || "",
     desc: "",
     shape: "",
     data_type: "",
@@ -25,6 +25,10 @@ export const CreateModalDialog = ({ modalOpen, onClose, createLabel }) => {
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
   const [formError, setFormError] = useState("");
+
+	React.useEffect(() => {
+		setFormData(defaults)
+	}, [typedText])
 
   const formValidators = {
     name: {

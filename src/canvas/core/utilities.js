@@ -112,22 +112,16 @@ export function cloneNestedObject(object, level) {
 }
 
 export const getIntersectingRectangle = (r1, r2) => {
-  [r1, r2] = [r1, r2].map((r) => {
-    return { x: [r.x1, r.x2].sort(), y: [r.y1, r.y2].sort() };
-  });
+  const noInterSect =  r2.x > r1.x + r1.width ||
+		r2.x + r2.width < r1.x ||
+		r2.y > r1.y + r1.height ||
+		r2.y + r2.height < r1.y
 
-  const noIntersect =
-    r2.x[0] > r1.x[1] ||
-    r2.x[1] < r1.x[0] ||
-    r2.y[0] > r1.y[1] ||
-    r2.y[1] < r1.y[0];
 
-  return noIntersect
-    ? false
-    : {
-        x1: Math.max(r1.x[0], r2.x[0]), // _[0] is the lesser,
-        y1: Math.max(r1.y[0], r2.y[0]), // _[1] is the greater
-        x2: Math.min(r1.x[1], r2.x[1]),
-        y2: Math.min(r1.y[1], r2.y[1]),
+  return noInterSect ? false : {
+        x1: Math.max(r1.x, r2.x), // _[0] is the lesser,
+        y1: Math.max(r1.y, r2.y), // _[1] is the greater
+        x2: Math.min(r1.x + r1.width, r2.x + r2.width),
+        y2: Math.min(r1.y + r1.height, r2.y + r2.height),
       };
 };

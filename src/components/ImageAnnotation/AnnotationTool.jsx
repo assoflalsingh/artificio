@@ -63,12 +63,14 @@ export default class AnnotationTool extends React.Component {
       words.forEach((w) => {
         const index = w.index;
         const proposal = proposals[index];
-        const ids = proposal.id.split("-");
-        const proposalIndex = parseInt(ids[0]);
-        const wordIndex = parseInt(ids[1]);
-        this.textAnnotations[proposalIndex].word_details[
-          wordIndex
-        ].entity_label = label;
+        if (proposal) {
+					const ids = proposal.id.split("-");
+					const proposalIndex = parseInt(ids[0]);
+					const wordIndex = parseInt(ids[1]);
+					this.textAnnotations[proposalIndex].word_details[
+						wordIndex
+						].entity_label = label;
+				}
       });
     });
   };
@@ -111,12 +113,14 @@ export default class AnnotationTool extends React.Component {
         words.forEach((w) => {
           const index = w.index;
           const proposal = proposals[index];
-          const ids = proposal.id.split("-");
-          const proposalIndex = parseInt(ids[0]);
-          const wordIndex = parseInt(ids[1]);
-          this.textAnnotations[proposalIndex].word_details[
-            wordIndex
-          ].confidence_score = 1.00;
+          if (proposal) {
+						const ids = proposal.id.split("-");
+						const proposalIndex = parseInt(ids[0]);
+						const wordIndex = parseInt(ids[1]);
+						this.textAnnotations[proposalIndex].word_details[
+							wordIndex
+							].confidence_score = 1.00;
+					}
         });
       }
     }
