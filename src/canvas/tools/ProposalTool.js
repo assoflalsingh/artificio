@@ -128,7 +128,7 @@ export class ProposalTool extends Tool {
             h: y2 - y1,
           },
           id: uuid.v4(),
-          color: generateRandomColor(),
+          color: label.color || generateRandomColor(),
           label: label.value,
         };
         const rectangle = new Rectangle(

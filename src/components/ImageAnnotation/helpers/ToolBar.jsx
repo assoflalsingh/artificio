@@ -74,7 +74,6 @@ export class ToolBar extends CanvasEventAttacher {
 					this.setState({ disableSelectMode: false });
 				}
 				this.setState({ activeTool: event.detail.toolType });
-
       },
     },
     {

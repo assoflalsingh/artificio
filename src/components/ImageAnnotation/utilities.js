@@ -129,34 +129,33 @@ export function findTextAnnotations(annotation, proposals) {
         });
       }
 
-      // Intersecting boxes logic
-      const intersectingRectangle = getIntersectingRectangle(
-        { x1: px1, y1: py1, x2: px2, y2: py2 },
-        { x1, y1, x2, y2 }
-      );
+			const r1 = { x: px1, y: py1, width: px2 - px1, height: py2 - py1 }
+			const r2 = { x: x1, y: y1, width: x2 - x1, height: y2 - y1 }
 
-      if (intersectingRectangle) {
-        const rectArea = (x2 - x1) * (y2 - y1);
-        const intersectingRectArea =
-          (intersectingRectangle.x2 - intersectingRectangle.x1) *
-          (intersectingRectangle.y2 - intersectingRectangle.y1);
-        const ratio = intersectingRectArea / rectArea;
-        // if intersected area is greater then 50% then select those boxes
-        if (ratio >= 0.5) {
-          if (
-            !words.find(
-              (w) => w.word_description === proposal.word.word_description
-            )
-          ) {
-            words.push({
-              confidence_score: proposal.word.confidence_score,
-              entity_label: proposal.word.entity_label,
-              word_description: proposal.word.word_description,
-              vertices,
-            });
-          }
-        }
-      }
+			// Intersecting boxes logic
+			const intersectingRectangle = getIntersectingRectangle(r1, r2);
+			if (intersectingRectangle) {
+				const rectArea = (x2 - x1) * (y2 - y1);
+				const intersectingRectArea =
+					Math.abs((intersectingRectangle.x2 - intersectingRectangle.x1) *
+					(intersectingRectangle.y2 - intersectingRectangle.y1));
+				const ratio = intersectingRectArea / rectArea;
+				// if intersected area is greater then 50% then select those boxes
+				if (ratio >= 0.5) {
+					if (
+						!words.find(
+							(w) => w.word_description === proposal.word.word_description
+						)
+					) {
+						words.push({
+							confidence_score: proposal.word.confidence_score,
+							entity_label: proposal.word.entity_label,
+							word_description: proposal.word.word_description,
+							vertices,
+						});
+					}
+				}
+			}
     });
   }
   return words;

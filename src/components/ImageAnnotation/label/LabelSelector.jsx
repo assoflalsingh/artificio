@@ -1,5 +1,5 @@
 import React from "react";
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable"
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import classnames from "classnames";
@@ -232,6 +232,7 @@ const Label = ({
       : DefaultLabel.label_name,
   });
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [creatableLabel, setCreatableLabel] = React.useState(undefined);
   return (
     <Paper className={classnames(classes.regionInfo)}>
       <Box style={{ width: 200 }}>
@@ -269,13 +270,18 @@ const Label = ({
             )}
           </Box>
           <br />
-          <Select
+          <CreatableSelect
             placeholder="Tags"
             value={labelValue}
             onChange={(label) => {
-              !proposalMode && setAnnotationLabel(label);
-              setLabelValue(label);
-            }}
+							if (!label.__isNew__) {
+								!proposalMode && setAnnotationLabel(label);
+								setLabelValue(label);
+							} else {
+								setCreatableLabel(label.value)
+								setModalOpen(true)
+							}
+						}}
             options={labels.map((label) => ({
               value: label.label_name,
               label: label.label_name,
@@ -315,6 +321,7 @@ const Label = ({
 
       <CreateModalDialog
         modalOpen={modalOpen}
+				typedText={creatableLabel}
         onClose={() => setModalOpen(false)}
         createLabel={(label) => {
           setAnnotationLabel(label);
