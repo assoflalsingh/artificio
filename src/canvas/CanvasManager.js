@@ -466,10 +466,6 @@ export class CanvasManager extends CanvasScene {
     proposal.getShape().on("dragend", () => {
       this.updateModelAnnotationData(proposal);
     });
-    proposal.on(AnnotationEventType.Delete, () => {
-      this.deleteProposal(proposal);
-      this.deleteProposalInModelData(proposal);
-    });
   }
 
   /**
@@ -553,7 +549,7 @@ export class CanvasManager extends CanvasScene {
     this.proposals.splice(index, 1);
     proposal.getShape().destroy();
     proposal.getShape().destroyChildren();
-    this.proposalLayer.draw();
+    this.proposalLayer.batchDraw();
   }
 
   getAnnotationData = (annotation, scaled) => {

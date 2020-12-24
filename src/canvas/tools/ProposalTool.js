@@ -145,7 +145,6 @@ export class ProposalTool extends Tool {
     this.canvasManager.notifyLabelCreation(false);
     this.canvasManager.proposals.forEach((p) => p.deSelect());
     this.canvasManager.proposalLayer.batchDraw();
-    this.canvasManager.updateModelAnnotationLabel(proposals, label.value);
     this.toolMode = null;
   };
 
@@ -155,6 +154,14 @@ export class ProposalTool extends Tool {
     });
     this.canvasManager.proposalLayer.batchDraw();
   }
+
+	deleteProposals = () => {
+  	const proposals = this.canvasManager.getProposals().filter(proposal => proposal.isSelected)
+		proposals.forEach(proposal => {
+			this.canvasManager.deleteProposal(proposal);
+			this.canvasManager.deleteProposalInModelData(proposal);
+		})
+	}
 
   eventListeners = [
     //   {
