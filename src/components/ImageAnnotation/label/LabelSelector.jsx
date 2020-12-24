@@ -192,6 +192,15 @@ export class LabelSelector extends CanvasEventAttacher {
             >
               Assign Label
             </MenuItem>
+						<MenuItem
+							value={""}
+							onClick={() => {
+								this.props.getProposalTool().deleteProposals();
+								this.setState({ showProposalOptionSelection: false });
+							}}
+						>
+							Delete
+						</MenuItem>
           </MaterialSelect>
         )}
         {this.state.proposalMode && <BackgroundScreen />}

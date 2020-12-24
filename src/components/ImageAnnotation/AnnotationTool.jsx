@@ -50,7 +50,7 @@ export default class AnnotationTool extends React.Component {
     const proposalIndex = parseInt(ids[0]);
     const wordIndex = parseInt(ids[1]);
     if (this.textAnnotations[proposalIndex]) {
-      this.textAnnotations[proposalIndex].word_details.splice(wordIndex, 1);
+      this.textAnnotations[proposalIndex].word_details[wordIndex] = null
     }
   };
 
@@ -294,7 +294,23 @@ export default class AnnotationTool extends React.Component {
     }
   }
 
-  componentDidMount() {
+  preventZoom = (event) => {
+		if ((event.ctrlKey===true || event.metaKey === true)
+			&& (event.which === 61
+				|| event.which === 107
+				|| event.which === 173
+				|| event.which === 109
+				|| event.which === 187
+				|| event.which === 189  ) ) {
+			event.preventDefault();
+		}
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('keydown', this.preventZoom)
+	}
+
+	componentDidMount() {
     this.setLoader(true);
     this.canvasManager = new CanvasManager(
       { appId },
@@ -302,6 +318,7 @@ export default class AnnotationTool extends React.Component {
       this.updateModelAnnotationLabel,
       this.deleteProposalInModelData
     );
+    window.addEventListener('keydown', this.preventZoom)
   }
 
   render() {

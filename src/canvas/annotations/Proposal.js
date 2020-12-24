@@ -42,7 +42,7 @@ export default class Proposal extends Annotation {
     });
     this.createRectangle();
     this.addCircles();
-    this.addDeleteIcon();
+    // this.addDeleteIcon();
   }
 
   addCircles() {
@@ -93,11 +93,11 @@ export default class Proposal extends Annotation {
     // Add circle event listeners to add & remove deleteicon
     this.circles.forEach((c) => {
       c.on("dragstart", () => {
-        this.removeDeleteIcon();
+        // this.removeDeleteIcon();
         this.draw();
       });
       c.on("dragend", () => {
-        this.addDeleteIcon();
+        // this.addDeleteIcon();
         this.draw();
       });
     });
@@ -166,8 +166,8 @@ export default class Proposal extends Annotation {
   }
 
   recreateDeleteIcon() {
-    this.removeDeleteIcon();
-    this.addDeleteIcon();
+    // this.removeDeleteIcon();
+    // this.addDeleteIcon();
   }
 
   hideCircles() {

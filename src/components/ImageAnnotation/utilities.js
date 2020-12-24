@@ -152,6 +152,7 @@ export function findTextAnnotations(annotation, proposals) {
 							entity_label: proposal.word.entity_label,
 							word_description: proposal.word.word_description,
 							vertices,
+							index
 						});
 					}
 				}
