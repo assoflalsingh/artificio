@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {setUser, setUserLoading} from "../store/reducers/user";
 
 import { getInstance, URL_MAP } from '../others/artificio_api.instance';
-import Logo from '../assets/images/Logo-final.svg';
+import Logo from '../assets/images/logo.svg';
 import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
 import SideMenuBar from '../components/SideMenuBar';

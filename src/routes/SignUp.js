@@ -10,7 +10,7 @@ import SignUpImg from '../assets/images/signup.png';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import { doValidation, FormInputPhoneNo, FormInputText, PasswordPolicy } from '../components/FormElements';
-import Logo from '../assets/images/Logo-final.svg';
+import Logo from '../assets/images/logo.svg';
 
 const api = getInstance();
 

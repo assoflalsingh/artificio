@@ -6,7 +6,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import BusinessIcon from '@material-ui/icons/Business';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Logo from '../assets/images/Logo-final.svg';
+import Logo from '../assets/images/logo.svg';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
