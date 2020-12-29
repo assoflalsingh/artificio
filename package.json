@@ -13,6 +13,7 @@
     "axios": "^0.20.0",
     "history": "^5.0.0",
     "immutable": "^4.0.0-rc.12",
+    "konva": "^7.1.8",
     "material-ui-color": "^0.4.6",
     "material-ui-dropzone": "^3.4.0",
     "material-ui-phone-number": "^2.2.6",
@@ -29,12 +30,12 @@
     "redux-thunk": "^2.3.0",
     "seedrandom": "^3.0.5",
     "styled-components": "^5.1.1",
-	"konva": "^7.1.8",
-	"uuid": "^8.3.1"
+    "uuid": "^8.3.1"
   },
   "scripts": {
     "start": "react-scripts start --no-cache",
-    "build": "react-scripts build",
+    "build": "npm run copy-logo && react-scripts build",
+    "copy-logo": "ncp './src/assets/images/logo.svg' './public/logo.svg'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -55,6 +56,7 @@
   },
   "devDependencies": {
     "mui-datatables": "^3.4.1",
+    "ncp": "^2.0.0",
     "redux-logger": "^3.0.6"
   }
 }
