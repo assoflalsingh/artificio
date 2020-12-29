@@ -258,6 +258,10 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
+  saveDataStructure = () => {
+
+  }
+
   setLoader(value) {
     this.setState({ loading: value });
   }
@@ -364,6 +368,7 @@ export default class AnnotationTool extends React.Component {
               this.canvasManager && this.canvasManager.showAnnotationLayer
             }
             reset={() => this.fetchImageData(this.state.activeImageIndex)}
+            saveDataStructure={()=>{}}
           />
           <Box style={{ backgroundColor: "#383838", height: "80%" }}>
             {this.state.loading && <Loader />}

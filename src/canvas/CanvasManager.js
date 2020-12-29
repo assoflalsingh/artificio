@@ -642,6 +642,20 @@ export class CanvasManager extends CanvasScene {
     };
   };
 
+  getDataStructure = (scaled = false) => {
+    const labels = [];
+    this.annotations.forEach((ann) => {
+      labels.push(this.getAnnotationData(ann, scaled));
+    });
+    return {
+      image: {
+        w: this.imageDimensions.width,
+        h: this.imageDimensions.height,
+      },
+      labels,
+    };
+  };
+
   updateUndoStack() {
     this.undoRedoStack.push(
       this.annotations.map((annotation) => {

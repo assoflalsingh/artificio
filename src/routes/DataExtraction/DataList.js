@@ -345,8 +345,8 @@ function DataList({history}) {
         <CompactButton className={classes.ml1} label="Data groups" variant="contained" color="primary"
           onClick={()=>{history.push('dg')}} />
         <Box className={classes.rightAlign}>
-          <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
-          <Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation V2</Button>
+          {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Old Annotation</Button> */}
+          <Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
           {/* <ButtonGroup className={classes.ml1}>
             <Button>Date range</Button>
             <Button>Search data</Button>
