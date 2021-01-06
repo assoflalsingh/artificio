@@ -643,17 +643,13 @@ export class CanvasManager extends CanvasScene {
   };
 
   getDataStructure = (scaled = false) => {
-    const labels = [];
-    this.annotations.forEach((ann) => {
-      labels.push(this.getAnnotationData(ann, scaled));
+    const data = this.getData(scaled);
+    const ds = [];
+    data.labels.forEach((label)=>{
+      delete label['label_value'];
+      ds.push(label);
     });
-    return {
-      image: {
-        w: this.imageDimensions.width,
-        h: this.imageDimensions.height,
-      },
-      labels,
-    };
+    return ds;
   };
 
   updateUndoStack() {

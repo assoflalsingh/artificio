@@ -19,6 +19,7 @@ import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import CachedIcon from "@material-ui/icons/Cached";
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import ShuffleIcon from '@material-ui/icons/Shuffle';
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 
 const useClasses = makeStyles(() => ({
@@ -203,11 +204,16 @@ export class ToolBar extends CanvasEventAttacher {
 					icon={<CachedIcon/>}
 					onClick={this.props.reset}
 				/>
-        {/* <ToolBarButton
-          label={'Save data structure'}
+        <ToolBarButton
+          label={'Choose structure'}
+          icon={<ShuffleIcon />}
+          onClick={this.props.chooseStructure}
+        />
+        <ToolBarButton
+          label={'Save structure'}
           icon={<DashboardIcon />}
-          onClick={this.props.saveDataStructure}
-        /> */}
+          onClick={this.props.saveStructure}
+        />
         <ToolBarButton
           style={{ float: "right" }}
           label="Exit"

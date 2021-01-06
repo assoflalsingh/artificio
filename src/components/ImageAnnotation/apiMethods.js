@@ -43,3 +43,20 @@ export async function saveAnnotationData(
     status: reviewMode ? "completed" : "in-process",
   });
 }
+
+export async function saveStructure(
+  api,
+  payload
+) {
+  return api.post(URL_MAP.CREATE_STRUCTURE, payload);
+}
+
+export async function getStructuresList(api) {
+  return api.get(URL_MAP.GET_STRUCTURES);
+}
+
+export async function getStructureTemplate(api, id) {
+  return api.post(URL_MAP.GET_STRUCTURE_TEMPLATE, {
+    _id: id
+  });
+}

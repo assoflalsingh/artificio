@@ -210,7 +210,7 @@ const theme = createMuiTheme({
         },
         MuiDialogTitle: {
           root: {
-            padding: '1rem'
+            padding: '0.5rem'
           }
         },
         MuiDialogContent: {

@@ -230,26 +230,14 @@ export default function Results() {
           <Box display="flex">
             <Typography color="primary" variant="h6">Results</Typography>
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
-            {/* <CompactAddButton className={classes.ml1} color="secondary" label="Create label"
-              onClick={()=>{setStackPath('createlabel')}}
-              />
-            <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={()=>{setStackPath('createdg')}} /> */}
             <Box className={classes.rightAlign}>
-              <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
-              {/* <ButtonGroup className={classes.ml1}>
-                <Button>Date range</Button>
-                <Button>Search data</Button>
-              </ButtonGroup> */}
-							<Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review V2</Button>
+              {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
+							<Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
             </Box>
           </Box>
-          {/* <AsssignDataGroup open={showAssignDG} onClose={()=>{setShowAssignDG(false)}}
-            onOK={onAssignDatagroup} api={api}/> */}
           <MUIDataTable
             title={<>
               <Box display="flex">
-              {/* <Button disabled={rowsSelected.length == 0} variant='outlined' style={{height: '2rem'}} size="small"
-                endIcon={<ChevronRightOutlinedIcon />} onClick={onMassMenuClick}>Mass action</Button> */}
               {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
               {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
               </Box>

@@ -8,10 +8,12 @@ import {ToolBar} from "./helpers/ToolBar";
 import {LabelSelector} from "./label/LabelSelector";
 import {LabelsContainer} from "./label/LabelsContainer";
 import {CustomEventType, ToolType} from "../../canvas/core/constants";
-import {getImageData, saveAnnotationData} from "./apiMethods";
+import {getImageData, getStructureTemplate, saveAnnotationData, saveStructure} from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
 import {findTextAnnotations, generateAnnotationsFromData,} from "./utilities";
 import {LeftToolBar} from "./helpers/LeftToolBar";
+import { CreateStructureDialog } from "./helpers/CreateStructureDialog";
+import { ChooseStructureDialog } from "./helpers/ChooseStructureDialog";
 
 export const appId = "canvas-annotation-tool";
 
@@ -43,6 +45,8 @@ export default class AnnotationTool extends React.Component {
     imageMetadata: null,
     ajaxMessage: null,
     imageName: null,
+    createStructOpen: false,
+    chooseStructOpen: false,
   };
 
   deleteProposalInModelData = (proposal) => {
@@ -258,8 +262,71 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
-  saveDataStructure = () => {
+  createStructure = (otherData) => {
+    const dataStructure = this.canvasManager.getDataStructure();
+    let data = {
+      ...otherData,
+      'template': dataStructure
+    };
+    this.setState({createStructOpen: false});
+    this.setLoader(true);
+    saveStructure(
+      this.props.api,data
+    )
+      .then(() => {
+        this.setLoader(false);
+        this.setState({
+          ajaxMessage: {
+            error: false,
+            text: "Data structure saved successfully !!",
+          },
+        });
+      })
+      .catch((error) => {
+        this.setLoader(false);
+        if (error.response) {
+          this.setState({
+            ajaxMessage: {
+              error: true,
+              text: error.response.data.message,
+            },
+          });
+        } else {
+          console.error(error);
+        }
+      });
+  }
 
+  chooseStructure = (id) => {
+    this.setState({chooseStructOpen: false});
+    this.setLoader(true);
+    getStructureTemplate(this.props.api, id)
+      .then((resp) => {
+        let data = {
+          labels: resp.data.data
+        }
+        this.addAnnotations(data);
+        this.setLoader(false);
+        this.setState({
+          ajaxMessage: {
+            error: false,
+            text: "Data structure loaded successfully !!",
+          },
+        });
+      })
+      .catch((error) => {
+        this.setLoader(false);
+        if (error.response) {
+          this.setState({
+            ajaxMessage: {
+              error: true,
+              text: error.response.data.message,
+            },
+          });
+        } else {
+          console.error(error);
+        }
+      });
   }
 
   setLoader(value) {
@@ -368,7 +435,9 @@ export default class AnnotationTool extends React.Component {
               this.canvasManager && this.canvasManager.showAnnotationLayer
             }
             reset={() => this.fetchImageData(this.state.activeImageIndex)}
-            saveDataStructure={()=>{}}
+            chooseStructure={() => {}}
+            saveStructure={() => this.setState({createStructOpen: true})}
+            chooseStructure={() => this.setState({chooseStructOpen: true})}
           />
           <Box style={{ backgroundColor: "#383838", height: "80%" }}>
             {this.state.loading && <Loader />}
@@ -434,6 +503,15 @@ export default class AnnotationTool extends React.Component {
             getProposalTool={this.canvasManager.getProposalTool}
           />
         )}
+        <CreateStructureDialog
+          modalOpen={this.state.createStructOpen}
+          onClose={()=>{this.setState({createStructOpen: false})}}
+          createStructure = {this.createStructure}/>
+        <ChooseStructureDialog
+          api={this.props.api}
+          modalOpen={this.state.chooseStructOpen}
+          onClose={()=>{this.setState({chooseStructOpen: false})}}
+          chooseStructure = {this.chooseStructure}/>
         <Snackbar
           open={Boolean(this.state.ajaxMessage)}
           autoHideDuration={6000}
