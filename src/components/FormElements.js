@@ -76,12 +76,10 @@ export function FormInput({children, info, ...props}) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handlePopoverOpen = (event) => {
-    console.log('open');
     setAnchorEl(event.currentTarget);
   };
 
   const handlePopoverClose = () => {
-    console.log('close');
     setAnchorEl(null);
   };
 

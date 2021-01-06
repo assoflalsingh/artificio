@@ -237,7 +237,10 @@ export default function SignUp({match, history}) {
                 <Box className={classes.formRow}>
                   <FormControlLabel
                     control={<Checkbox name="accept" color='primary' checked={formData.accept} onChange={onTextChange} />}
-                    label={'I accept Terms and Conditions'}
+                    label={
+                      <Typography>
+                      I accept <Link href="https://artificio.ai/web/terms-services" target="_blank" rel="noopener">Terms of Services</Link> and <Link href=" https://artificio.ai/web/privacy-policy" target="_blank" rel="noopener">Privacy Policy</Link>
+                      </Typography>}
                   />
                 </Box>
                 <Box className={classes.formRow}>

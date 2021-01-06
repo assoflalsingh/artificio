@@ -15,7 +15,6 @@ export default function FileDropZone({filesLimit=10, ...props}) {
   const classes = useStyles();
   return (
       <DropzoneArea
-        // onChange={(files) => console.log('Files:', files)} useChipsForPreview={true} showAlerts={true}
         filesLimit={filesLimit}
         useChipsForPreview={true}
         previewChipProps={{

@@ -65,7 +65,7 @@ const Dashboard = ({match, ...props}) => {
         props.setUser(data);
       })
       .catch((err)=>{
-        console.log(err);
+        console.error(err);
       });
   }, []);
 
