@@ -250,11 +250,11 @@ const theme = createMuiTheme({
             color: '#fff'
           }
         },
-        MUIDataTableHeadCell: {
-          data: {
-            fontWeight: 'bold'
-          }
-        }
+        MUIDataTable: {
+          responsiveScroll: {
+            maxHeight: 'none',
+          },
+        },
     }
 }, globalTheme);
 

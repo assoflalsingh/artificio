@@ -14,8 +14,10 @@ import {
 } from "../../FormElements";
 import Alert from "@material-ui/lab/Alert";
 import { getStructuresList } from "../apiMethods";
-import { Box, makeStyles, Paper, Typography } from "@material-ui/core";
+import { Box, CircularProgress, makeStyles, Paper, Typography, Link } from "@material-ui/core";
 import { CompactButton } from "../../CustomButtons";
+import MUIDataTable from "mui-datatables";
+import ConfirmDialog from "../../ConfirmDialog";
 
 
 const useStyles = makeStyles(()=>({
@@ -33,32 +35,89 @@ const useStyles = makeStyles(()=>({
   }
 }));
 
-function SingleStructure({data, dataGroup, onChoose}) {
-  const classes = useStyles();
-  return (
-    <Paper className={classes.fileroot} elevation={2}>
-      <Box className={classes.filedetails}>
-        <Typography variant="body1"><strong>Name: </strong>{data.name}</Typography>
-        <Typography variant="body2">{data.desc}</Typography>
-        {dataGroup && <Typography variant="body2"><strong>Default for datagroup: </strong>{dataGroup}</Typography>}
-      </Box>
-      <Box className={classes.rightAlign}>
-        <CompactButton label="Open" variant="outlined"
-          onClick={()=>{onChoose(data._id)}} />
-      </Box>
-    </Paper>
-  )
-}
-
-
 export const ChooseStructureDialog = ({ api, modalOpen, onClose, chooseStructure }) => {
   const [formError, setFormError] = useState("");
   const [structs, setStructs] = useState([]);
   const [loader, setLoader] = useState(true);
+  const [listMessage, setListMessage] = useState(null);
+  const [selectedStruct, setSelectedStruct] = useState(null);
+
+  const columns = [
+    {
+      name: "name",
+      label: "Name",
+      options: {
+        filter: true,
+        sort: true,
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          return (
+            <Link href="#" onClick={(e)=>{
+              e.preventDefault();
+              console.log(dataIndex);
+              setSelectedStruct(dataIndex);
+            }}>{structs[dataIndex].name}</Link>
+          );
+        }
+      }
+    },
+    {
+      name: "desc",
+      label: "Description",
+      options: {
+        filter: true,
+        sort: true,
+      }
+    },
+    {
+      name: "created_by",
+      label: "Created by",
+      options: {
+        filter: true,
+        sort: true,
+      }
+    },
+    {
+      name: "timestamp",
+      label: "Date time",
+      options: {
+        filter: false,
+        sort: true,
+        customBodyRender: (value, tableMeta)=>{
+          let d = new Date(`${value}+00:00`);
+          return d.toLocaleString();
+        }
+      }
+    },
+  ];
+
+  const options = {
+    selectableRows: 'none',
+    filterType: 'checkbox',
+    filterType: 'dropdown',
+    elevation: 0,
+    filter: false,
+    print: false,
+    pagination: false,
+    download: false,
+    draggableColumns: {enabled: true},
+    selectToolbarPlacement: 'none',
+    sortOrder: {
+      name: 'timestamp',
+      direction: 'desc'
+    },
+    responsive: 'standard',
+    setTableProps: () => {
+      return {
+        size: 'small',
+      };
+    },
+  };
 
   useEffect(()=>{
     if(modalOpen) {
       setStructs([]);
+      setFormError(null);
+      setListMessage('Loading data...');
       getStructuresList(api)
         .then((resp)=>{
           setLoader(false);
@@ -71,24 +130,39 @@ export const ChooseStructureDialog = ({ api, modalOpen, onClose, chooseStructure
           } else {
             console.error(error);
           }
+        })
+        .then(()=>{
+          setListMessage(null);
         });
     }
   }, [modalOpen]);
 
   return (
+    <>
     <Dialog
       onClose={onClose}
       aria-labelledby="customized-dialog-title"
       open={modalOpen}
+      maxWidth='lg'
+      PaperProps={{
+        style: {
+          overflow: 'hidden'
+        }
+      }}
     >
-      <DialogTitle id="customized-dialog-title" onClose={onClose}>
-        Choose structure
-      </DialogTitle>
       <DialogContent>
         {loader && <Typography>Loading...</Typography>}
-        {structs.map((struct)=>{
-          return <SingleStructure data={struct} onChoose={chooseStructure}/>
-        })}
+        <MUIDataTable
+          title={<>
+            <Box display="flex">
+            {listMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{listMessage}</Typography></>}
+            {!listMessage && <><Typography variant="h6">Choose structure</Typography></>}
+            </Box>
+          </>}
+          data={structs}
+          columns={columns}
+          options={options}
+        />
         {formError && (
           <FormRow>
             <FormRowItem>
@@ -103,5 +177,13 @@ export const ChooseStructureDialog = ({ api, modalOpen, onClose, chooseStructure
         </Button>
       </DialogActions>
     </Dialog>
+    <ConfirmDialog open={selectedStruct != null} onCancel={()=>{setSelectedStruct(null)}} title={'Load structure ?'}
+      content={selectedStruct != null && `Are you sure you want to load the structure - ${structs[selectedStruct].name} ?`}
+      onConfirm={()=>{
+        let id = structs[selectedStruct]._id;
+        setSelectedStruct(null);
+        chooseStructure(id);
+      }}/>
+    </>
   );
 };
