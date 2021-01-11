@@ -1,4 +1,5 @@
 import axios from 'axios';
+import APP_CONFIGS from '../app-config.js';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
@@ -72,4 +73,9 @@ export const URL_MAP = {
   GET_DATA_LIST: 'label/get-data-list/',
   GET_ANNOTATION_DETAILS: 'label/get-image-annotation-details/',
   UPDATE_FILE_STATUS: 'label/update-file-status/',
+
+  /* ReCaptcha */
+
+  RECAPTCHA_API: `https://www.google.com/recaptcha/api.js?render=${APP_CONFIGS.CAPTCHA_SITE_KEY}`
+
 };
