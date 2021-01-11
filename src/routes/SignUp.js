@@ -183,11 +183,9 @@ export default function SignUp({match, history}) {
             password: formData.password,
             recaptcha_code: token
           }).then((resp)=>{
-            debugger;
             setFormSuccess('User registered sucessfully. Please check your email to activate your account.');
             setFormData(defaults);
           }).catch((err)=>{
-            debugger;
             if (err.response) {
               // client received an error response (5xx, 4xx)
               if(err.response.data.message || err.response.data.message) {
