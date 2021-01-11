@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
@@ -11,6 +11,7 @@ import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instanc
 import Alert from '@material-ui/lab/Alert';
 import { doValidation, FormInputPhoneNo, FormInputText, PasswordPolicy } from '../components/FormElements';
 import Logo from '../assets/images/logo.svg';
+import APP_CONFIGS from '../app-config.js';
 
 const api = getInstance();
 
@@ -75,6 +76,28 @@ export default function SignUp({match, history}) {
   const [formSuccess, setFormSuccess] = useState('');
   const reqFields = ['first_name', 'last_name', 'email', 'password', 'confirm_pass'];
 
+  useEffect(() => {
+    // Initialize Recaptcha here..
+    const loadScriptByURL = (id, url, callback) => {
+      const isScriptExist = document.getElementById(id);
+      if (!isScriptExist) {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = url;
+        script.id = id;
+        script.onload = function () {
+          if (callback) callback();
+        };
+        document.body.appendChild(script);
+      }
+   
+      if (isScriptExist && callback) callback();
+    }
+    // load the script by passing the URL
+    loadScriptByURL("recaptcha-key", URL_MAP.RECAPTCHA_API , function () {
+      console.log("Captcha Script loaded!");
+    });
+  }, [])
 
   const onSigninClick = (e)=>{
     e.preventDefault();
@@ -149,32 +172,39 @@ export default function SignUp({match, history}) {
 
     if(isFormValid) {
       setSaving(true);
-      api.post(URL_MAP.SIGN_UP, {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        org: formData.org,
-        phone_no: formData.phone_no,
-        password: formData.password,
-      }).then((resp)=>{
-        setFormSuccess('User registered sucessfully. Please check your email to activate your account.');
-        setFormData(defaults);
-      }).catch((err)=>{
-        if (err.response) {
-          // client received an error response (5xx, 4xx)
-          if(err.response.data.message) {
-            setFormError(err.response.data.message);
-          } else {
-            setFormError(err.response.statusText + '. Contact administrator.');
-          }
-        } else if (err.request) {
-          // client never received a response, or request never left
-        } else {
-          // anything else
-        }
-      }).then(()=>{
-        setSaving(false);
-      });
+      window.grecaptcha.ready(() => {
+        window.grecaptcha.execute(APP_CONFIGS.CAPTCHA_SITE_KEY, { action: 'submit' }).then(token => {
+          api.post(URL_MAP.SIGN_UP, {
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            email: formData.email,
+            org: formData.org,
+            phone_no: formData.phone_no,
+            password: formData.password,
+            recaptcha_code: token
+          }).then((resp)=>{
+            debugger;
+            setFormSuccess('User registered sucessfully. Please check your email to activate your account.');
+            setFormData(defaults);
+          }).catch((err)=>{
+            debugger;
+            if (err.response) {
+              // client received an error response (5xx, 4xx)
+              if(err.response.data.message || err.response.data.message) {
+                setFormError(err.response.data.message?.msg || err.response.data.message);
+              } else {
+                setFormError(err.response.statusText + '. Contact administrator.');
+              }
+            } else if (err.request) {
+              // client never received a response, or request never left
+            } else {
+              // anything else
+            }
+          }).then(()=>{
+            setSaving(false);
+          });
+        })
+      })
     }
   }
 
