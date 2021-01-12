@@ -21,7 +21,8 @@ import CachedIcon from "@material-ui/icons/Cached";
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ShuffleIcon from '@material-ui/icons/Shuffle';
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
-
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
 const useClasses = makeStyles(() => ({
   button: {
     borderRadius: 0,
@@ -65,6 +66,7 @@ export class ToolBar extends CanvasEventAttacher {
     activeTool: null,
     showProposals: false,
     hideAnnotations: false,
+    deleteAllAnnotation: false
   };
 
   eventListeners = [
@@ -89,6 +91,7 @@ export class ToolBar extends CanvasEventAttacher {
           activeTool: null,
           showProposals: false,
           hideAnnotations: false,
+          deleteAllAnnotation: false
         });
       },
     },
@@ -143,7 +146,7 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           active={this.state.activeTool}
           label="Shapes"
-          disabled={this.state.hideAnnotations}
+          disabled={this.state.hideAnnotations || this.state.deleteAllAnnotation}
           icon={<FormatShapesIcon />}
           onClick={(e) => {
             if (this.state.activeTool) {
@@ -195,8 +198,25 @@ export class ToolBar extends CanvasEventAttacher {
           }
           onClick={() => {
             const hide = !this.state.hideAnnotations;
-            this.setState({ hideAnnotations: hide });
-            this.props.showAnnotationLayer(!hide);
+            this.setState({ hideAnnotations: hide, deleteAllAnnotation: false });
+            this.props.showAnnotationLayer(!hide && !this.state.deleteAllAnnotation);
+          }}
+        />
+        <ToolBarButton
+          active={this.state.deleteAllAnnotation}
+          label={`${this.state.deleteAllAnnotation ? "Revert Deletion" : "Delete All Annotations"}`}
+          icon={
+            this.state.deleteAllAnnotation ? (
+              <RestoreFromTrashIcon />
+            ) : (
+              <DeleteForeverIcon />
+            )
+          }
+          onClick={() => {
+            const hide = !this.state.deleteAllAnnotation;
+            this.setState({ deleteAllAnnotation: hide, hideAnnotations: false });
+            this.props.setDeleteAllAnnotation(true);
+            this.props.showAnnotationLayer(!hide && !this.state.hideAnnotations);
           }}
         />
 				<ToolBarButton
