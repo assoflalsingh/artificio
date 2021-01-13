@@ -47,6 +47,7 @@ export default class AnnotationTool extends React.Component {
     imageName: null,
     createStructOpen: false,
     chooseStructOpen: false,
+    deleteAllAnnotation: false,
   };
 
   deleteProposalInModelData = (proposal) => {
@@ -212,6 +213,9 @@ export default class AnnotationTool extends React.Component {
   }
 
   saveImageData = (inReview) => {
+    if(this.state.deleteAllAnnotation) {
+      this.canvasManager.deleteAllAnnotations();
+    }
     const selectedImage = this.props.images[this.state.activeImageIndex];
     const annotatedData = this.canvasManager.getData();
     this.setLoader(true);
@@ -403,11 +407,12 @@ export default class AnnotationTool extends React.Component {
           redo={this.canvasManager && this.canvasManager.redo}
           fetchNextImage={this.fetchNextImage}
           fetchPreviousImage={this.fetchPreviousImage}
-          save={this.saveImageData}
+          save={this.saveImageData.bind(this)}
           clickZoomInOut={
             this.canvasManager && this.canvasManager.clickZoomInOut
           }
           inReview={this.props.inReview}
+          deleteAllAnnotation = {this.state.deleteAllAnnotation}
         />
         <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
           <ToolBar
@@ -428,6 +433,9 @@ export default class AnnotationTool extends React.Component {
             blockAnnotationClick={
               this.canvasManager && this.canvasManager.blockAnnotationClick
             }
+            setDeleteAllAnnotation = {(isDeleteAll= false)=> {this.setState({
+              deleteAllAnnotation : isDeleteAll
+            })}}
             setStageDraggable={
               this.canvasManager && this.canvasManager.setStageDraggable
             }
@@ -530,9 +538,3 @@ export default class AnnotationTool extends React.Component {
     );
   }
 }
-
-const styles = {
-  labelsHeader: {
-    color: "green",
-  },
-};

@@ -333,7 +333,7 @@ const Label = ({
             style={{
               width: "100%",
             }}
-            onChange={(e) => {
+            onFocus={(e) => {
               const value = e.target.value;
               setLabel(value);
               setLabelValue(value);
