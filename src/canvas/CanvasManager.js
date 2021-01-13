@@ -214,6 +214,20 @@ export class CanvasManager extends CanvasScene {
     this.updateUndoStack();
   }
 
+  deleteAllAnnotations() {
+    this.annotations.map((ann)=> { 
+      const index = this.annotations.findIndex((anns) => anns.id === ann.id);
+      const annotation = this.annotations[index];
+      this.selectedAnnotation && this.deSelectActiveAnnotation();
+      annotation.getShape().destroy();
+    })
+    this.annotations.splice(0, this.annotations.length);
+    this.annotationLayer.batchDraw();
+    this.hideLabelSelectorDropdown();
+    this.notifyLabelCreation();
+    this.updateUndoStack();  
+  }
+
   /**
 	 * {
 			points: number[];
