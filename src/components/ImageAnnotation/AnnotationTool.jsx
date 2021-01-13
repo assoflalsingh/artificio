@@ -16,7 +16,10 @@ import { CreateStructureDialog } from "./helpers/CreateStructureDialog";
 import { ChooseStructureDialog } from "./helpers/ChooseStructureDialog";
 
 export const appId = "canvas-annotation-tool";
-
+export const DefaultLabel = {
+  label_name: "Label",
+  label_value: "arto_others",
+};
 export default class AnnotationTool extends React.Component {
   canvasManager;
   textAnnotations;
@@ -59,7 +62,7 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
-  updateModelLabelsForAllAnnotations = () => {
+  updateModelLabelsForAllAnnotations = (labelValue) => {
     const annotations = this.canvasManager.getAnnotations();
     annotations.forEach((ann) => {
       const proposals = this.canvasManager.getProposals();
@@ -74,10 +77,28 @@ export default class AnnotationTool extends React.Component {
 					const wordIndex = parseInt(ids[1]);
 					this.textAnnotations[proposalIndex].word_details[
 						wordIndex
-						].entity_label = label;
+						].entity_label = labelValue || label;
 				}
       });
     });
+  };
+
+  updateModelLabelsForDeletedAnnotation = (annId) => {
+      const annotation = this.canvasManager.getAnnotationById(annId);
+      const proposals = this.canvasManager.getProposals();
+      const words = findTextAnnotations(annotation, proposals);
+      words.forEach((w) => {
+        const index = w.index;
+        const proposal = proposals[index];
+        if (proposal) {
+          const ids = proposal.id.split("-");
+					const proposalIndex = parseInt(ids[0]);
+          const wordIndex = parseInt(ids[1]);
+          this.textAnnotations[proposalIndex].word_details[
+						wordIndex
+						].entity_label = DefaultLabel.label_value;
+				}
+      });
   };
 
   updateModelAnnotationLabel = (proposals, labelName) => {
@@ -214,6 +235,7 @@ export default class AnnotationTool extends React.Component {
 
   saveImageData = (inReview) => {
     if(this.state.deleteAllAnnotation) {
+      this.updateModelLabelsForAllAnnotations(DefaultLabel.label_value);
       this.canvasManager.deleteAllAnnotations();
     }
     const selectedImage = this.props.images[this.state.activeImageIndex];
@@ -499,10 +521,12 @@ export default class AnnotationTool extends React.Component {
             deSelectActiveAnnotation={
               this.canvasManager.deSelectActiveAnnotation
             }
-            deleteAnnotation={() =>
-              this.canvasManager.deleteAnnotation(
+            deleteAnnotation={() => {
+              this.updateModelLabelsForDeletedAnnotation(this.canvasManager.getSelectedAnnotation().id);
+              return this.canvasManager.deleteAnnotation(
                 this.canvasManager.getSelectedAnnotation().id
               )
+            }
             }
             getSelectedAnnotation={this.canvasManager.getSelectedAnnotation}
             setAnnotationLabel={this.canvasManager.setAnnotationLabel}
