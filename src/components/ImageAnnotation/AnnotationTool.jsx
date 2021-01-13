@@ -254,7 +254,9 @@ export default class AnnotationTool extends React.Component {
     )
       .then(() => {
         this.setLoader(false);
+        this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
         this.setState({
+          deleteAllAnnotation: false,
           ajaxMessage: {
             error: false,
             text: "Annotation details saved successfully !!",

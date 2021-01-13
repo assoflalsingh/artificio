@@ -47,7 +47,7 @@ export function LeftToolBar({
   fetchNextImage,
   fetchPreviousImage,
   save,
-  clickZoomInOut,
+  clickZoomInOut
 }) {
   const classes = useStyles();
 
@@ -56,7 +56,7 @@ export function LeftToolBar({
       <Tooltip title="Save progress">
         <IconButton
           data-name="save"
-          onClick={() => save(false)}
+          onClick={() => save()}
           className={classes.leftBarButton}
         >
           <SaveIcon />

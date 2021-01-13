@@ -188,7 +188,7 @@ export class ToolBar extends CanvasEventAttacher {
         />
         <ToolBarButton
           active={this.state.hideAnnotations}
-          label={`${this.state.hideAnnotations ? "Show" : "Hide"} Annotations`}
+          label={`${this.state.hideAnnotations ? "Show" : "Hide"}`}
           icon={
             this.state.hideAnnotations ? (
               <VisibilityIcon />
@@ -204,7 +204,7 @@ export class ToolBar extends CanvasEventAttacher {
         />
         <ToolBarButton
           active={this.state.deleteAllAnnotation}
-          label={`${this.state.deleteAllAnnotation ? "Revert Deletion" : "Delete All Annotations"}`}
+          label={`${this.state.deleteAllAnnotation ? "Revert" : "Delete All"}`}
           icon={
             this.state.deleteAllAnnotation ? (
               <RestoreFromTrashIcon />
@@ -220,7 +220,7 @@ export class ToolBar extends CanvasEventAttacher {
           }}
         />
 				<ToolBarButton
-					label={'Reset/Clear Data'}
+					label={'Reset/Clear'}
 					icon={<CachedIcon/>}
 					onClick={this.props.reset}
 				/>
