@@ -63,7 +63,7 @@ export const URL_MAP = {
   GET_DATAGROUP_PREQUISITES: 'label/get-datagroup-prequisites/',
   GET_DATAGROUP_NAMES: 'label/get-datagroup-names/',
   GET_DATAGROUPS: 'label/get-datagroups/',
-  ASSIGN_DATAGROUP: 'label/assign-datagroup/',
+  ASSIGN_DATA: 'label/assign-data/',
 
   CREATE_STRUCTURE: 'label/post-structure/',
   GET_STRUCTURES: 'label/get-structures/',

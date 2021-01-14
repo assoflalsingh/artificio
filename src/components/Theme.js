@@ -255,6 +255,11 @@ const theme = createMuiTheme({
             maxHeight: 'none',
           },
         },
+        MuiTableCell: {
+          head: {
+            fontWeight: 'bold'
+          }
+        }
     }
 }, globalTheme);
 
