@@ -64,12 +64,52 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={()=>{onClose(); onOK(datagroup._id, datagroup.name)}} color="primary">
+        <Button onClick={()=>{onClose(); onOK('datagroup', datagroup._id, datagroup.name)}} color="primary">
           Ok
         </Button>
       </DialogActions>
     </Dialog>
   )
+}
+
+function AsssignDataStructure({open, onClose, onOK, api}) {
+  const [structOpts, setStructOpts] = useState();
+  const [struct, setStruct] = useState(null);
+  const [opLoading, setOpLoading] = useState(false);
+
+  useEffect(()=>{
+    if(open) {
+      setOpLoading(true);
+      api.get(URL_MAP.GET_STRUCTURES)
+        .then((res)=>{
+          let data = res.data.data;
+          setStructOpts(data);
+        })
+        .catch((err)=>{
+          console.error(err);
+        })
+        .then(()=>{
+          setOpLoading(false);
+        });
+    }
+  }, [open]);
+  return(
+    <Dialog disableBackdropClick disableEscapeKeyDown open={open} onClose={onClose}>
+      <DialogContent>
+        <FormInputSelect hasSearch label="Assign structure"
+          onChange={(e, value)=>{setStruct(value)}} loading={opLoading} value={struct} options={structOpts}
+              labelKey='name' valueKey='_id' />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={()=>{onClose(); onOK('structure', struct._id, struct.name)}} color="primary">
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 }
 
 function DataList({history}) {
@@ -81,6 +121,7 @@ function DataList({history}) {
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
   const [showAssignDG, setShowAssignDG] = useState(false);
+  const [showAssignStruct, setShowAssignStruct] = useState(false);
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
@@ -108,6 +149,15 @@ function DataList({history}) {
     {
       name: "datagroup_name",
       label: "Data group",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true
+      }
+    },
+    {
+      name: "struct_name",
+      label: "Data structure",
       options: {
         filter: true,
         sort: true,
@@ -180,9 +230,9 @@ function DataList({history}) {
     setMassAnchorEl(null);
   };
 
-  const onAssignDatagroup = (id, name) => {
+  const onAssignData = (type, id, name) => {
     handleClose();
-    setPageMessage('Assigning data group...');
+    setPageMessage('Assigning...');
     let data_lists = {};
     rowsSelected.map((i)=>{
       let row = datalist[i];
@@ -190,16 +240,21 @@ function DataList({history}) {
       data_lists[row._id].push(row.page_no);
     });
 
-    api.post(URL_MAP.ASSIGN_DATAGROUP, {
-      datagroup_id: id,
+    api.post(URL_MAP.ASSIGN_DATA, {
+      type: type,
+      datum: id,
       data_lists: data_lists
     }).then((res)=>{
       setAjaxMessage({
-        error: false, text: 'Data group assigned successfully !!',
+        error: false, text: 'Assignment success !!',
       });
       let newDatalist = [...datalist];
       rowsSelected.forEach((i)=>{
-        newDatalist[i].datagroup_name = name;
+        if(type === 'datagroup') {
+          newDatalist[i].datagroup_name = name;
+        } else {
+          newDatalist[i].struct_name = name;
+        }
       });
       setDatalist(newDatalist);
     }).catch((error)=>{
@@ -298,6 +353,7 @@ function DataList({history}) {
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
           datagroup_name: datum.images[page].datagroup_name,
+          struct_name: datum.images[page].struct_name,
           img_thumb: datum.images[page].img_thumb
         });
       });
@@ -354,7 +410,9 @@ function DataList({history}) {
         </Box>
       </Box>
       <AsssignDataGroup open={showAssignDG} onClose={()=>{setShowAssignDG(false)}}
-        onOK={onAssignDatagroup} api={api}/>
+        onOK={onAssignData} api={api}/>
+      <AsssignDataStructure open={showAssignStruct} onClose={()=>{setShowAssignStruct(false)}}
+        onOK={onAssignData} api={api}/>
       <MUIDataTable
         title={<>
           <Box display="flex">
@@ -376,7 +434,8 @@ function DataList({history}) {
               horizontal: 'left',
             }}
           >
-            <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignDG(true)}}>Assign datagroup</MenuItem>
+            <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignDG(true)}}>Assign data group</MenuItem>
+            <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignStruct(true)}}>Assign data structure</MenuItem>
             <MenuItem onClick={onDeleteFiles}>Delete files</MenuItem>
           </Popover>
         </>}

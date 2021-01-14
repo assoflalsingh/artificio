@@ -200,7 +200,11 @@ export default class AnnotationTool extends React.Component {
       );
       this.canvasManager.addOrResetProposals(proposals, false);
       this.canvasManager.notifyLabelCreation();
-      this.setLoader(false);
+      if(imageData.struct_id && !this.props.inReview) {
+        this.chooseStructure(imageData.struct_id);
+      } else {
+        this.setLoader(false);
+      }
     });
     this.canvasManager.unsetProposalTool();
     this.canvasManager.hideLabelSelectorDropdown();
@@ -467,7 +471,6 @@ export default class AnnotationTool extends React.Component {
               this.canvasManager && this.canvasManager.showAnnotationLayer
             }
             reset={() => this.fetchImageData(this.state.activeImageIndex)}
-            chooseStructure={() => {}}
             saveStructure={() => this.setState({createStructOpen: true})}
             chooseStructure={() => this.setState({chooseStructOpen: true})}
           />
