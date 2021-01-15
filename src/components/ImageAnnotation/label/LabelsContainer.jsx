@@ -333,6 +333,12 @@ const Label = ({
             style={{
               width: "100%",
             }}
+            onChange={(e) => {
+              const value = e.target.value;
+              setLabel(value);
+              setLabelValue(value);
+              selectAnnotationById(annotationId);
+            }}
             onFocus={(e) => {
               const value = e.target.value;
               setLabel(value);

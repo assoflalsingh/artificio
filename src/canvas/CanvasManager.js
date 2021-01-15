@@ -1,4 +1,5 @@
 import { CanvasScene } from "./CanvasScene";
+import Konva from "konva";
 import {
   AnnotationType,
   CustomEventType,
@@ -471,11 +472,37 @@ export class CanvasManager extends CanvasScene {
     });
     proposal.getShape().on("click", () => {
       if (proposal.isSelected) {
+        this.proposalLayer.find(`.T${proposal.word.word_description}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.R${proposal.word.word_description}-${proposal.getShape().attrs.id}`).remove();
         proposal.deSelect();
       } else {
         proposal.select();
+        let text = new Konva.Text({
+          x: proposal.annotationData.dimensions.x,
+          y: proposal.annotationData.dimensions.y-10,
+          text: proposal.word.word_description,
+          fontSize: 8,
+          name:`T${proposal.word.word_description}-${proposal.getShape().attrs.id}`,
+          padding: 2,
+          fontFamily: 'Calibri',
+          fill: proposal.word.confidence_score > 0.5? AnnotationProposalColor: AnnotationProposalLowConfidenceScoreColor,
+        });
+        let rect = new Konva.Rect({
+          x: proposal.annotationData.dimensions.x,
+          y: proposal.annotationData.dimensions.y-10,
+          stroke: proposal.word.confidence_score > 0.5? AnnotationProposalColor: AnnotationProposalLowConfidenceScoreColor,
+          strokeWidth: 1,
+          width: text.width(),
+          height: text.height(),
+          name:`R${proposal.word.word_description}-${proposal.getShape().attrs.id}`,
+          cornerRadius: 10,
+        });
+        this.proposalLayer.add(rect);
+        this.proposalLayer.add(text);
       }
-      proposal.draw();
+      
+      // proposal.draw();
+      this.proposalLayer.batchDraw();
     });
     proposal.getShape().on("dragend", () => {
       this.updateModelAnnotationData(proposal);
@@ -538,7 +565,6 @@ export class CanvasManager extends CanvasScene {
             word
           );
           this.addProposalEventListeners(proposal);
-
           this.proposals.push(proposal);
           this.proposalLayer.add(proposal.getShape());
         });
