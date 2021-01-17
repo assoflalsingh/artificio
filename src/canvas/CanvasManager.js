@@ -109,7 +109,6 @@ export class CanvasManager extends CanvasScene {
     if (this.selectedAnnotation) {
       this.deSelectActiveAnnotation();
     }
-    debugger;
     this.annotations.forEach((ann) => ann.deSelect());
     this.selectedAnnotation = annotation;
     annotation.select();
@@ -200,7 +199,6 @@ export class CanvasManager extends CanvasScene {
       this.selectAnnotation(annotation);
       this.updateUndoStack();
     } else {
-      debugger;
       annotation.deSelect();
     }
   };
@@ -733,7 +731,6 @@ export class CanvasManager extends CanvasScene {
         this.stage.scaleX(),
         annotation.imageLabels
       );
-      debugger;
       ann.deSelect();
       this.annotationLayer.add(ann.getShape());
       this.annotations.push(ann);

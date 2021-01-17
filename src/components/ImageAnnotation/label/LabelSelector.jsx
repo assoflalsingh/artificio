@@ -103,7 +103,6 @@ export class LabelSelector extends CanvasEventAttacher {
       {
         event: "contextmenu",
         func: (event) => {
-          debugger;
           event.preventDefault();
           const proposalTool = this.props.getProposalTool();
           if (proposalTool) {
