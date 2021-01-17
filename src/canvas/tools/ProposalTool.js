@@ -27,6 +27,7 @@ export class ProposalTool extends Tool {
     );
     if (intersectedProposal) {
       if (intersectedProposal.isSelected) {
+        debugger;
         intersectedProposal.deSelect();
       } else {
         intersectedProposal.select();
@@ -136,6 +137,7 @@ export class ProposalTool extends Tool {
           this.canvasManager.stage.scaleX(),
           this.imageLabels
         );
+        debugger;
         rectangle.deSelect();
         this.canvasManager.addAnnotation(rectangle, false);
       });
@@ -143,6 +145,7 @@ export class ProposalTool extends Tool {
       this.canvasManager.updateUndoStack();
     }
     this.canvasManager.notifyLabelCreation(false);
+    debugger;
     this.canvasManager.proposals.forEach((p) => p.deSelect());
     this.canvasManager.proposalLayer.batchDraw();
     this.toolMode = null;
