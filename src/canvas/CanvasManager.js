@@ -472,29 +472,31 @@ export class CanvasManager extends CanvasScene {
     });
     proposal.getShape().on("click", () => {
       if (proposal.isSelected) {
-        this.proposalLayer.find(`.T${proposal.word.word_description}-${proposal.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.R${proposal.word.word_description}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.T${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.R${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`).remove();
         proposal.deSelect();
       } else {
         proposal.select();
         let text = new Konva.Text({
           x: proposal.annotationData.dimensions.x,
-          y: proposal.annotationData.dimensions.y-10,
+          y: proposal.annotationData.dimensions.y-12,
           text: proposal.word.word_description,
-          fontSize: 8,
-          name:`T${proposal.word.word_description}-${proposal.getShape().attrs.id}`,
-          padding: 2,
-          fontFamily: 'Calibri',
-          fill: proposal.word.confidence_score > 0.5? AnnotationProposalColor: AnnotationProposalLowConfidenceScoreColor,
+          fontSize: 6,
+          name:`T${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`,
+          padding: 4,
+          fill: "black",
+          fontStyle: "bold",
+          fontFamily: 'Nunito'
         });
         let rect = new Konva.Rect({
           x: proposal.annotationData.dimensions.x,
-          y: proposal.annotationData.dimensions.y-10,
-          stroke: proposal.word.confidence_score > 0.5? AnnotationProposalColor: AnnotationProposalLowConfidenceScoreColor,
+          y: proposal.annotationData.dimensions.y-12,
+          stroke: "#ffb600",
+          fill: "#ffb600",
           strokeWidth: 1,
           width: text.width(),
           height: text.height(),
-          name:`R${proposal.word.word_description}-${proposal.getShape().attrs.id}`,
+          name:`R${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`,
           cornerRadius: 10,
         });
         this.proposalLayer.add(rect);
@@ -570,7 +572,11 @@ export class CanvasManager extends CanvasScene {
         });
       });
     } else {
-      this.proposals.forEach((p) => p.deSelect());
+      this.proposals.forEach((p) => {
+        this.proposalLayer.find(`.T${p.word.word_description.replace(/,/g, '')}-${p.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.R${p.word.word_description.replace(/,/g, '')}-${p.getShape().attrs.id}`).remove();
+        p.deSelect()
+      });
     }
     if (showProposals) {
       this.proposalLayer.show();
