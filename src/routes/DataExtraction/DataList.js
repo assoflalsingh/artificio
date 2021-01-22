@@ -229,7 +229,54 @@ function DataList({history}) {
   const handleClose = () => {
     setMassAnchorEl(null);
   };
-
+  const sendFileDetailsForExtraction = () => {
+    let errorMessage = "";
+    let massExtractionPayload = {
+      data_lists: []
+    };
+    rowsSelected.map((row) => {
+      if(datalist[row] && datalist[row].struct_name && datalist[row].img_status==="ready") {
+        let existingFileIndexWithSameId = massExtractionPayload.data_lists.findIndex(o => o.id === datalist[row]._id);
+        if(massExtractionPayload.data_lists && existingFileIndexWithSameId >= 0)
+        {
+          massExtractionPayload["data_lists"][existingFileIndexWithSameId].images.push({
+              struct_name: datalist[row].struct_name,
+              file: datalist[row].file,
+              datagroup_name: datalist[row].datagroup_name,
+              datagroup_id:datalist[row].datagroup_id,
+              img_json:datalist[row].img_json,
+              img_status:datalist[row].img_status,
+              img_name:datalist[row].img_name
+          })
+        }
+        else
+        {
+        massExtractionPayload.data_lists.push(
+          {
+            id: datalist[row]._id,
+            images:[{ 
+              struct_name: datalist[row].struct_name,
+              file: datalist[row].file,
+              datagroup_name: datalist[row].datagroup_name,
+              datagroup_id:datalist[row].datagroup_id,
+              img_json:datalist[row].img_json,
+              img_status:datalist[row].img_status,
+              img_name:datalist[row].img_name
+            }]
+          }
+        )
+        }
+      }
+      else{
+        errorMessage = "There is some issue with the selection either the Data structure ID is missing for any one of the selected file or the status of the file is not ready."
+        setAjaxMessage({
+          error: true, text: errorMessage
+        })
+      }
+    })
+    if(massExtractionPayload.data_lists.length>0 && !errorMessage)
+      return massExtractionPayload;
+  }
   const onAssignData = (type, id, name) => {
     handleClose();
     setPageMessage('Assigning...');
@@ -336,7 +383,6 @@ function DataList({history}) {
   //     "status": "new",
   //     "idStr": "202010305407"
   // }
-
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -436,6 +482,7 @@ function DataList({history}) {
           >
             <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignDG(true)}}>Assign data group</MenuItem>
             <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignStruct(true)}}>Assign data structure</MenuItem>
+            <MenuItem onClick={()=>{sendFileDetailsForExtraction(); }}>Mass data extraction</MenuItem>
             <MenuItem onClick={onDeleteFiles}>Delete files</MenuItem>
           </Popover>
         </>}
