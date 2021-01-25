@@ -229,7 +229,88 @@ function DataList({history}) {
   const handleClose = () => {
     setMassAnchorEl(null);
   };
-
+  const sendFileDetailsForExtraction = () => {
+    let errorMessage = "";
+    let massExtractionPayload = {
+      data_lists: []
+    };
+    rowsSelected.map((row) => {
+      if(datalist[row].img_status!=="ready" && !datalist[row].struct_name) {
+        errorMessage="Structure id and Ready Status is missing for the selection."
+        setAjaxMessage({
+          error: true, text: errorMessage
+        })
+      }
+      else if(datalist[row].img_status!=="ready" && datalist[row].struct_name)
+      {
+        errorMessage="Status is not Ready for the selection"
+        setAjaxMessage({
+          error: true, text: errorMessage
+        })
+      }
+      else if(datalist[row].img_status==="ready" && !datalist[row].struct_name)
+      {
+        errorMessage="Structure id is missing for the selection."
+        setAjaxMessage({
+          error: true, text: errorMessage
+        })
+      }
+      else {
+        let existingFileIndexWithSameId = massExtractionPayload.data_lists.findIndex(o => o.id === datalist[row]._id);
+        if(massExtractionPayload.data_lists && existingFileIndexWithSameId >= 0)
+        {
+          massExtractionPayload["data_lists"][existingFileIndexWithSameId].images.push({
+              struct_id: datalist[row].struct_name,
+              datagroup_name: datalist[row].datagroup_name,
+              datagroup_id:datalist[row].datagroup_id,
+              img_json:datalist[row].img_json,
+              img_status:datalist[row].img_status,
+              img_name:datalist[row].img_name,
+              page_no: datalist[row].page_no
+          })
+        }
+        else
+        {
+        massExtractionPayload.data_lists.push(
+          {
+            id: datalist[row]._id,
+            images:[{ 
+              struct_id: datalist[row].struct_name,
+              datagroup_name: datalist[row].datagroup_name,
+              datagroup_id:datalist[row].datagroup_id,
+              img_json:datalist[row].img_json,
+              img_status:datalist[row].img_status,
+              img_name:datalist[row].img_name,
+              page_no: datalist[row].page_no
+            }]
+          }
+        )
+        }
+      }
+    })
+    if(massExtractionPayload.data_lists.length>0 && !errorMessage) {
+      console.log(massExtractionPayload);
+      api.post(URL_MAP.MASS_EXTRACTION_API, {
+        ...massExtractionPayload
+      }).then((res)=>{
+        setAjaxMessage({
+          error: false, text: 'Request in progress !!',
+        });
+      }).catch((error)=>{
+        if(error.response) {
+          setAjaxMessage({
+            error: true, text: error?.response?.data.message || "There is some technial issue with this request please try again in some time.",
+          });
+        } else {
+          setAjaxMessage({
+            error: true, text: error?.response?.data.message || "There is some technial issue with this request please try again in some time.",
+          });
+        }
+      }).then(()=>{
+        setPageMessage(null);
+      })
+    }
+  }
   const onAssignData = (type, id, name) => {
     handleClose();
     setPageMessage('Assigning...');
@@ -336,7 +417,6 @@ function DataList({history}) {
   //     "status": "new",
   //     "idStr": "202010305407"
   // }
-
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -382,14 +462,17 @@ function DataList({history}) {
     fetchDataList();
   },[]);
 
+  const hideErrorMessage = () => {
+    setAjaxMessage(null)
+  }
   return (
     <>
       <Backdrop className={classes.backdrop} open={Boolean(pageMessage)}>
         <CircularProgress color="inherit" />
         <Typography style={{marginLeft: '0.25rem'}} variant='h4'>{pageMessage}</Typography>
       </Backdrop>
-      <Snackbar open={Boolean(ajaxMessage)} autoHideDuration={6000} >
-        {ajaxMessage && <Alert onClose={()=>{setAjaxMessage(null)}} severity={ajaxMessage.error ? "error" : "success"}>
+      <Snackbar open={Boolean(ajaxMessage)} autoHideDuration={6000} onClose={hideErrorMessage}>
+        {ajaxMessage && <Alert onClose={hideErrorMessage} severity={ajaxMessage.error ? "error" : "success"}>
           {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
         </Alert>}
       </Snackbar>
@@ -436,6 +519,7 @@ function DataList({history}) {
           >
             <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignDG(true)}}>Assign data group</MenuItem>
             <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignStruct(true)}}>Assign data structure</MenuItem>
+            <MenuItem onClick={()=>{sendFileDetailsForExtraction(); }}>Mass data extraction</MenuItem>
             <MenuItem onClick={onDeleteFiles}>Delete files</MenuItem>
           </Popover>
         </>}

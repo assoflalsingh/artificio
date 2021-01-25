@@ -471,18 +471,27 @@ export class CanvasManager extends CanvasScene {
       }
     });
     proposal.getShape().on("click", () => {
+       // logic to get the word description
+       let proposalLayer = this.proposalLayer;
+       let allAnnotations = this.textAnnotations;
+       const ids = proposal.id.split("-");
+       const proposalIndex = parseInt(ids[0]);
+       const wordIndex = parseInt(ids[1]);
+       const textToDisplay = allAnnotations[proposalIndex]?.word_details[wordIndex].word_description;
       if (proposal.isSelected) {
-        this.proposalLayer.find(`.T${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.R${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.T${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.R${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.TR${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
         proposal.deSelect();
+        proposalLayer.draw();
       } else {
         proposal.select();
         let text = new Konva.Text({
           x: proposal.annotationData.dimensions.x,
           y: proposal.annotationData.dimensions.y-12,
-          text: proposal.word.word_description,
-          fontSize: 6,
-          name:`T${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`,
+          text: textToDisplay,
+          fontSize: 10,
+          name:`T${textToDisplay.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
           padding: 4,
           fill: "black",
           fontStyle: "bold",
@@ -491,20 +500,199 @@ export class CanvasManager extends CanvasScene {
         let rect = new Konva.Rect({
           x: proposal.annotationData.dimensions.x,
           y: proposal.annotationData.dimensions.y-12,
-          stroke: "#ffb600",
-          fill: "#ffb600",
+          stroke: proposal.word.user_modified===1 ? "#e73cd0" : "#ffb600",
+          fill:  proposal.word.user_modified===1 ? "#e73cd0" : "#ffb600",
           strokeWidth: 1,
           width: text.width(),
           height: text.height(),
-          name:`R${proposal.word.word_description.replace(/,/g, '')}-${proposal.getShape().attrs.id}`,
+          name:`R${textToDisplay.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
           cornerRadius: 10,
         });
-        this.proposalLayer.add(rect);
-        this.proposalLayer.add(text);
+        proposalLayer.add(rect);
+        proposalLayer.add(text);
+        
+        let transformer = new Konva.Transformer({
+          nodes: [rect],
+          enabledAnchors: ['middle-left', 'middle-right'],
+          width: 75,
+          name:`TR${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
+          // set minimum width of text
+          boundBoxFunc: function (oldBox, newBox) {
+            newBox.width = Math.max(30, newBox.width);
+            return newBox;
+          },
+        });
+        text.on('transform', function () {
+          // reset scale, so only with is changing by transformer
+          text.setAttrs({
+            width: text.width() * text.scaleX(),
+            scaleX: 1,
+          });
+        });
+
+
+        proposalLayer.add(transformer);
+        proposalLayer.draw();
+
+
+        text.on('dblclick', () => {
+          // hide text node and transformer:
+          text.hide();
+          rect.hide()
+          transformer.hide();
+          proposalLayer.draw();
+          // create textarea over canvas with absolute position
+          // first we need to find position for textarea
+          // how to find it?
+          // at first lets find position of text node relative to the stage:
+          let textPosition = text.absolutePosition();
+          // then lets find position of stage container on the page:
+          let stageBox = this.stage.container().getBoundingClientRect();
+          // so position of textarea will be the sum of positions above:
+          let areaPosition = {
+            x: stageBox.left + textPosition.x,
+            y: stageBox.top + textPosition.y,
+          };
+          // create textarea and style it
+          let textarea = document.createElement('textarea');
+          document.body.appendChild(textarea);
+          // apply many styles to match text on canvas as close as possible
+          // remember that text rendering on canvas and on the textarea can be different
+          // and sometimes it is hard to make it 100% the same. But we will try...
+          textarea.value = text.text();
+          document.getElementsByClassName("MuiDialog-container MuiDialog-scrollPaper")[0].setAttribute("tabindex", "inherit");
+          textarea.name="ediable-"+text.text();
+          textarea.maxLength=200;
+          textarea.cols=2;
+          textarea.rows=2;
+          textarea.style.position = 'absolute';
+          textarea.style.top = areaPosition.y + 'px';
+          textarea.style.left = areaPosition.x + 'px';
+          textarea.style.width = "100px";
+          textarea.style.height = text.height() - text.padding() * 2 + 5 + 'px';
+          textarea.style.fontSize = '16px';
+          textarea.style.border = 'none';
+          textarea.style.padding = '0px';
+          textarea.style.margin = '0px';
+          textarea.style.overflow = 'hidden';
+          textarea.style.background = 'none';
+          textarea.style.outline = 'none';
+          textarea.style.resize = 'none';
+          textarea.style.lineHeight = text.lineHeight();
+          textarea.style.fontFamily = text.fontFamily();
+          textarea.style.transformOrigin = 'left top';
+          textarea.style.textAlign = text.align();
+          textarea.style.zIndex = 99999;
+          textarea.style.color = text.fill();
+          let rotation = text.rotation();
+          let transform = '';
+          if (rotation) {
+            transform += 'rotateZ(' + rotation + 'deg)';
+          }
+          let px = 0;
+          // also we need to slightly move textarea on firefox
+          // because it jumps a bit
+          let isFirefox =
+            navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+          if (isFirefox) {
+            px += 2 + Math.round(text.fontSize() / 20);
+          }
+          transform += 'translateY(-' + px + 'px)';
+          textarea.style.transform = transform;
+          // reset height
+          textarea.style.height = 'auto';
+          // after browsers resized it we can set actual value
+          textarea.style.height = textarea.scrollHeight + 3 + 'px';
+          textarea.focus();
+          function removeTextarea() {
+            textarea.parentNode.removeChild(textarea);
+            window.removeEventListener('click', handleOutsideClick);
+            document.getElementsByClassName("MuiDialog-container MuiDialog-scrollPaper")[0].setAttribute("tabindex", "-1");
+            text.show();
+            text.width(150);
+            transformer.width(70);
+            rect.width(70);
+            rect.show();
+            transformer.show();
+            transformer.forceUpdate();
+            proposalLayer.draw();
+          }
+  
+          function setTextareaWidth(newWidth) {
+            if (!newWidth) {
+              // set width for placeholder
+              newWidth = text.placeholder.length * text.fontSize();
+            }
+            // some extra fixes on different browsers
+            let isSafari = /^((?!chrome|android).)*safari/i.test(
+              navigator.userAgent
+            );
+            let isFirefox =
+              navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+            if (isSafari || isFirefox) {
+              newWidth = Math.ceil(newWidth);
+            }
+  
+            let isEdge =
+              document.documentMode || /Edge/.test(navigator.userAgent);
+            if (isEdge) {
+              newWidth += 1;
+            }
+            textarea.style.width = newWidth + 'px';
+          }
+  
+          textarea.addEventListener('keydown', function (e) {
+            // hide on enter
+            // but don't hide on shift + enter
+            if (e.keyCode === 13 && !e.shiftKey) {
+              text.text(textarea.value);
+              removeTextarea.call(this);
+            }
+            // on esc do not set value back to node
+            if (e.keyCode === 27) {
+              removeTextarea.call(this);
+            }
+          });
+  
+          textarea.addEventListener('keydown', function (e) {
+            let scale = rect.getAbsoluteScale().x;
+            setTextareaWidth(rect.width() * scale);
+            textarea.style.height = 'auto';
+            textarea.style.height =
+              textarea.scrollHeight + text.fontSize() + 'px';
+          });
+  
+          function handleOutsideClick(e) {
+            if (e.target !== textarea) {
+              const ids = proposal.id.split("-");
+              const proposalIndex = parseInt(ids[0]);
+              const wordIndex = parseInt(ids[1]);
+              if (allAnnotations[proposalIndex] && text.text() !== textarea.value) {
+                allAnnotations[proposalIndex].word_details[wordIndex].word_description = textarea.value;
+                allAnnotations[proposalIndex].word_details[wordIndex].["user_modified"] = 1;
+                // update existing text, rect and transformer name
+                text.name(`T${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`)
+                rect.name(`R${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`)
+                rect.stroke("#e73cd0");
+                rect.fill("#e73cd0");
+                transformer.name(`TR${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`);
+                proposalLayer.draw();
+              }
+              text.text(textarea.value);
+              removeTextarea.call(this);
+            }
+          }
+          setTimeout(() => {
+            window.addEventListener('click', handleOutsideClick);
+          });
+        });
+
+        // this.proposalLayer.add(rect);
+        // this.proposalLayer.add(text);
       }
       
       // proposal.draw();
-      this.proposalLayer.batchDraw();
+      // this.proposalLayer.draw();
     });
     proposal.getShape().on("dragend", () => {
       this.updateModelAnnotationData(proposal);
@@ -532,6 +720,8 @@ export class CanvasManager extends CanvasScene {
       const imagePosition = this.konvaImage.position();
       proposals.forEach((proposal, proposalIndex) => {
         proposal.word_details.forEach((word, wordIndex) => {
+        if(word)
+          {
           const coordinates = word.bounding_box.vertices;
           const topLeft = coordinates[0];
           const bottomRight = coordinates[2];
@@ -569,12 +759,14 @@ export class CanvasManager extends CanvasScene {
           this.addProposalEventListeners(proposal);
           this.proposals.push(proposal);
           this.proposalLayer.add(proposal.getShape());
+        }
         });
       });
     } else {
       this.proposals.forEach((p) => {
-        this.proposalLayer.find(`.T${p.word.word_description.replace(/,/g, '')}-${p.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.R${p.word.word_description.replace(/,/g, '')}-${p.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.T${p.word.word_description.replace(/[\s, ,]/g, '')}-${p.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.R${p.word.word_description.replace(/[\s, ,]/g, '')}-${p.getShape().attrs.id}`).remove();
+        this.proposalLayer.find(`.TR${p.word.word_description.replace(/[\s, ,]/g, '')}-${p.getShape().attrs.id}`).remove();
         p.deSelect()
       });
     }
@@ -590,6 +782,9 @@ export class CanvasManager extends CanvasScene {
   }
 
   deleteProposal(proposal) {
+    this.proposalLayer.find(`.T${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
+    this.proposalLayer.find(`.R${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
+    this.proposalLayer.find(`.TR${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
     const id = proposal.id;
     const index = this.proposals.find((p) => p.id === id);
     this.proposals.splice(index, 1);

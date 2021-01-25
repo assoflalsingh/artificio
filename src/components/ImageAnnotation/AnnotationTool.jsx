@@ -91,6 +91,10 @@ export default class AnnotationTool extends React.Component {
         const index = w.index;
         const proposal = proposals[index];
         if (proposal) {
+          this.canvasManager.proposalLayer.find(`.T${w.word_description.replace(/[\s, ,]/g, '')}-${proposals[index].getShape().attrs.id}`).remove();
+          this.canvasManager.proposalLayer.find(`.R${w.word_description.replace(/[\s, ,]/g, '')}-${proposals[index].getShape().attrs.id}`).remove();
+          this.canvasManager.proposalLayer.find(`.TR${w.word_description.replace(/[\s, ,]/g, '')}-${proposals[index].getShape().attrs.id}`).remove();
+          this.canvasManager.proposalLayer.draw();
           const ids = proposal.id.split("-");
 					const proposalIndex = parseInt(ids[0]);
           const wordIndex = parseInt(ids[1]);
@@ -192,16 +196,16 @@ export default class AnnotationTool extends React.Component {
     // set text annotations in canvas manager
     this.canvasManager.setTextAnnotations(this.textAnnotations);
     // Set canvas image
-    this.canvasManager.setImage(imageData.image_url, () => {
+    this.canvasManager.setImage(imageData?.image_url, () => {
       // Fit image to screen
       this.canvasManager.fitImageToScreen();
       this.addAnnotations(
-        imageData.image_json ? imageData.image_json.user_annotate_data : {}
+        imageData.image_json ? imageData?.image_json.user_annotate_data : {}
       );
       this.canvasManager.addOrResetProposals(proposals, false);
       this.canvasManager.notifyLabelCreation();
       if(imageData.struct_id && !this.props.inReview) {
-        this.chooseStructure(imageData.struct_id);
+        this.chooseStructure(imageData?.struct_id);
       } else {
         this.setLoader(false);
       }
@@ -222,14 +226,14 @@ export default class AnnotationTool extends React.Component {
         selectedImage.page_no,
         this.props.inReview
       );
-      this.textAnnotations = this.imageData.image_json
-        ? this.imageData.image_json.text_annotations ||
-          this.imageData.image_json.initial_model_data.text_annotations
+      this.textAnnotations = this.imageData?.image_json
+        ? this.imageData?.image_json?.text_annotations ||
+          this.imageData?.image_json?.initial_model_data?.text_annotations
         : [];
       this.setState({
-        imageLabels: this.imageData.image_labels,
-        imageMetadata: this.imageData.image_json.metadata,
-        imageName: this.imageData.document_file_name,
+        imageLabels: this.imageData?.image_labels,
+        imageMetadata: this.imageData?.image_json.metadata,
+        imageName: this.imageData?.document_file_name,
       });
       this.initializeCanvas();
     } else {
