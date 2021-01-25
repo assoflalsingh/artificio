@@ -76,6 +76,8 @@ export const URL_MAP = {
 
   /* ReCaptcha */
 
-  RECAPTCHA_API: `https://www.google.com/recaptcha/api.js?render=${APP_CONFIGS.CAPTCHA_SITE_KEY}`
+  RECAPTCHA_API: `https://www.google.com/recaptcha/api.js?render=${APP_CONFIGS.CAPTCHA_SITE_KEY}`,
+
+  MASS_EXTRACTION_API: `label/mass-data-extraction`
 
 };
