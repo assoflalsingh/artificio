@@ -498,13 +498,13 @@ export class CanvasManager extends CanvasScene {
           fontFamily: 'Nunito'
         });
         let rect = new Konva.Rect({
-          x: proposal.annotationData.dimensions.x,
-          y: proposal.annotationData.dimensions.y-12,
+          x: proposal.annotationData.dimensions.x+2,
+          y: proposal.annotationData.dimensions.y-10,
           stroke: proposal.word.user_modified===1 ? "#e73cd0" : "#ffb600",
           fill:  proposal.word.user_modified===1 ? "#e73cd0" : "#ffb600",
           strokeWidth: 1,
           width: text.width(),
-          height: text.height(),
+          height: text.height() - 4,
           name:`R${textToDisplay.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
           cornerRadius: 10,
         });
