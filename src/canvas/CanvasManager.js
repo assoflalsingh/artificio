@@ -490,7 +490,7 @@ export class CanvasManager extends CanvasScene {
           x: proposal.annotationData.dimensions.x,
           y: proposal.annotationData.dimensions.y-12,
           text: textToDisplay,
-          fontSize: 10,
+          fontSize: 5,
           name:`T${textToDisplay.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
           padding: 4,
           fill: "black",
@@ -551,7 +551,7 @@ export class CanvasManager extends CanvasScene {
           // so position of textarea will be the sum of positions above:
           let areaPosition = {
             x: stageBox.left + textPosition.x,
-            y: stageBox.top + textPosition.y,
+            y: stageBox.top + textPosition.y - 10,
           };
           // create textarea and style it
           let textarea = document.createElement('textarea');
@@ -568,14 +568,14 @@ export class CanvasManager extends CanvasScene {
           textarea.style.position = 'absolute';
           textarea.style.top = areaPosition.y + 'px';
           textarea.style.left = areaPosition.x + 'px';
-          textarea.style.width = "100px";
+          textarea.style.border = "2px dashed blueviolet";
+          textarea.style.background = "whitesmoke"
           textarea.style.height = text.height() - text.padding() * 2 + 5 + 'px';
+          textarea.style.width = "100px";
           textarea.style.fontSize = '16px';
-          textarea.style.border = 'none';
-          textarea.style.padding = '0px';
+          textarea.style.padding = '2px';
           textarea.style.margin = '0px';
           textarea.style.overflow = 'hidden';
-          textarea.style.background = 'none';
           textarea.style.outline = 'none';
           textarea.style.resize = 'none';
           textarea.style.lineHeight = text.lineHeight();
@@ -583,22 +583,7 @@ export class CanvasManager extends CanvasScene {
           textarea.style.transformOrigin = 'left top';
           textarea.style.textAlign = text.align();
           textarea.style.zIndex = 99999;
-          textarea.style.color = text.fill();
-          let rotation = text.rotation();
-          let transform = '';
-          if (rotation) {
-            transform += 'rotateZ(' + rotation + 'deg)';
-          }
-          let px = 0;
-          // also we need to slightly move textarea on firefox
-          // because it jumps a bit
-          let isFirefox =
-            navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-          if (isFirefox) {
-            px += 2 + Math.round(text.fontSize() / 20);
-          }
-          transform += 'translateY(-' + px + 'px)';
-          textarea.style.transform = transform;
+          textarea.style.color = "blueviolet";
           // reset height
           textarea.style.height = 'auto';
           // after browsers resized it we can set actual value
@@ -676,10 +661,17 @@ export class CanvasManager extends CanvasScene {
                 rect.stroke("#e73cd0");
                 rect.fill("#e73cd0");
                 transformer.name(`TR${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`);
-                proposalLayer.draw();
               }
               text.text(textarea.value);
               removeTextarea.call(this);
+              if(textarea.value.length > 5) {
+                rect.width(textarea.value.length*3)
+              }
+              else
+                {
+                  rect.width(25)  
+                }
+              proposalLayer.draw();
             }
           }
           setTimeout(() => {
