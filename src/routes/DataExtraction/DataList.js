@@ -235,20 +235,20 @@ function DataList({history}) {
       data_lists: []
     };
     rowsSelected.map((row) => {
-      if(datalist[row].img_status!=="ready" && !datalist[row].struct_name) {
+      if(datalist[row].img_status!=="ready" && !datalist[row].struct_id) {
         errorMessage="Structure id and Ready Status is missing for the selection."
         setAjaxMessage({
           error: true, text: errorMessage
         })
       }
-      else if(datalist[row].img_status!=="ready" && datalist[row].struct_name)
+      else if(datalist[row].img_status!=="ready" && datalist[row].struct_id)
       {
-        errorMessage="Status is not Ready for the selection"
+        errorMessage="Status is not Ready for the selection."
         setAjaxMessage({
           error: true, text: errorMessage
         })
       }
-      else if(datalist[row].img_status==="ready" && !datalist[row].struct_name)
+      else if(datalist[row].img_status==="ready" && !datalist[row].struct_id)
       {
         errorMessage="Structure id is missing for the selection."
         setAjaxMessage({
@@ -260,12 +260,12 @@ function DataList({history}) {
         if(massExtractionPayload.data_lists && existingFileIndexWithSameId >= 0)
         {
           massExtractionPayload["data_lists"][existingFileIndexWithSameId].images.push({
-              struct_id: datalist[row].struct_name,
+              struct_id: datalist[row].struct_id,
               datagroup_name: datalist[row].datagroup_name,
               datagroup_id:datalist[row].datagroup_id,
               img_json:datalist[row].img_json,
               img_status:datalist[row].img_status,
-              img_name:datalist[row].img_name,
+              img_name:datalist[row].image_name,
               page_no: datalist[row].page_no
           })
         }
@@ -275,12 +275,12 @@ function DataList({history}) {
           {
             id: datalist[row]._id,
             images:[{ 
-              struct_id: datalist[row].struct_name,
+              struct_id: datalist[row].struct_id,
               datagroup_name: datalist[row].datagroup_name,
               datagroup_id:datalist[row].datagroup_id,
               img_json:datalist[row].img_json,
               img_status:datalist[row].img_status,
-              img_name:datalist[row].img_name,
+              img_name:datalist[row].image_name,
               page_no: datalist[row].page_no
             }]
           }
@@ -292,7 +292,7 @@ function DataList({history}) {
       console.log(massExtractionPayload);
       api.post(URL_MAP.MASS_EXTRACTION_API, {
         ...massExtractionPayload
-      }).then((res)=>{
+      }).then(()=>{
         setAjaxMessage({
           error: false, text: 'Request in progress !!',
         });
@@ -389,34 +389,6 @@ function DataList({history}) {
   }
 
   const parseGetDataList = (data) => {
-  //   {
-  //     "_id": "5f9c3594920d9e5fad533c19",
-  //     "timestamp": "2020-10-30T15:47:32",
-  //     "id": 202010305407,
-  //     "created_by": "name last_name",
-  //     "file": "skipper_logo.jpg",
-  //     "images": [
-  //         {
-  //             "page_1": {
-  //                 "img_name": "202010305407-skipper_logo.jpg",
-  //                 "img_thumb": "thumbnail_202010305407-skipper_logo.jpg",
-  //                 "img_status": "new",
-  //                 "datagroup_id": "",
-  //                 "datagroup_name": ""
-  //             },
-  //             "page_2": {
-  //                 "img_name": "202010305407-skipper_logo1.jpg",
-  //                 "img_thumb": "thumbnail_202010305407-skipper_logo1.jpg",
-  //                 "img_status": "new",
-  //                 "datagroup_id": "",
-  //                 "datagroup_name": ""
-  //             }
-  //         }
-  //     ],
-  //     "account": 12345,
-  //     "status": "new",
-  //     "idStr": "202010305407"
-  // }
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -430,10 +402,12 @@ function DataList({history}) {
         newData.push({
           ...newRecord,
           page_no: page,
+          img_json:datum.images[page].img_json,
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
           datagroup_name: datum.images[page].datagroup_name,
           struct_name: datum.images[page].struct_name,
+          struct_id: datum.images[page].struct_id,
           img_thumb: datum.images[page].img_thumb
         });
       });
