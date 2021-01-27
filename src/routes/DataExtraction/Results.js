@@ -181,6 +181,8 @@ export default function Results() {
       Object.keys(datum.images).forEach((page)=>{
         newData.push({
           ...newRecord,
+          struct_id:datum.images[page].struct_id,
+          img_json:datum.images[page].img_json,
           page_no: page,
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,

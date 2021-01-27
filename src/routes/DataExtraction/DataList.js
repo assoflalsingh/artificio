@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Popover, Snackbar, Switch, Tooltip, Typography } from '@material-ui/core';
+import TextField from "@material-ui/core/TextField";
+import { Backdrop, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
-import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton, CompactButton, RefreshIconButton} from '../../components/CustomButtons';
+import {CompactButton, RefreshIconButton} from '../../components/CustomButtons';
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
@@ -14,6 +14,9 @@ import Alert from '@material-ui/lab/Alert';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 import DataGroup from './DataGroup';
 import Labels from './Labels';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
 import { MemoryRouter, Route, Switch as RouteSwitch, useHistory, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +32,31 @@ const useStyles = makeStyles((theme) => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
+  },
+  contentColumn: {
+    textAlign: "center",
+    border: "solid 1px gray",
+    borderRadius: "10px",
+    height: "40px",
+    padding: "0px",
+    fontSize: "18px",
+    maxWidth: "120px"
+  },
+  headingColumn:{
+    height: "50px",
+    color: "gray",
+    fontSize: "18px",
+    fontWeight: "bold"
+  },
+  noBorder: {
+    border: "none"
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -53,6 +81,7 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
         });
     }
   }, [open]);
+  
   return(
     <Dialog disableBackdropClick disableEscapeKeyDown open={open} onClose={onClose}>
       <DialogContent>
@@ -71,7 +100,93 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
     </Dialog>
   )
 }
-
+function FilterDialogBox({isOpen, onClose, customFilters, comparisonOptions}){
+  const classes = useStyles();
+  const [selectedFilters, updateSelectedFilters] = useState({});
+  const updateFilters = (filterName, event)=> {
+    let filtersToUpdate = selectedFilters;
+    let {name, value} = event.target;
+    filtersToUpdate[filterName] = filtersToUpdate[filterName] || {};
+    filtersToUpdate[filterName][name] = value;
+    // updateSelectedFilters(filtersToUpdate)
+    updateSelectedFilters(prevState => ({
+      ...prevState,           
+      ...filtersToUpdate
+    }));
+  }
+  const resetFilter = (filterName) => {
+    let filtersToUpdate = selectedFilters;
+    if(filtersToUpdate[filterName]) filtersToUpdate[filterName] = {};
+    debugger;
+    updateSelectedFilters(prevState => ({
+      ...prevState,           
+      ...filtersToUpdate
+    }));
+  }
+  return(
+    <Dialog disableBackdropClick disableEscapeKeyDown open={isOpen} onClose={onClose}>
+      <DialogContent>
+      <Typography variant='h5'>Apply Filters</Typography>
+        <table style={{width: '100%', margin: "20px 0px"}}>
+          <tr className="header-rows">
+            <th className={classes.headingColumn}>Column Name</th>
+            <th>Filter</th>
+            <th>Value</th>
+            <th>Reset</th>
+          </tr>
+          {
+            customFilters.map((element, index)=> {
+              return (
+              <tr key={index}>
+                <td className={classes.contentColumn}>{element.filterName}</td>
+                <td className={`${classes.contentColumn} ${classes.noBorder}`}>
+                <FormControl variant="filled" className={classes.formControl}>
+                <InputLabel id="demo-simple-select-filled-label">Select filter</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-filled-label"
+                    id="demo-simple-select-filled"
+                    value={selectedFilters[element.colName]?.comparison || ""}
+                    name="comparison"
+                    onChange={updateFilters.bind(this, element.colName)}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    {
+                      comparisonOptions.map((comparison, index)=> (element.possibleComparisons.indexOf(comparison.value) > -1) && <MenuItem value={comparison.value}>{comparison.name}</MenuItem>)
+                    }
+                  </Select>
+                </FormControl>
+                </td>
+                <td className={`${classes.contentColumn} ${classes.noBorder}`}>
+                <TextField
+                    placeholder= "Enter value.."
+                    variant="outlined"
+                    name="fieldValue"
+                    onChange={updateFilters.bind(this, element.colName)}
+                    value={selectedFilters[element.colName]?.fieldValue || ""}
+                />
+                </td>
+                <td className={`${classes.contentColumn} ${classes.noBorder}`}>
+                  <RefreshIconButton className={classes.ml1} title="Reset filter value" label="" onClick={()=>{resetFilter(element.colName)}}/>
+                </td>
+              </tr>
+              )
+            })
+          }
+        </table>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary">
+          Apply filter
+        </Button>
+        <Button onClick={()=>{onClose()}} color="primary">
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
 function AsssignDataStructure({open, onClose, onOK, api}) {
   const [structOpts, setStructOpts] = useState();
   const [struct, setStruct] = useState(null);
@@ -114,7 +229,6 @@ function AsssignDataStructure({open, onClose, onOK, api}) {
 
 function DataList({history}) {
   const classes = useStyles();
-  const [stackPath, setStackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
 	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
@@ -126,7 +240,47 @@ function DataList({history}) {
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
-
+  const [showFilterPanel, setFilterPanelDisplay] = useState(false);
+  const [customFilters] = useState([
+    {
+      filterName: "File name",
+      colName: "file",
+      possibleComparisons: ["eq", "bw"]
+    },
+    {
+      filterName: "Page number",
+      colName: "page_no",
+      possibleComparisons: ["eq", "bw"]
+    },
+    {
+      filterName: "Data group",
+      colName: "datagroup_name",
+      possibleComparisons: ["eq", "bw"]
+    },
+    {
+      filterName: "Data structure",
+      colName: "struct_name",
+      possibleComparisons: ["eq", "bw"]
+    }
+  ]);
+  const [comparisonOptions] = useState([
+    {
+      name: "Greater than",
+      value: "gt",
+    },
+    {
+      name: "Lesser than",
+      value: "lt",
+    },
+    {
+      name: "Equals to",
+      value: "eq",
+    },
+    {
+      name: "Begins with",
+      value: "bw",
+    }
+  ]);
   const columns = [
     {
       name: "file",
@@ -170,7 +324,7 @@ function DataList({history}) {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value, tableMeta)=>{
+        customBodyRender: (value)=>{
           return <Chip size="small" label={value?.replace('-', ' ').toUpperCase()} variant="outlined" />;
         }
       },
@@ -180,7 +334,7 @@ function DataList({history}) {
       label: "Created by",
       options: {
         filter: true,
-        sort: true,
+        sort: true
       }
     },
     {
@@ -189,7 +343,7 @@ function DataList({history}) {
       options: {
         filter: false,
         sort: true,
-        customBodyRender: (value, tableMeta)=>{
+        customBodyRender: (value)=>{
           let d = new Date(`${value}+00:00`);
           return d.toLocaleString();
         }
@@ -200,7 +354,6 @@ function DataList({history}) {
   const options = {
     selectableRows: 'multiple',
     filterType: 'checkbox',
-    filterType: 'dropdown',
     elevation: 0,
     filter: false,
     print: false,
@@ -235,20 +388,20 @@ function DataList({history}) {
       data_lists: []
     };
     rowsSelected.map((row) => {
-      if(datalist[row].img_status!=="ready" && !datalist[row].struct_name) {
+      if(datalist[row].img_status!=="ready" && !datalist[row].struct_id) {
         errorMessage="Structure id and Ready Status is missing for the selection."
         setAjaxMessage({
           error: true, text: errorMessage
         })
       }
-      else if(datalist[row].img_status!=="ready" && datalist[row].struct_name)
+      else if(datalist[row].img_status!=="ready" && datalist[row].struct_id)
       {
-        errorMessage="Status is not Ready for the selection"
+        errorMessage="Status is not Ready for the selection."
         setAjaxMessage({
           error: true, text: errorMessage
         })
       }
-      else if(datalist[row].img_status==="ready" && !datalist[row].struct_name)
+      else if(datalist[row].img_status==="ready" && !datalist[row].struct_id)
       {
         errorMessage="Structure id is missing for the selection."
         setAjaxMessage({
@@ -260,12 +413,12 @@ function DataList({history}) {
         if(massExtractionPayload.data_lists && existingFileIndexWithSameId >= 0)
         {
           massExtractionPayload["data_lists"][existingFileIndexWithSameId].images.push({
-              struct_id: datalist[row].struct_name,
+              struct_id: datalist[row].struct_id,
               datagroup_name: datalist[row].datagroup_name,
               datagroup_id:datalist[row].datagroup_id,
               img_json:datalist[row].img_json,
               img_status:datalist[row].img_status,
-              img_name:datalist[row].img_name,
+              img_name:datalist[row].image_name,
               page_no: datalist[row].page_no
           })
         }
@@ -275,12 +428,12 @@ function DataList({history}) {
           {
             id: datalist[row]._id,
             images:[{ 
-              struct_id: datalist[row].struct_name,
+              struct_id: datalist[row].struct_id,
               datagroup_name: datalist[row].datagroup_name,
               datagroup_id:datalist[row].datagroup_id,
               img_json:datalist[row].img_json,
               img_status:datalist[row].img_status,
-              img_name:datalist[row].img_name,
+              img_name:datalist[row].image_name,
               page_no: datalist[row].page_no
             }]
           }
@@ -292,7 +445,7 @@ function DataList({history}) {
       console.log(massExtractionPayload);
       api.post(URL_MAP.MASS_EXTRACTION_API, {
         ...massExtractionPayload
-      }).then((res)=>{
+      }).then(()=>{
         setAjaxMessage({
           error: false, text: 'Request in progress !!',
         });
@@ -325,7 +478,7 @@ function DataList({history}) {
       type: type,
       datum: id,
       data_lists: data_lists
-    }).then((res)=>{
+    }).then(()=>{
       setAjaxMessage({
         error: false, text: 'Assignment success !!',
       });
@@ -389,34 +542,6 @@ function DataList({history}) {
   }
 
   const parseGetDataList = (data) => {
-  //   {
-  //     "_id": "5f9c3594920d9e5fad533c19",
-  //     "timestamp": "2020-10-30T15:47:32",
-  //     "id": 202010305407,
-  //     "created_by": "name last_name",
-  //     "file": "skipper_logo.jpg",
-  //     "images": [
-  //         {
-  //             "page_1": {
-  //                 "img_name": "202010305407-skipper_logo.jpg",
-  //                 "img_thumb": "thumbnail_202010305407-skipper_logo.jpg",
-  //                 "img_status": "new",
-  //                 "datagroup_id": "",
-  //                 "datagroup_name": ""
-  //             },
-  //             "page_2": {
-  //                 "img_name": "202010305407-skipper_logo1.jpg",
-  //                 "img_thumb": "thumbnail_202010305407-skipper_logo1.jpg",
-  //                 "img_status": "new",
-  //                 "datagroup_id": "",
-  //                 "datagroup_name": ""
-  //             }
-  //         }
-  //     ],
-  //     "account": 12345,
-  //     "status": "new",
-  //     "idStr": "202010305407"
-  // }
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -430,10 +555,12 @@ function DataList({history}) {
         newData.push({
           ...newRecord,
           page_no: page,
+          img_json:datum.images[page].img_json,
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
           datagroup_name: datum.images[page].datagroup_name,
           struct_name: datum.images[page].struct_name,
+          struct_id: datum.images[page].struct_id,
           img_thumb: datum.images[page].img_thumb
         });
       });
@@ -496,6 +623,8 @@ function DataList({history}) {
         onOK={onAssignData} api={api}/>
       <AsssignDataStructure open={showAssignStruct} onClose={()=>{setShowAssignStruct(false)}}
         onOK={onAssignData} api={api}/>
+      <FilterDialogBox isOpen={showFilterPanel} onClose={()=>{setFilterPanelDisplay(false)}} customFilters={customFilters} comparisonOptions={comparisonOptions}/>
+
       <MUIDataTable
         title={<>
           <Box display="flex">
@@ -503,6 +632,8 @@ function DataList({history}) {
             endIcon={<ChevronRightOutlinedIcon />} onClick={onMassMenuClick}>Mass action</Button>
           {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
           {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
+          <Button variant='outlined' style={{height: '2rem', marginLeft:10}} size="small"
+            endIcon={<ChevronRightOutlinedIcon />} onClick={()=>setFilterPanelDisplay(true)}>Add filters</Button>
           </Box>
           <Popover
             open={Boolean(massAnchorEl)}
