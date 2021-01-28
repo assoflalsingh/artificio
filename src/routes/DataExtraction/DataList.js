@@ -100,14 +100,16 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
     </Dialog>
   )
 }
-function FilterDialogBox({isOpen, onClose, customFilters, comparisonOptions}){
+function FilterDialogBox({isOpen, onClose, onApplyFilter, customFilters, comparisonOptions}){
   const classes = useStyles();
   const [selectedFilters, updateSelectedFilters] = useState({});
   const updateFilters = (filterName, event)=> {
+    debugger;
     let filtersToUpdate = selectedFilters;
     let {name, value} = event.target;
     filtersToUpdate[filterName] = filtersToUpdate[filterName] || {};
     filtersToUpdate[filterName][name] = value;
+    filtersToUpdate[filterName]["comparison"] = (name==="comparison") ? value : (!filtersToUpdate[filterName]["comparison"]) ? "eq" : filtersToUpdate[filterName]["comparison"];
     // updateSelectedFilters(filtersToUpdate)
     updateSelectedFilters(prevState => ({
       ...prevState,           
@@ -117,7 +119,6 @@ function FilterDialogBox({isOpen, onClose, customFilters, comparisonOptions}){
   const resetFilter = (filterName) => {
     let filtersToUpdate = selectedFilters;
     if(filtersToUpdate[filterName]) filtersToUpdate[filterName] = {};
-    debugger;
     updateSelectedFilters(prevState => ({
       ...prevState,           
       ...filtersToUpdate
@@ -141,17 +142,13 @@ function FilterDialogBox({isOpen, onClose, customFilters, comparisonOptions}){
                 <td className={classes.contentColumn}>{element.filterName}</td>
                 <td className={`${classes.contentColumn} ${classes.noBorder}`}>
                 <FormControl variant="filled" className={classes.formControl}>
-                <InputLabel id="demo-simple-select-filled-label">Select filter</InputLabel>
                   <Select
                     labelId="demo-simple-select-filled-label"
                     id="demo-simple-select-filled"
-                    value={selectedFilters[element.colName]?.comparison || ""}
+                    value={selectedFilters[element.colName]?.comparison || "eq"}
                     name="comparison"
                     onChange={updateFilters.bind(this, element.colName)}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
+                  > 
                     {
                       comparisonOptions.map((comparison, index)=> (element.possibleComparisons.indexOf(comparison.value) > -1) && <MenuItem value={comparison.value}>{comparison.name}</MenuItem>)
                     }
@@ -177,9 +174,9 @@ function FilterDialogBox({isOpen, onClose, customFilters, comparisonOptions}){
         </table>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+      {Object.keys(selectedFilters).length > 0 &&  <Button onClick={()=> onApplyFilter(selectedFilters)} color="primary">
           Apply filter
-        </Button>
+        </Button>}
         <Button onClick={()=>{onClose()}} color="primary">
           Cancel
         </Button>
@@ -541,8 +538,42 @@ function DataList({history}) {
     setPageMessage(null);
   }
 
-  const parseGetDataList = (data) => {
+  const parseGetDataList = (data, filters) => {
+    debugger;
     let newData = [];
+    if(filters) {
+      data.forEach((datum)=>{
+        if(filters.file && filters.file.fieldValue)
+      {
+        if(filters.file.comparison === "eq" && filters.file.fieldValue === datum.file)
+        {
+
+        let newRecord = {
+          _id: datum._id,
+          timestamp: datum.timestamp,
+          created_by: datum.created_by,
+          file: datum.file,
+        }
+        debugger;
+        Object.keys(datum.images).forEach((page)=>{
+          newData.push({
+            ...newRecord,
+            page_no: page,
+            img_json:datum.images[page].img_json,
+            image_name: datum.images[page].img_name,
+            img_status: datum.images[page].img_status,
+            datagroup_name: datum.images[page].datagroup_name,
+            struct_name: datum.images[page].struct_name,
+            struct_id: datum.images[page].struct_id,
+            img_thumb: datum.images[page].img_thumb
+          });
+        });
+      }
+    }
+    });
+    }
+    else 
+    {
     data.forEach((datum)=>{
       let newRecord = {
         _id: datum._id,
@@ -550,7 +581,7 @@ function DataList({history}) {
         created_by: datum.created_by,
         file: datum.file,
       }
-
+      debugger;
       Object.keys(datum.images).forEach((page)=>{
         newData.push({
           ...newRecord,
@@ -564,10 +595,18 @@ function DataList({history}) {
           img_thumb: datum.images[page].img_thumb
         });
       });
-    });
+  });
+  }
     return newData;
   }
-
+  const filterDataList = (selectedFilters) => {
+    setFilterPanelDisplay(false);
+    setDatalistMessage('Filtering data...');
+    let dataListToUpdate = datalist;
+    setDatalist([]);
+    setRowsSelected([]);
+    setDatalist(parseGetDataList(dataListToUpdate , selectedFilters));
+  }
   const fetchDataList = () => {
     setDatalistMessage('Loading data...');
     setDatalist([]);
@@ -623,7 +662,7 @@ function DataList({history}) {
         onOK={onAssignData} api={api}/>
       <AsssignDataStructure open={showAssignStruct} onClose={()=>{setShowAssignStruct(false)}}
         onOK={onAssignData} api={api}/>
-      <FilterDialogBox isOpen={showFilterPanel} onClose={()=>{setFilterPanelDisplay(false)}} customFilters={customFilters} comparisonOptions={comparisonOptions}/>
+      <FilterDialogBox isOpen={showFilterPanel} onClose={()=>{setFilterPanelDisplay(false)}} onApplyFilter={filterDataList} customFilters={customFilters} comparisonOptions={comparisonOptions}/>
 
       <MUIDataTable
         title={<>
