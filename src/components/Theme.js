@@ -165,6 +165,7 @@ const theme = createMuiTheme({
             borderTopRightRadius: '1rem',
             marginRight: '0.75rem',
             minHeight: '2.5rem',
+            minWidth: 0,
           },
           textColorInherit: {
             textTransform: 'none',
