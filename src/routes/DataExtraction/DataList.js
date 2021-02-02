@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Popover, Snackbar, Switch, Tooltip, Typography } from '@material-ui/core';
+import { Backdrop, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
-import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton, CompactButton, RefreshIconButton} from '../../components/CustomButtons';
+import {CompactButton, RefreshIconButton} from '../../components/CustomButtons';
+import TableFilterPanel from "../../components/TableFilterPanel"
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
@@ -30,6 +30,31 @@ const useStyles = makeStyles((theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
   },
+  contentColumn: {
+    textAlign: "center",
+    border: "solid 1px gray",
+    borderRadius: "10px",
+    height: "40px",
+    padding: "0px",
+    fontSize: "18px",
+    maxWidth: "120px"
+  },
+  headingColumn:{
+    height: "50px",
+    color: "gray",
+    fontSize: "18px",
+    fontWeight: "bold"
+  },
+  noBorder: {
+    border: "none"
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
 }));
 
 function AsssignDataGroup({open, onClose, onOK, api}) {
@@ -53,6 +78,7 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
         });
     }
   }, [open]);
+  
   return(
     <Dialog disableBackdropClick disableEscapeKeyDown open={open} onClose={onClose}>
       <DialogContent>
@@ -71,7 +97,6 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
     </Dialog>
   )
 }
-
 function AsssignDataStructure({open, onClose, onOK, api}) {
   const [structOpts, setStructOpts] = useState();
   const [struct, setStruct] = useState(null);
@@ -114,7 +139,6 @@ function AsssignDataStructure({open, onClose, onOK, api}) {
 
 function DataList({history}) {
   const classes = useStyles();
-  const [stackPath, setStackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
 	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
@@ -125,8 +149,10 @@ function DataList({history}) {
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
+  const [unFilteredData, setUnFilteredData] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
-
+  const [refreshCounter, setRefreshCounter] = useState(1);
+  
   const columns = [
     {
       name: "file",
@@ -135,7 +161,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "page_no",
@@ -144,7 +172,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "datagroup_name",
@@ -153,7 +183,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "struct_name",
@@ -162,7 +194,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "img_status",
@@ -170,18 +204,22 @@ function DataList({history}) {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value, tableMeta)=>{
+        customBodyRender: (value)=>{
           return <Chip size="small" label={value?.replace('-', ' ').toUpperCase()} variant="outlined" />;
         }
       },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "created_by",
       label: "Created by",
       options: {
         filter: true,
-        sort: true,
-      }
+        sort: true
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "timestamp",
@@ -189,18 +227,20 @@ function DataList({history}) {
       options: {
         filter: false,
         sort: true,
-        customBodyRender: (value, tableMeta)=>{
+        customBodyRender: (value)=>{
           let d = new Date(`${value}+00:00`);
           return d.toLocaleString();
         }
-      }
+      },
+      possibleComparisons: ["gt", "lt","drange"],
+      type:"datetime"
     },
   ];
 
   const options = {
     selectableRows: 'multiple',
+    searchPlaceholder: 'Enter keywords',
     filterType: 'checkbox',
-    filterType: 'dropdown',
     elevation: 0,
     filter: false,
     print: false,
@@ -325,7 +365,7 @@ function DataList({history}) {
       type: type,
       datum: id,
       data_lists: data_lists
-    }).then((res)=>{
+    }).then(()=>{
       setAjaxMessage({
         error: false, text: 'Assignment success !!',
       });
@@ -388,7 +428,7 @@ function DataList({history}) {
     setPageMessage(null);
   }
 
-  const parseGetDataList = (data) => {
+  const parseGetDataList = (data, filters) => {
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -397,7 +437,6 @@ function DataList({history}) {
         created_by: datum.created_by,
         file: datum.file,
       }
-
       Object.keys(datum.images).forEach((page)=>{
         newData.push({
           ...newRecord,
@@ -411,10 +450,16 @@ function DataList({history}) {
           img_thumb: datum.images[page].img_thumb
         });
       });
-    });
+  });
     return newData;
   }
-
+  const filterDataList = (filteredResult) => {
+    setDatalistMessage('Filtering data...');
+    setDatalist([]);
+    setRowsSelected([]);
+    setDatalist(filteredResult);
+    setDatalistMessage(null);
+  }
   const fetchDataList = () => {
     setDatalistMessage('Loading data...');
     setDatalist([]);
@@ -422,7 +467,11 @@ function DataList({history}) {
     api.post(URL_MAP.GET_DATA_LIST, {status: ['new', 'ready']})
       .then((res)=>{
         let data = res.data.data;
-        setDatalist(parseGetDataList(data.data_lists));
+        let contr = refreshCounter+1;
+        setRefreshCounter(contr);
+        let parsedResult = parseGetDataList(data.data_lists);
+        setUnFilteredData([...parsedResult]);
+        setDatalist(parsedResult);
       })
       .catch((err)=>{
         console.error(err);
@@ -431,11 +480,12 @@ function DataList({history}) {
         setDatalistMessage(null);
       });
   }
-
+  const ResetAllFilters = () => {
+    setDatalist([...unFilteredData]);
+  }
   useEffect(()=>{
     fetchDataList();
   },[]);
-
   const hideErrorMessage = () => {
     setAjaxMessage(null)
   }
@@ -450,7 +500,7 @@ function DataList({history}) {
           {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
         </Alert>}
       </Snackbar>
-      <Box style={{display: 'flex', flexWrap: 'wrap'}}>
+      <Box style={{display: 'flex', flexWrap: 'wrap', margin: "15px 0px"}}>
         <Typography color="primary" variant="h6">Data List</Typography>
         <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDataList()}}/>
         <CompactButton className={classes.ml1} label="Labels" variant="contained" color="primary"
@@ -458,25 +508,20 @@ function DataList({history}) {
         <CompactButton className={classes.ml1} label="Data groups" variant="contained" color="primary"
           onClick={()=>{history.push('dg')}} />
         <Box className={classes.rightAlign}>
-          {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Old Annotation</Button> */}
-          <Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
-          {/* <ButtonGroup className={classes.ml1}>
-            <Button>Date range</Button>
-            <Button>Search data</Button>
-          </ButtonGroup> */}
+          <Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
         </Box>
       </Box>
       <AsssignDataGroup open={showAssignDG} onClose={()=>{setShowAssignDG(false)}}
         onOK={onAssignData} api={api}/>
       <AsssignDataStructure open={showAssignStruct} onClose={()=>{setShowAssignStruct(false)}}
         onOK={onAssignData} api={api}/>
-      <MUIDataTable
-        title={<>
+        <>
           <Box display="flex">
-          <Button disabled={rowsSelected.length == 0} variant='outlined' style={{height: '2rem'}} size="small"
+          <Button disabled={rowsSelected.length === 0 } variant='outlined' style={{height: '2rem'}} size="small"
             endIcon={<ChevronRightOutlinedIcon />} onClick={onMassMenuClick}>Mass action</Button>
           {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
           {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
+          <TableFilterPanel refreshCounter={refreshCounter} unFilteredData={unFilteredData} disabled={unFilteredData.length === 0} onApplyFilter={filterDataList} coloumnDetails={columns} onResetAllFilters={ResetAllFilters} />
           </Box>
           <Popover
             open={Boolean(massAnchorEl)}
@@ -496,7 +541,11 @@ function DataList({history}) {
             <MenuItem onClick={()=>{sendFileDetailsForExtraction(); }}>Mass data extraction</MenuItem>
             <MenuItem onClick={onDeleteFiles}>Delete files</MenuItem>
           </Popover>
-        </>}
+        </>
+      <MUIDataTable
+        title={<>
+                <Typography color="primary" variant="h8">Please select file(s) for annotation</Typography>
+              </>}
         data={datalist}
         columns={columns}
         options={options}

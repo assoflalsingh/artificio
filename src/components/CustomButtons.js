@@ -46,11 +46,11 @@ export function ButtonLink({children, to, ...props}) {
   );
 }
 
-export function RefreshIconButton({onClick, className}) {
+export function RefreshIconButton({onClick, className, label="Refresh"}) {
   return (
     <YellowButton size="small" className={className} startIcon={<CachedIcon />} variant="contained"
       onClick={onClick} style={{height: '2rem'}}>
-        Refresh
+        {label}
     </YellowButton>
   );
 }
