@@ -21,3 +21,6 @@
   src: local('Nunito'),
     url('./assets/fonts/Nunito-Bold.ttf') format('truetype'), /* Safari, Android, iOS */
 }
+.react-datepicker__tab-loop {
+  display: inline-block !important;
+}

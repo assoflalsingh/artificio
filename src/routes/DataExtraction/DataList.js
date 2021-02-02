@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import TextField from "@material-ui/core/TextField";
 import { Backdrop, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import {CompactButton, RefreshIconButton} from '../../components/CustomButtons';
+import TableFilterPanel from "../../components/TableFilterPanel"
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
@@ -14,9 +14,6 @@ import Alert from '@material-ui/lab/Alert';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 import DataGroup from './DataGroup';
 import Labels from './Labels';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
 import { MemoryRouter, Route, Switch as RouteSwitch, useHistory, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -100,93 +97,6 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
     </Dialog>
   )
 }
-function FilterDialogBox({isOpen, onClose, onApplyFilter, customFilters, comparisonOptions, onResetAllFilters}){
-  const classes = useStyles();
-  const [selectedFilters, updateSelectedFilters] = useState({});
-  const updateFilters = (filterName, event)=> {
-    let filtersToUpdate = selectedFilters;
-    let {name, value} = event.target;
-    filtersToUpdate[filterName] = filtersToUpdate[filterName] || {};
-    filtersToUpdate[filterName][name] = value;
-    filtersToUpdate[filterName]["comparison"] = (name==="comparison") ? value : (!filtersToUpdate[filterName]["comparison"]) ? (filterName==="timestamp" ? "gt" :"eq") : filtersToUpdate[filterName]["comparison"];
-    updateSelectedFilters(prevState => ({
-      ...prevState,           
-      ...filtersToUpdate
-    }));
-  }
-  const resetFilter = (filterName) => {
-    let filtersToUpdate = selectedFilters;
-    if(filtersToUpdate[filterName]) delete filtersToUpdate[filterName];
-    updateSelectedFilters(prevState => ({
-      ...prevState,           
-      ...filtersToUpdate
-    }));
-  }
-
-  return(
-    <Dialog disableBackdropClick disableEscapeKeyDown open={isOpen} onClose={onClose}>
-      <DialogContent>
-      <Typography variant='h5'>Apply Filters</Typography>
-        <table style={{width: '100%', margin: "20px 0px"}}>
-          <tr className="header-rows">
-            <th className={classes.headingColumn}>Column Name</th>
-            <th>Filter</th>
-            <th>Value</th>
-            <th>Reset</th>
-          </tr>
-          {
-            customFilters.map((element, index)=> {
-              return (
-              <tr key={index}>
-                <td className={classes.contentColumn}>{element.filterName}</td>
-                <td className={`${classes.contentColumn} ${classes.noBorder}`}>
-                <FormControl variant="filled" className={classes.formControl}>
-                  <Select
-                    labelId="demo-simple-select-filled-label"
-                    id="demo-simple-select-filled"
-                    value={selectedFilters[element.colName]?.comparison || (element.colName==="timestamp" ? "gt" : "eq")}
-                    name="comparison"
-                    onChange={updateFilters.bind(this, element.colName)}
-                  > 
-                    {
-                      comparisonOptions.map((comparison, index)=> (element.possibleComparisons.indexOf(comparison.value) > -1) && <MenuItem value={comparison.value}>{comparison.name}</MenuItem>)
-                    }
-                  </Select>
-                </FormControl>
-                </td>
-                <td className={`${classes.contentColumn} ${classes.noBorder}`}>
-                <TextField
-                    placeholder= {element.colName!=="timestamp" ? "Enter value.." : "mm/dd/yyyy hh:mm:ss"}
-                    title = {element.colName!=="timestamp" ? "Enter value.." : "mm/dd/yyyy hh:mm:ss"}
-                    variant="outlined"
-                    name="fieldValue"
-                    onChange={updateFilters.bind(this, element.colName)}
-                    value={selectedFilters[element.colName]?.fieldValue || ""}
-                />
-                </td>
-                <td className={`${classes.contentColumn} ${classes.noBorder}`}>
-                  <RefreshIconButton className={classes.ml1} title="Reset filter value" label="" onClick={()=>{resetFilter(element.colName)}}/>
-                </td>
-              </tr>
-              )
-            })
-          }
-        </table>
-      </DialogContent>
-      <DialogActions>
-      {Object.keys(selectedFilters).length > 0 &&  <Button onClick={()=> onApplyFilter(selectedFilters)} color="primary">
-          Apply filter
-        </Button>}
-        <Button onClick={()=>{updateSelectedFilters({});onResetAllFilters()}} color="primary">
-          Remove All Filters
-        </Button>
-        <Button onClick={()=>{onClose()}} color="primary">
-          Cancel
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-}
 function AsssignDataStructure({open, onClose, onOK, api}) {
   const [structOpts, setStructOpts] = useState();
   const [struct, setStruct] = useState(null);
@@ -241,62 +151,8 @@ function DataList({history}) {
   const [datalist, setDatalist] = useState([]);
   const [unFilteredData, setUnFilteredData] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
-  const [showFilterPanel, setFilterPanelDisplay] = useState(false);
-  const [customFilters] = useState([
-    {
-      filterName: "File name",
-      colName: "file",
-      possibleComparisons: ["eq", "bw"]
-    },
-    {
-      filterName: "Page",
-      colName: "page_no",
-      possibleComparisons: ["eq", "bw"]
-    },
-    {
-      filterName: "Data group",
-      colName: "datagroup_name",
-      possibleComparisons: ["eq", "bw"]
-    },
-    {
-      filterName: "Data structure",
-      colName: "struct_name",
-      possibleComparisons: ["eq", "bw"]
-    },
-    {
-      filterName: "Status",
-      colName: "img_status",
-      possibleComparisons: ["eq", "bw"]
-    },
-    {
-      filterName: "Created By",
-      colName: "created_by",
-      possibleComparisons: ["eq", "bw"]
-    },
-    {
-      filterName: "Time",
-      colName: "timestamp",
-      possibleComparisons: ["gt", "lt"]
-    }
-  ]);
-  const [comparisonOptions] = useState([
-    {
-      name: "Greater than",
-      value: "gt",
-    },
-    {
-      name: "Equals to",
-      value: "eq",
-    },
-    {
-      name: "Begins with",
-      value: "bw",
-    },
-    {
-      name: "Lesser than",
-      value: "lt",
-    }
-  ]);
+  const [refreshCounter, setRefreshCounter] = useState(1);
+  
   const columns = [
     {
       name: "file",
@@ -305,7 +161,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "page_no",
@@ -314,7 +172,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "datagroup_name",
@@ -323,7 +183,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "struct_name",
@@ -332,7 +194,9 @@ function DataList({history}) {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "img_status",
@@ -344,6 +208,8 @@ function DataList({history}) {
           return <Chip size="small" label={value?.replace('-', ' ').toUpperCase()} variant="outlined" />;
         }
       },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "created_by",
@@ -351,7 +217,9 @@ function DataList({history}) {
       options: {
         filter: true,
         sort: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "timestamp",
@@ -363,12 +231,15 @@ function DataList({history}) {
           let d = new Date(`${value}+00:00`);
           return d.toLocaleString();
         }
-      }
+      },
+      possibleComparisons: ["gt", "lt","drange"],
+      type:"datetime"
     },
   ];
 
   const options = {
     selectableRows: 'multiple',
+    searchPlaceholder: 'Enter keywords',
     filterType: 'checkbox',
     elevation: 0,
     filter: false,
@@ -559,40 +430,6 @@ function DataList({history}) {
 
   const parseGetDataList = (data, filters) => {
     let newData = [];
-    if(filters) {
-      data.forEach((datum)=> {
-        let isValidData = true;
-        Object.keys(filters).forEach((filterKey)=> {
-          if(datum[filterKey])
-          {
-           switch (true) {
-             case (isValidData && filters[filterKey]["comparison"] ==="eq" && filters[filterKey]["fieldValue"] && datum[filterKey] !== filters[filterKey]["fieldValue"]):       
-                    isValidData = false
-             break;
-             case (isValidData && filters[filterKey]["comparison"] ==="bw" && filters[filterKey]["fieldValue"] && !datum[filterKey].startsWith(filters[filterKey]["fieldValue"])):
-                    isValidData = false
-             break;
-             case (isValidData && filters[filterKey]["comparison"] ==="gt" && filters[filterKey]["fieldValue"] && Date.parse(datum[filterKey]) <= Date.parse(filters[filterKey]["fieldValue"])):
-                    isValidData = false
-             break;
-             case (isValidData && filters[filterKey]["comparison"] ==="lt" && filters[filterKey]["fieldValue"] && Date.parse(datum[filterKey]) > Date.parse(filters[filterKey]["fieldValue"])):       
-                    isValidData = false
-             break;
-             default: 
-                console.log("no filter applicable..") 
-           }
-          }
-          else{
-            isValidData = false
-          }
-        })
-        if(isValidData){
-          newData.push(datum)
-        }
-      })
-    }
-    else 
-    {
     data.forEach((datum)=>{
       let newRecord = {
         _id: datum._id,
@@ -614,16 +451,13 @@ function DataList({history}) {
         });
       });
   });
-  }
     return newData;
   }
-  const filterDataList = (selectedFilters) => {
-    setFilterPanelDisplay(false);
+  const filterDataList = (filteredResult) => {
     setDatalistMessage('Filtering data...');
-    let dataListToUpdate = unFilteredData;
     setDatalist([]);
     setRowsSelected([]);
-    setDatalist(parseGetDataList(dataListToUpdate , selectedFilters));
+    setDatalist(filteredResult);
     setDatalistMessage(null);
   }
   const fetchDataList = () => {
@@ -633,8 +467,10 @@ function DataList({history}) {
     api.post(URL_MAP.GET_DATA_LIST, {status: ['new', 'ready']})
       .then((res)=>{
         let data = res.data.data;
+        let contr = refreshCounter+1;
+        setRefreshCounter(contr);
         let parsedResult = parseGetDataList(data.data_lists);
-        setUnFilteredData(parsedResult);
+        setUnFilteredData([...parsedResult]);
         setDatalist(parsedResult);
       })
       .catch((err)=>{
@@ -645,13 +481,11 @@ function DataList({history}) {
       });
   }
   const ResetAllFilters = () => {
-    setFilterPanelDisplay(false);
-    setDatalist(unFilteredData);
+    setDatalist([...unFilteredData]);
   }
   useEffect(()=>{
     fetchDataList();
   },[]);
-
   const hideErrorMessage = () => {
     setAjaxMessage(null)
   }
@@ -666,7 +500,7 @@ function DataList({history}) {
           {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
         </Alert>}
       </Snackbar>
-      <Box style={{display: 'flex', flexWrap: 'wrap'}}>
+      <Box style={{display: 'flex', flexWrap: 'wrap', margin: "15px 0px"}}>
         <Typography color="primary" variant="h6">Data List</Typography>
         <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDataList()}}/>
         <CompactButton className={classes.ml1} label="Labels" variant="contained" color="primary"
@@ -674,29 +508,20 @@ function DataList({history}) {
         <CompactButton className={classes.ml1} label="Data groups" variant="contained" color="primary"
           onClick={()=>{history.push('dg')}} />
         <Box className={classes.rightAlign}>
-          {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Old Annotation</Button> */}
-          <Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
-          {/* <ButtonGroup className={classes.ml1}>
-            <Button>Date range</Button>
-            <Button>Search data</Button>
-          </ButtonGroup> */}
+          <Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
         </Box>
       </Box>
       <AsssignDataGroup open={showAssignDG} onClose={()=>{setShowAssignDG(false)}}
         onOK={onAssignData} api={api}/>
       <AsssignDataStructure open={showAssignStruct} onClose={()=>{setShowAssignStruct(false)}}
         onOK={onAssignData} api={api}/>
-      <FilterDialogBox isOpen={showFilterPanel} onClose={()=>{setFilterPanelDisplay(false)}} onApplyFilter={filterDataList} customFilters={customFilters} comparisonOptions={comparisonOptions} onResetAllFilters={ResetAllFilters}/>
-
-      <MUIDataTable
-        title={<>
+        <>
           <Box display="flex">
-          <Button disabled={rowsSelected.length == 0} variant='outlined' style={{height: '2rem'}} size="small"
+          <Button disabled={rowsSelected.length === 0 } variant='outlined' style={{height: '2rem'}} size="small"
             endIcon={<ChevronRightOutlinedIcon />} onClick={onMassMenuClick}>Mass action</Button>
           {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
           {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
-          <Button variant='outlined' style={{height: '2rem', marginLeft:10}} size="small"
-            endIcon={<ChevronRightOutlinedIcon />} onClick={()=>setFilterPanelDisplay(true)}>Add/Remove filters</Button>
+          <TableFilterPanel refreshCounter={refreshCounter} unFilteredData={unFilteredData} disabled={unFilteredData.length === 0} onApplyFilter={filterDataList} coloumnDetails={columns} onResetAllFilters={ResetAllFilters} />
           </Box>
           <Popover
             open={Boolean(massAnchorEl)}
@@ -716,7 +541,11 @@ function DataList({history}) {
             <MenuItem onClick={()=>{sendFileDetailsForExtraction(); }}>Mass data extraction</MenuItem>
             <MenuItem onClick={onDeleteFiles}>Delete files</MenuItem>
           </Popover>
-        </>}
+        </>
+      <MUIDataTable
+        title={<>
+                <Typography color="primary" variant="h8">Please select file(s) for annotation</Typography>
+              </>}
         data={datalist}
         columns={columns}
         options={options}
