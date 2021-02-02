@@ -29,13 +29,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 export default function Results() {
   const classes = useStyles();
   const [stackPath, setStackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
 	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
-  const [massAnchorEl, setMassAnchorEl] = useState();
+  const [massAnchorEl, setDownloadAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
   const [showAssignDG, setShowAssignDG] = useState(false);
   const [pageMessage, setPageMessage] = useState(null);
@@ -131,12 +132,12 @@ export default function Results() {
     }
   };
 
-  const onMassMenuClick = (event) => {
-    setMassAnchorEl(event.currentTarget);
+  const onDownloadMenuClick = (event) => {
+    setDownloadAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
-    setMassAnchorEl(null);
+    setDownloadAnchorEl(null);
   };
 
   const parseGetDataList = (data) => {
@@ -186,6 +187,7 @@ export default function Results() {
           page_no: page,
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
+          datagroup_id: datum.images[page].datagroup_id,
           datagroup_name: datum.images[page].datagroup_name,
           img_thumb: datum.images[page].img_thumb
         });
@@ -209,6 +211,35 @@ export default function Results() {
       .then(()=>{
         setDatalistMessage(null);
       });
+  }
+
+  const postDownloadRequest = (type) => {
+    handleClose();
+    if(!datalist[rowsSelected[0]]['datagroup_id']) {
+      setAjaxMessage({
+        error: true, text: "Datagroup must be assigned.",
+      });
+      return;
+    }
+    setPageMessage('Requesting...');
+    api.post(URL_MAP.SCHEDULE_DOWNLOAD_REQUEST, {
+      type: type,
+      datagroup_id: datalist[rowsSelected[0]]['datagroup_id'],
+    }).then((res)=>{
+      setAjaxMessage({
+        error: false, text: 'Request success. Please check downloads !!',
+      });
+    }).catch((error)=>{
+      if(error.response) {
+        setAjaxMessage({
+          error: true, text: error.response.data.message,
+        });
+      } else {
+        console.error(error);
+      }
+    }).then(()=>{
+      setPageMessage(null);
+    })
   }
 
   useEffect(()=>{
@@ -240,6 +271,8 @@ export default function Results() {
           <MUIDataTable
             title={<>
               <Box display="flex">
+              <Button disabled={rowsSelected.length == 0} variant='outlined' style={{height: '2rem'}} size="small"
+                endIcon={<ChevronRightOutlinedIcon />} onClick={onDownloadMenuClick}>Download</Button>
               {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
               {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
               </Box>
@@ -256,7 +289,7 @@ export default function Results() {
                   horizontal: 'left',
                 }}
               >
-                <MenuItem onClick={()=>{setMassAnchorEl(null); setShowAssignDG(true)}}>Assign datagroup</MenuItem>
+                <MenuItem onClick={()=>{setDownloadAnchorEl(null); postDownloadRequest('csv')}}>CSV</MenuItem>
               </Popover>
             </>}
             data={datalist}

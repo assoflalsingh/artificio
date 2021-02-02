@@ -5,6 +5,7 @@ import {getInstance} from '../../others/artificio_api.instance';
 import UploadFile from './UploadFile';
 import DataList from './DataList';
 import Results from './Results';
+import Downloads from './Downloads';
 
 
 
@@ -22,6 +23,7 @@ export default function DataExtraction() {
         "Upload file": <UploadFile />,
         "Data list": <DataList />,
         "Results": <Results />,
+        "Downloads": <Downloads />,
       }
     } panelClasses={classes.panelClasses}/>
   );

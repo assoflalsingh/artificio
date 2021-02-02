@@ -74,6 +74,9 @@ export const URL_MAP = {
   GET_ANNOTATION_DETAILS: 'label/get-image-annotation-details/',
   UPDATE_FILE_STATUS: 'label/update-file-status/',
 
+  GET_DOWNLOADS_LIST: 'downloads/list/',
+  SCHEDULE_DOWNLOAD_REQUEST: 'downloads/schedule/',
+
   /* ReCaptcha */
 
   RECAPTCHA_API: `https://www.google.com/recaptcha/api.js?render=${APP_CONFIGS.CAPTCHA_SITE_KEY}`,
