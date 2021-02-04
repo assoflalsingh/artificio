@@ -5,7 +5,7 @@ import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
 import {CompactButton, RefreshIconButton} from '../../components/CustomButtons';
-import TableFilterPanel from "../../components/TableFilterPanel"
+import TableFilterPanel from "../../components/TableFilterPanel";
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';

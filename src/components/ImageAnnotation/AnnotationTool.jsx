@@ -74,10 +74,11 @@ export default class AnnotationTool extends React.Component {
         if (proposal) {
 					const ids = proposal.id.split("-");
 					const proposalIndex = parseInt(ids[0]);
-					const wordIndex = parseInt(ids[1]);
-					this.textAnnotations[proposalIndex].word_details[
-						wordIndex
-						].entity_label = labelValue || label;
+          const wordIndex = parseInt(ids[1]);
+          if(this.textAnnotations[proposalIndex].word_details[wordIndex])
+          {
+            this.textAnnotations[proposalIndex].word_details[wordIndex].entity_label = labelValue || label;
+          }
 				}
       });
     });
@@ -98,9 +99,10 @@ export default class AnnotationTool extends React.Component {
           const ids = proposal.id.split("-");
 					const proposalIndex = parseInt(ids[0]);
           const wordIndex = parseInt(ids[1]);
-          this.textAnnotations[proposalIndex].word_details[
-						wordIndex
-						].entity_label = DefaultLabel.label_value;
+          if(this.textAnnotations[proposalIndex].word_details[wordIndex])
+          {
+            this.textAnnotations[proposalIndex].word_details[wordIndex].entity_label = DefaultLabel.label_value;
+          }
 				}
       });
   };
@@ -111,9 +113,9 @@ export default class AnnotationTool extends React.Component {
         const ids = proposal.id.split("-");
         const proposalIndex = parseInt(ids[0]);
         const wordIndex = parseInt(ids[1]);
-        this.textAnnotations[proposalIndex].word_details[
-          wordIndex
-        ].entity_label = labelName;
+        if(this.textAnnotations[proposalIndex].word_details[wordIndex]) {
+          this.textAnnotations[proposalIndex].word_details[wordIndex].entity_label = labelName;
+        }
       });
     }
   };
@@ -124,7 +126,7 @@ export default class AnnotationTool extends React.Component {
       const proposalIndex = parseInt(ids[0]);
       const wordIndex = parseInt(ids[1]);
       const data = this.canvasManager.getAnnotationData(proposal);
-      const word = this.textAnnotations[proposalIndex].word_details[wordIndex];
+      const word = this.textAnnotations[proposalIndex]?.word_details[wordIndex];
       if (word && word.bounding_box && word.bounding_box.vertices) {
         word.bounding_box.vertices = data.label_points.map((point) => {
           return { x: point[0], y: point[1] };
@@ -263,6 +265,7 @@ export default class AnnotationTool extends React.Component {
       .then(() => {
         this.setLoader(false);
         this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
+        this.fetchImageData(this.state.activeImageIndex);
         this.setState({
           deleteAllAnnotation: false,
           ajaxMessage: {
@@ -515,14 +518,6 @@ export default class AnnotationTool extends React.Component {
               getAnnotationAccuracy={this.getAnnotationAccuracy}
             />
           )}
-          {/*<Box style={{overflow: 'auto', flexGrow: 1}}>*/}
-          {/*	{activeImage && */}
-          {/*		<LabelValues */}
-          {/*			activeImage={activeImage} */}
-          {/*			labelsData={images[this.state.selectedImage].labels_data} */}
-          {/*			setLabelsData={setLabelsData} */}
-          {/*		/>}*/}
-          {/*</Box>*/}
         </Box>
         {this.canvasManager && (
           <LabelSelector
@@ -556,6 +551,7 @@ export default class AnnotationTool extends React.Component {
         <Snackbar
           open={Boolean(this.state.ajaxMessage)}
           autoHideDuration={6000}
+          onClose={() => this.setState({ ajaxMessage: null })}
         >
           {this.state.ajaxMessage && (
             <Alert

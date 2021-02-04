@@ -138,7 +138,7 @@ export class LabelSelector extends CanvasEventAttacher {
               position: "absolute",
               opacity: 1,
               top: this.state.position.y,
-              left: this.state.position.x,
+              left: this.state.position.x <= 150 ? this.state.position.x : this.state.position.x - 80,
               zIndex: 1000,
             }}
           >
@@ -252,7 +252,7 @@ const Label = ({
   const [creatableLabel, setCreatableLabel] = React.useState(undefined);
   return (
     <Paper className={classnames(classes.regionInfo)}>
-      <Box style={{ width: 200 }}>
+      <Box style={{ width: 185 }}>
         <Box>
           <Box style={{ display: "flex", flexDirection: "row" }}>
             {!proposalMode && (
