@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
+import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
-import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton, RefreshIconButton} from '../../components/CustomButtons';
-
+import {RefreshIconButton} from '../../components/CustomButtons';
+import TableFilterPanel from "../../components/TableFilterPanel";
 import {Stacked, StackItem} from '../../components/Stacked';
 import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
@@ -32,17 +31,19 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Results() {
   const classes = useStyles();
-  const [stackPath, setStackPath] = useState('home');
+  const [stackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
 	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setDownloadAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
-  const [showAssignDG, setShowAssignDG] = useState(false);
+  const [] = useState(false);
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
+  const [unFilteredData, setUnFilteredData] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
+  const [refreshCounter, setRefreshCounter] = useState(1);
 
   const columns = [
     {
@@ -52,7 +53,9 @@ export default function Results() {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "page_no",
@@ -61,7 +64,9 @@ export default function Results() {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "datagroup_name",
@@ -70,7 +75,9 @@ export default function Results() {
         filter: true,
         sort: true,
         draggable: true
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "img_status",
@@ -78,10 +85,12 @@ export default function Results() {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value, tableMeta)=>{
+        customBodyRender: (value)=>{
           return <Chip size="small" label={value?.replace('-', ' ').toUpperCase()} variant="outlined" />;
         }
       },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "created_by",
@@ -89,7 +98,9 @@ export default function Results() {
       options: {
         filter: true,
         sort: true,
-      }
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
     },
     {
       name: "timestamp",
@@ -97,11 +108,13 @@ export default function Results() {
       options: {
         filter: false,
         sort: true,
-        customBodyRender: (value, tableMeta)=>{
+        customBodyRender: (value)=>{
           let d = new Date(`${value}+00:00`);
           return d.toLocaleString();
         }
-      }
+      },
+      possibleComparisons: ["gt", "lt","drange"],
+      type:"datetime"
     },
   ];
 
@@ -203,7 +216,11 @@ export default function Results() {
     api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process', 'completed']})
       .then((res)=>{
         let data = res.data.data;
-        setDatalist(parseGetDataList(data.data_lists));
+        let contr = refreshCounter+1;
+        setRefreshCounter(contr);
+        let parsedResult = parseGetDataList(data.data_lists);
+        setUnFilteredData([...parsedResult]);
+        setDatalist(parsedResult);
       })
       .catch((err)=>{
         console.error(err);
@@ -212,7 +229,16 @@ export default function Results() {
         setDatalistMessage(null);
       });
   }
-
+  const filterDataList = (filteredResult) => {
+    setDatalistMessage('Filtering data...');
+    setDatalist([]);
+    setRowsSelected([]);
+    setDatalist(filteredResult);
+    setDatalistMessage(null);
+  }
+  const ResetAllFilters = () => {
+    setDatalist([...unFilteredData]);
+  }
   const postDownloadRequest = (type) => {
     handleClose();
     if(!datalist[rowsSelected[0]]['datagroup_id']) {
@@ -225,7 +251,7 @@ export default function Results() {
     api.post(URL_MAP.SCHEDULE_DOWNLOAD_REQUEST, {
       type: type,
       datagroup_id: datalist[rowsSelected[0]]['datagroup_id'],
-    }).then((res)=>{
+    }).then(()=>{
       setAjaxMessage({
         error: false, text: 'Request success. Please check downloads !!',
       });
@@ -260,21 +286,21 @@ export default function Results() {
               {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
             </Alert>}
           </Snackbar>
-          <Box display="flex">
+          <Box display="flex" style={{margin: "15px 0px"}}>
             <Typography color="primary" variant="h6">Results</Typography>
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
             <Box className={classes.rightAlign}>
               {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
-							<Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
+							<Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
             </Box>
           </Box>
-          <MUIDataTable
-            title={<>
-              <Box display="flex">
+          <>
+          <Box display="flex">
               <Button disabled={rowsSelected.length == 0} variant='outlined' style={{height: '2rem'}} size="small"
                 endIcon={<ChevronRightOutlinedIcon />} onClick={onDownloadMenuClick}>Download</Button>
               {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
               {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
+              <TableFilterPanel refreshCounter={refreshCounter} unFilteredData={unFilteredData} disabled={unFilteredData.length === 0} onApplyFilter={filterDataList} coloumnDetails={columns} onResetAllFilters={ResetAllFilters} />
               </Box>
               <Popover
                 open={Boolean(massAnchorEl)}
@@ -291,6 +317,10 @@ export default function Results() {
               >
                 <MenuItem onClick={()=>{setDownloadAnchorEl(null); postDownloadRequest('csv')}}>CSV</MenuItem>
               </Popover>
+            </>
+          <MUIDataTable
+            title={<>
+              <Typography color="primary" variant="h8">Please select file(s) for review</Typography>
             </>}
             data={datalist}
             columns={columns}
