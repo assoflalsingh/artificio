@@ -140,9 +140,7 @@ export default function Results() {
     onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelectedNow)=>{
       setRowsSelected(rowsSelectedNow)
     },
-    isRowSelectable: (dataIndex)=>{
-      return datalist[dataIndex].img_status == "completed" ? false : true;
-    }
+    isRowSelectable: ()=> true
   };
 
   const onDownloadMenuClick = (event) => {

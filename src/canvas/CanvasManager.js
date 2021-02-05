@@ -626,29 +626,37 @@ export class CanvasManager extends CanvasScene {
             textarea.style.width = newWidth + 'px';
           }
   
-          textarea.addEventListener('keydown', function (e) {
-            // hide on enter
-            // but don't hide on shift + enter
-            if (e.keyCode === 13 && !e.shiftKey) {
-              text.text(textarea.value);
-              removeTextarea.call(this);
-            }
-            // on esc do not set value back to node
-            if (e.keyCode === 27) {
-              removeTextarea.call(this);
-            }
-          });
+          // textarea.addEventListener('keydown', function (e) {
+          //   // hide on enter
+          //   // but don't hide on shift + enter
+          //   if (e.keyCode === 13 && !e.shiftKey) {
+          //     text.text(textarea.value);
+          //     removeTextarea.call(this);
+          //   }
+          //   // on esc do not set value back to node
+          //   if (e.keyCode === 27) {
+          //     removeTextarea.call(this);
+          //   }
+          // });
   
           textarea.addEventListener('keydown', function (e) {
-            let scale = rect.getAbsoluteScale().x;
+            if (e.which === 13) {
+              handleOutsideClick(e);
+            }
+            else if (e.which === 27) {
+              removeTextarea.call(this);
+            }
+            else {
+              let scale = rect.getAbsoluteScale().x;
             setTextareaWidth(rect.width() * scale);
             textarea.style.height = 'auto';
             textarea.style.height =
               textarea.scrollHeight + text.fontSize() + 'px';
+          }
           });
   
           function handleOutsideClick(e) {
-            if (e.target !== textarea) {
+            if (e.target !== textarea || (e.target === textarea && e.which === 13)) {
               const ids = proposal.id.split("-");
               const proposalIndex = parseInt(ids[0]);
               const wordIndex = parseInt(ids[1]);
