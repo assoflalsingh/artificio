@@ -134,7 +134,7 @@ export default function SignIn({history, location}) {
         if(location.state && location.state.from === 'signin') {
           history.push(location.state.from);
         } else {
-          history.push('/dashboard');
+          history.push('/dashboard/createModel');
         }
       }).catch((err)=>{
         if (err.response) {
