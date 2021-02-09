@@ -178,12 +178,8 @@ export default function Downloads() {
             </Alert>}
           </Snackbar>
           <Box display="flex">
-            <Typography color="primary" variant="h6">Results</Typography>
+            <Typography color="primary" variant="h6">Download reports</Typography>
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
-            <Box className={classes.rightAlign}>
-              {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
-							<Button onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
-            </Box>
           </Box>
           <MUIDataTable
             title={<>

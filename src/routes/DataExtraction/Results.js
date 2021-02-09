@@ -237,7 +237,7 @@ export default function Results() {
   const ResetAllFilters = () => {
     setDatalist([...unFilteredData]);
   }
-  const postDownloadRequest = (type) => {
+  const postDownloadRequest = (file_type) => {
     handleClose();
     if(!datalist[rowsSelected[0]]['datagroup_id']) {
       setAjaxMessage({
@@ -246,9 +246,16 @@ export default function Results() {
       return;
     }
     setPageMessage('Requesting...');
+    let data_lists = {};
+    rowsSelected.map((i)=>{
+      let row = datalist[i];
+      data_lists[row._id] = data_lists[row._id] || [];
+      data_lists[row._id].push(row.page_no);
+    });
     api.post(URL_MAP.SCHEDULE_DOWNLOAD_REQUEST, {
-      type: type,
+      file_type: file_type,
       datagroup_id: datalist[rowsSelected[0]]['datagroup_id'],
+      data_lists: data_lists,
     }).then(()=>{
       setAjaxMessage({
         error: false, text: 'Request success. Please check downloads !!',

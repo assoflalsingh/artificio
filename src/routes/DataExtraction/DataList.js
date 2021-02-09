@@ -78,7 +78,7 @@ function AsssignDataGroup({open, onClose, onOK, api}) {
         });
     }
   }, [open]);
-  
+
   return(
     <Dialog disableBackdropClick disableEscapeKeyDown open={open} onClose={onClose}>
       <DialogContent>
@@ -152,7 +152,7 @@ function DataList({history}) {
   const [unFilteredData, setUnFilteredData] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
   const [refreshCounter, setRefreshCounter] = useState(1);
-  
+
   const columns = [
     {
       name: "file",
@@ -314,7 +314,7 @@ function DataList({history}) {
         massExtractionPayload.data_lists.push(
           {
             id: datalist[row]._id,
-            images:[{ 
+            images:[{
               struct_id: datalist[row].struct_id,
               datagroup_name: datalist[row].datagroup_name,
               datagroup_id:datalist[row].datagroup_id,

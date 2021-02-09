@@ -23,7 +23,7 @@ export default function DataExtraction() {
         "Upload file": <UploadFile />,
         "Data list": <DataList />,
         "Results": <Results />,
-        "Downloads": <Downloads />,
+        "Download reports": <Downloads />,
       }
     } panelClasses={classes.panelClasses}/>
   );
