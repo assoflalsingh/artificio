@@ -13,7 +13,7 @@ export default function ListItemLink({icon, primary, to, onClick}) {
 
   return (
     <ListItem button component={CustomLink} onClick={onClick}>
-      <img src={icon} alt={primary} width= {60} height= {50}></img>
+      <img src={icon} alt={primary} width= {40} height= {30}></img>
       <ListItemText primary={primary} disableTypography/>
     </ListItem>
   );

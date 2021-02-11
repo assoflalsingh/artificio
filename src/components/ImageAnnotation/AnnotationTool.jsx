@@ -141,7 +141,7 @@ export default class AnnotationTool extends React.Component {
       const annotation = this.canvasManager.getAnnotationById(annotationId);
       const proposals = this.canvasManager.getProposals();
       const words = findTextAnnotations(annotation, proposals);
-      if (words.some((w) => w.confidence_score < 0.5) && confidence === 1) {
+      if (words.some((w) => w?.confidence_score < 0.5) && confidence === 1) {
         words.forEach((w) => {
           const index = w.index;
           const proposal = proposals[index];
@@ -149,9 +149,10 @@ export default class AnnotationTool extends React.Component {
 						const ids = proposal.id.split("-");
 						const proposalIndex = parseInt(ids[0]);
 						const wordIndex = parseInt(ids[1]);
-						this.textAnnotations[proposalIndex].word_details[
-							wordIndex
-							].confidence_score = 1.00;
+            if(this.textAnnotations[proposalIndex].word_details[wordIndex])
+            {
+              this.textAnnotations[proposalIndex].word_details[wordIndex].confidence_score = 1.00;
+            }
 					}
         });
       }

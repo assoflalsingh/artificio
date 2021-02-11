@@ -38,6 +38,7 @@ export default function SideMenuBar({baseurl}) {
     <>
       <List component="nav" className={classes.root}>
         <ListItemLink icon={StorageIcon} primary='Create Model' to={`${baseurl}/createModel`}/>
+        <Divider />
         <ListItemLink icon={FormatShapesIcon} primary='Annotation' to={`${baseurl}/annotation`}/>
         {/* <MenuItem button onClick={handleClick}>
           <ListItemIcon>

@@ -747,7 +747,7 @@ export class CanvasManager extends CanvasScene {
             id: `${proposalIndex}-${wordIndex}`,
             label: word.bounding_box.entity_label,
             color:
-              word.confidence_score > 0.5
+              word?.confidence_score > 0.5
                 ? AnnotationProposalColor
                 : AnnotationProposalLowConfidenceScoreColor,
           };

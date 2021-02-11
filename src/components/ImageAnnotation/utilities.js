@@ -121,7 +121,7 @@ export function findTextAnnotations(annotation, proposals) {
       // Containing boxes logic
       if (x1 >= px1 && y1 >= py1 && x2 <= px2 && y2 <= py2) {
         words.push({
-          confidence_score: proposal.word.confidence_score,
+          confidence_score: proposal?.word?.confidence_score,
           entity_label: proposal.word.entity_label,
           word_description: proposal.word.word_description,
           index,
@@ -148,7 +148,7 @@ export function findTextAnnotations(annotation, proposals) {
 						)
 					) {
 						words.push({
-							confidence_score: proposal.word.confidence_score,
+							confidence_score: proposal?.word?.confidence_score,
 							entity_label: proposal.word.entity_label,
 							word_description: proposal.word.word_description,
 							vertices,
@@ -169,7 +169,7 @@ export function getLabelValueFromProposals(annotation, proposals) {
   let count = 0;
   words.forEach((w, index) => {
     labelValue = labelValue.concat(w.word_description + " ");
-    confidence += w.confidence_score;
+    confidence += w?.confidence_score;
     count++;
   });
   return { value: labelValue, confidence: confidence / count, words };
