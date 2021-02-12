@@ -244,6 +244,40 @@ export default class AnnotationTool extends React.Component {
     }
   }
 
+  downloadCsv() {
+    this.setLoader(true);
+    const selectedImage = this.props.images[this.state.activeImageIndex];
+    const annotatedData = this.canvasManager.getData();
+    if(annotatedData['labels'].length === 0) {
+      this.setState({
+        ajaxMessage: {
+          error: true,
+          text: "No data available  !!",
+        },
+      });
+    } else {
+      let header = '';
+      let data = '';
+      annotatedData['labels'].forEach((label)=>{
+        if(header != '') {
+          header += ',';
+          data += ',';
+        }
+        header += label['label_name'];
+        data += '"' + label['label_value'] + '"';
+      });
+      let csvContent = "data:text/csv;charset=utf-8,"+header+'\n'+data;
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `${this.state.imageName}-${selectedImage.page_no}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+    this.setLoader(false);
+  }
+
   saveImageData = (inReview) => {
     if(this.state.deleteAllAnnotation) {
       this.updateModelLabelsForAllAnnotations(DefaultLabel.label_value);
@@ -481,6 +515,7 @@ export default class AnnotationTool extends React.Component {
             reset={() => this.fetchImageData(this.state.activeImageIndex)}
             saveStructure={() => this.setState({createStructOpen: true})}
             chooseStructure={() => this.setState({chooseStructOpen: true})}
+            downloadCsv={() => this.downloadCsv()}
           />
           <Box style={{ backgroundColor: "#383838", height: "80%" }}>
             {this.state.loading && <Loader />}

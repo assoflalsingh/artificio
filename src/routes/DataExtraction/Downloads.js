@@ -132,6 +132,10 @@ export default function Downloads() {
     elevation: 0,
     filter: false,
     print: false,
+    sortOrder: {
+      name: 'last_updated',
+      direction: 'desc'
+    },
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
     responsive: 'vertical',

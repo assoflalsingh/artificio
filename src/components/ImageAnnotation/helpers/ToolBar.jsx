@@ -23,6 +23,8 @@ import ShuffleIcon from '@material-ui/icons/Shuffle';
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
+import GetAppIcon from '@material-ui/icons/GetApp';
+
 const useClasses = makeStyles(() => ({
   button: {
     borderRadius: 0,
@@ -233,6 +235,11 @@ export class ToolBar extends CanvasEventAttacher {
           label={'Save structure'}
           icon={<DashboardIcon />}
           onClick={this.props.saveStructure}
+        />
+        <ToolBarButton
+          label={'Download CSV'}
+          icon={<GetAppIcon />}
+          onClick={this.props.downloadCsv}
         />
         <ToolBarButton
           style={{ float: "right" }}
