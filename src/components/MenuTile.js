@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Card, CardContent, makeStyles, Typography } from '@material-ui/core';
 import clsx from 'clsx';
 import {ButtonLink} from './CustomButtons';
+import CustomToolTip from './CustomToolTip'
 
 const useStyles = makeStyles((theme)=>({
   root: {
@@ -32,16 +33,17 @@ const useStyles = makeStyles((theme)=>({
   }
 }));
 
-export default function MenuTile({icon, label, buttonLabel, className, to}) {
+export default function MenuTile({icon, label, buttonLabel, className, to, toolTipLabel, toolTipDesc}) {
   const classes = useStyles();
   return (
     <Card className={clsx(classes.root, className)}>
       <CardContent className={classes.content}>
         <Box className={classes.iconContainer}>
-          <img src={icon} width='100%' height='100%'></img>
+          <img src={icon} width='100%' height='100%' alt={label}></img>
         </Box>
         <Typography className={classes.label}>{label}</Typography>
         <ButtonLink to={to} color="primary" variant="contained" className={classes.buttonLabel}>{buttonLabel}</ButtonLink>
+        {toolTipLabel && <CustomToolTip toolTipTitle={label} toolTipLabel={toolTipLabel}  toolTipDesc={toolTipDesc}/>}
       </CardContent>
     </Card>
   )

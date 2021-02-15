@@ -137,7 +137,8 @@ function AsssignDataStructure({open, onClose, onOK, api}) {
   );
 }
 
-function DataList({history}) {
+function DataList(props) {
+  const {history, uploadCounter, annotationSuccessCB} = props;
   const classes = useStyles();
   const [annotateOpen, setAnnotateOpen] = useState(false);
 	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
@@ -428,7 +429,7 @@ function DataList({history}) {
     setPageMessage(null);
   }
 
-  const parseGetDataList = (data, filters) => {
+  const parseGetDataList = (data) => {
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -483,10 +484,12 @@ function DataList({history}) {
   const ResetAllFilters = () => {
     setDatalist([...unFilteredData]);
   }
-  useEffect(()=>{
-    fetchDataList();
-  },[]);
-  const hideErrorMessage = () => {
+
+  useEffect(() => {
+    if (!uploadCounter) return
+      fetchDataList();
+  }, [uploadCounter]);
+ const hideErrorMessage = () => {
     setAjaxMessage(null)
   }
   return (
@@ -556,6 +559,7 @@ function DataList({history}) {
       <ImageAnnotationDialog
         open={annotateOpenV2}
         onClose={()=>{setAnnotateOpenV2(false)}}
+        onSuccessSave= {()=> {annotationSuccessCB()}}
         api={api}
         getImages={()=>rowsSelected.map((i)=>datalist[i])}
       />
@@ -574,15 +578,15 @@ function RouterBackButton() {
   );
 }
 
-export default function() {
+export default function(props) {
   const classes = useStyles();
-
+  const {uploadCounter, annotationSuccessCB} = props;
   return (
     <Box className={classes.root}>
       <MemoryRouter>
         <RouterBackButton />
         <RouteSwitch>
-          <Route exact path="/" component={DataList}></Route>
+          <Route exact path="/"  render={(props) => (<DataList uploadCounter={uploadCounter} annotationSuccessCB={annotationSuccessCB} {...props}/>)} ></Route>
           <Route path="/labels" component={Labels}></Route>
           <Route path="/dg" component={DataGroup}></Route>
         </RouteSwitch>

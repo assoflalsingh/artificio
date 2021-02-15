@@ -7,8 +7,6 @@ import DataList from './DataList';
 import Results from './Results';
 import Downloads from './Downloads';
 
-
-
 const useStyles = makeStyles((theme) => ({
   panelClasses: {
     padding: '1rem',
@@ -16,13 +14,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function DataExtraction() {
+  const [uploadCounter, setUploadCounter] = React.useState(1);
+  const updateUploadCounter = () => {
+    setUploadCounter(uploadCounter+1);
+  }
   const classes = useStyles();
   return (
     <CommonTabs tabs={
       {
-        "Upload file": <UploadFile />,
-        "Data list": <DataList />,
-        "Results": <Results />,
+        "Upload file": <UploadFile successCB={updateUploadCounter}/>,
+        "Data list": <DataList uploadCounter={uploadCounter} annotationSuccessCB={updateUploadCounter}/>,
+        "Results": <Results uploadCounter={uploadCounter} />,
         "Download reports": <Downloads />,
       }
     } panelClasses={classes.panelClasses}/>

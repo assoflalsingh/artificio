@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function UploadFile() {
+export default function UploadFile(props) {
   const username = 'aditya';
   const prng = new seedrandom(username.length.toString());
   const randUploadNo = Math.abs(prng.int32()).toString().substr(0, 6);
@@ -83,6 +83,7 @@ export default function UploadFile() {
             progress: completed,
             done: false
           });
+          props.successCB();
         }
       }).then(()=>{
         setProgressForFile(i, {

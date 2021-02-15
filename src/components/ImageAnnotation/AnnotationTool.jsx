@@ -307,7 +307,7 @@ export default class AnnotationTool extends React.Component {
             error: false,
             text: "Annotation details saved successfully !!",
           },
-        });
+        }, () => this.props.onAnnotationSavedSucces());
       })
       .catch((error) => {
         this.setLoader(false);
@@ -467,7 +467,7 @@ export default class AnnotationTool extends React.Component {
   }
 
   render() {
-    const { images, onAnnotationToolClose } = this.props;
+    const { images, onAnnotationToolClose, onAnnotationSavedSucces } = this.props;
     const activeImage = images && images[this.state.activeImageIndex];
     return (
       <Box display="flex" style={{ height: "100%" }}>
