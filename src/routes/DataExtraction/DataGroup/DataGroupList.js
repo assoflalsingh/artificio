@@ -37,7 +37,6 @@ export default function DataGroupList({setFormData, ...props}) {
     showDGForm();
   };
   const onNameClick = (dataIndex)=>{
-
     setFormData(dglist[dataIndex]);
     showDGForm();
   };

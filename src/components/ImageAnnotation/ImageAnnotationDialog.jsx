@@ -18,6 +18,7 @@ export const ImageAnnotationDialog = (props) => {
           api={api}
           inReview={inReview}
           onClose={props.onClose}
+          onSuccessSave={props.onSuccessSave}
         />
       )}
     </Dialog>

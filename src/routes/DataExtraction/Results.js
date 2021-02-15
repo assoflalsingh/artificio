@@ -29,7 +29,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Results() {
+export default function Results(props) {
+  const {uploadCounter} = props;
   const classes = useStyles();
   const [stackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
@@ -272,11 +273,11 @@ export default function Results() {
       setPageMessage(null);
     })
   }
-
-  useEffect(()=>{
-    fetchDataList();
-  },[]);
-
+  useEffect(() => {
+    if (!uploadCounter) return
+      fetchDataList();
+  }, [uploadCounter]);
+  
   return (
     <>
     <Box className={classes.root}>
