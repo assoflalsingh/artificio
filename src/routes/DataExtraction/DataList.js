@@ -559,7 +559,6 @@ function DataList(props) {
       <ImageAnnotationDialog
         open={annotateOpenV2}
         onClose={()=>{setAnnotateOpenV2(false)}}
-        onSuccessSave= {()=> {annotationSuccessCB()}}
         api={api}
         getImages={()=>rowsSelected.map((i)=>datalist[i])}
       />

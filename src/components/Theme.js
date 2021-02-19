@@ -264,6 +264,45 @@ const theme = createMuiTheme({
     }
 }, globalTheme);
 
+export const DMUploaderCustomTheme = createMuiTheme({
+  typography: {
+    ...globalTheme.typography,
+  },
+  overrides: {
+      MuiDropzoneArea: {
+        root: {
+          minHeight: 150,
+          maxHeight: 150,
+          borderRadius: '0.125rem',
+          borderColor: globalTheme.palette.primary.main,
+          backgroundColor: globalTheme.palette.primary.light,
+          width: '100%',
+          margin: '2rem 0rem'
+        },
+        text: {
+          fontSize: globalTheme.typography.fontSize,
+          fontFamily: globalTheme.typography.fontFamily,
+          margin: '0.75rem 5rem'
+        }
+      },
+      MuiDropzonePreviewList: {
+        root: {
+          margin: '0rem',
+        }
+      },
+      MuiDialogTitle: {
+        root: {
+          padding: '0.5rem'
+        }
+      },
+      MuiDialogContent: {
+        root: {
+          padding: '0.5rem 1rem',
+          minWidth: '600px',
+        }
+      }
+  }
+}, globalTheme);
 export default function Theme(props) {
     return (
         <ThemeProvider theme={theme}>

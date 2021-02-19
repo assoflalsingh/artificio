@@ -91,7 +91,6 @@ export default class ImageAnnotation extends React.Component {
             api={this.props.api}
             images={Object.values(this.state.images)}
             onAnnotationToolClose={this.props.onClose}
-            onAnnotationSavedSucces= {this.props.onSuccessSave}
             inReview={this.props.inReview}
           />
         )}

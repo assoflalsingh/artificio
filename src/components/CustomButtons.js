@@ -16,13 +16,14 @@ const YellowButton = withStyles((theme) => ({
   },
 }))(Button);
 
-export function CompactButton({className, label, onClick, ...props}) {
+export function CompactButton({className, label, onClick, children, ...props}) {
   return (
     <Button size="small" className={className}
       onClick={onClick} {...props} style={{
           height: '2rem'
         }}>
         {label}
+        {children}
     </Button>
   )
 }
