@@ -126,6 +126,7 @@ export default function Results(props) {
     elevation: 0,
     filter: false,
     print: false,
+    download: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
     sortOrder: {
