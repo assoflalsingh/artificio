@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, Dialog, DialogTitle, Paper, DialogContent, LinearProgress, Tooltip, Typography } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import ErrorIcon from '@material-ui/icons/Error';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles(()=>({
   root: {
@@ -19,6 +21,11 @@ const useStyles = makeStyles(()=>({
   },
   rightAlign: {
     marginLeft: 'auto',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 6,
+    top: 6
   }
 }));
 
@@ -63,7 +70,14 @@ export default function FileUploadProgress({fileUploadInfo=[], ...props}) {
   }
   return (
     <Dialog {...props} className={classes.root}>
-      <DialogTitle>Files upload progress</DialogTitle>
+      <DialogTitle>
+        Files upload progress
+        {props.onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={props.onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+      </DialogTitle>
       <DialogContent>
         {fileUploadInfo.length > 0 && fileUploadInfo.map((fileInfo, i)=>{
           return <SingleFile key={i} name={fileInfo.name} progress={fileInfo.progress} done={fileInfo.done} error={fileInfo.error}/>

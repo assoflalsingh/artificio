@@ -17,7 +17,7 @@ export default function LabelForm({initFormData, ...props}) {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [saving, setSaving] = useState(false);
-
+  const CURRENT_APP_ID = "10";
   const [opLoading, setOpLoading] = useState(false);
 
   const [appUsageOpts, setAppUsageOpts] = useState([]);
@@ -26,8 +26,8 @@ export default function LabelForm({initFormData, ...props}) {
 
   const formValidators = {
     data_set_id: {
-      validators: ['required', {type:'regex', param:'^[a-zA-Z0-9-@()_ ]{1,20}$'}],
-      messages: ['This field is required', 'Only alpha-numeric allowed with max length of 20.'],
+      validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
+      messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
     },
     desc: {
       validators: ['required', {type:'regex', param:'^[a-zA-Z0-9-@()_ ]{1,20}$'}],
@@ -46,7 +46,7 @@ export default function LabelForm({initFormData, ...props}) {
       setAppUsageOpts(data);
       if(editMode) {
         let formAppUsage = data.filter((label)=>{
-          return initFormData.app_usage.indexOf(label._id) > -1;
+          return Object.keys(initFormData.app_usage).indexOf(label._id) > -1;
         });
         setFormData({
           ...initFormData,
@@ -116,7 +116,7 @@ export default function LabelForm({initFormData, ...props}) {
         "data_set_id":formData.data_set_id,
         "desc": formData.desc ,
         "app_usage": formData.app_usage.map((label)=>label._id),
-        "app_id": "10",
+        "app_id": CURRENT_APP_ID,
         "update":editMode || false,
         "_id": editMode ? formData._id : null
       };

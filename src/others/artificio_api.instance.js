@@ -52,6 +52,7 @@ export const URL_MAP = {
 
   /* annotation */
   UPLOAD_TO_S3: 'upload-to-s3/',
+  UPLOAD_DATA_SET_FILE: 'api/v2/upload-to-s3/',
 
   CREATE_LABEL: 'label/post-labels/',
   UPDATE_LABEL: 'label/update-labels/',

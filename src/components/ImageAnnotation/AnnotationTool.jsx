@@ -51,8 +51,9 @@ export default class AnnotationTool extends React.Component {
     createStructOpen: false,
     chooseStructOpen: false,
     deleteAllAnnotation: false,
+    isSaved: false
   };
-
+  
   deleteProposalInModelData = (proposal) => {
     const ids = proposal.id.split("-");
     const proposalIndex = parseInt(ids[0]);
@@ -303,6 +304,7 @@ export default class AnnotationTool extends React.Component {
         this.fetchImageData(this.state.activeImageIndex);
         this.setState({
           deleteAllAnnotation: false,
+          isSaved: true,
           ajaxMessage: {
             error: false,
             text: "Annotation details saved successfully !!",

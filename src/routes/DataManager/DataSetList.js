@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { Backdrop, Box, Button, Chip, CircularProgress, Snackbar, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
@@ -8,13 +8,22 @@ import { MemoryRouter, Route, Switch as RouteSwitch, useHistory, useLocation, Li
 import {CompactButton} from '../../components/CustomButtons';
 import DataSets from './DataSets';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
-
+import { DropzoneDialog } from 'material-ui-dropzone';
+import {getEpochNow} from '../../others/utils';
+import seedrandom from 'seedrandom';
+import FileUploadProgress from '../../components/FileUploadProgress';
+import {DMUploaderCustomTheme} from "../../components/Theme"
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
     marginLeft: 'auto'
   },
   ml1: {
     marginLeft: '1rem',
+  },
+  fileUpload: {
+    marginLeft: '1rem',
+    height: '2rem',
+    padding: "4px 10px"
   },
   root: {
     position: 'relative'
@@ -57,9 +66,16 @@ function DataSetList({history}) {
   const [pageMessage, setPageMessage] = useState(null);
   const [dataSetlist, setDataSetlist] = useState([]);
   const [ajaxMessage, setAjaxMessage] = useState(null);
+  const CURRENT_APP_ID = "10";
   const [dataSetListMessage, setDataSetlistMessage] = useState(null);
+  const [openUpload, setOpenUpload] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
-
+  const username = 'username';
+  const prng = new seedrandom(username.length.toString());
+  const randUploadNo = Math.abs(prng.int32()).toString().substr(0, 6);
+  const [progressFileInfo, setProgressFileInfo] = useState([]);
+  const [progressOpen, setProgressOpen] = useState(false);
+  const [latestSelectionDetails, setLatestSelectionDetails] = useState({});
   const columns = [
     {
       name: "data_set_id",
@@ -138,6 +154,8 @@ function DataSetList({history}) {
     },
     rowsSelected: rowsSelected,
     onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelectedNow)=>{
+      setLatestSelectionDetails(dataSetlist[rowsSelectedNow[rowsSelectedNow.length-1]]);
+      console.log(latestSelectionDetails);
       setRowsSelected(rowsSelectedNow)
     }
   };
@@ -146,6 +164,61 @@ function DataSetList({history}) {
     setAjaxMessage(null)
   }
 
+  const uploadFiles = (files) => {
+    let txnId = `${getEpochNow()}${randUploadNo}`;
+    setProgressFileInfo(files.map((file)=>{
+      return {
+        name: file.name, progress: 0,
+      }
+    }));
+    const setProgressForFile = (i, data) => {
+      setProgressFileInfo((prevProgressFileInfo)=>([
+        ...prevProgressFileInfo.slice(0, i),
+        {
+          ...prevProgressFileInfo[i],
+          ...data,
+        },
+        ...prevProgressFileInfo.slice(i+1)
+      ]));
+    };
+    setProgressOpen(true);
+    files.forEach((file, i) => {
+    const formData = new FormData();
+    formData.append('file',file);
+    formData.append('data_set_id',latestSelectionDetails._id);
+    formData.append('app_id',CURRENT_APP_ID);
+    formData.append('app_usage',JSON.stringify(Object.values(latestSelectionDetails.app_usage)));
+    debugger;
+    api.post(URL_MAP.UPLOAD_DATA_SET_FILE, formData,{
+      headers :{
+        'Content-Type': 'multipart/form-data',
+        'Access-Control-Allow-Origin': '*',
+        'txn_id': txnId,
+        'file_name': file.name
+      },
+      onUploadProgress: (e)=>{
+        let completed = Math.round((e.loaded * 100) / e.total);
+        setProgressForFile(i, {
+          progress: completed,
+          done: false
+        });
+      }
+  }).then(()=>{
+    setProgressForFile(i, {
+      done: true
+    });
+    setAjaxMessage({error: false, text: 'File uploaded successfully !!'})
+  })
+  .catch((error) => {
+    setProgressForFile(i, {
+      progress: 0,
+      done: true,
+      error: 'Error occurred while uploading !!'
+    });
+    setAjaxMessage({error: true, text: "Sorry, there is some technical issue while uploading please try after some time."});
+  })
+    })
+}
   const fetchDataList = () => {
     setDataSetlistMessage('Loading data...');
     setDataSetlist([]);
@@ -181,6 +254,24 @@ function DataSetList({history}) {
         <Typography color="primary" variant="h6">Data sets</Typography>
         <CompactButton className={classes.ml1} label="Create Data set" variant="contained" color="primary"
           onClick={()=>{history.push('create-dataset')}} />
+        {rowsSelected.length > 0 && <Button disabled={rowsSelected.length !== 1} className={classes.fileUpload} variant="contained" color="secondary" onClick={() => setOpenUpload(true)}>
+            Upload File(s)
+        </Button>}
+        <MuiThemeProvider theme={DMUploaderCustomTheme}>
+            <DropzoneDialog
+            dropzoneClass="nishant"
+            dialogTitle="Upload file(s) for data extraction."
+            cancelButtonText={"cancel"}
+            submitButtonText={"submit"}
+            maxFileSize={5000000}
+            open={openUpload}
+            onClose={() => setOpenUpload(false)}
+            onSave={(files) => uploadFiles(files)}
+            showPreviews={true}
+            showFileNamesInPreview={true}
+          />
+      </MuiThemeProvider>
+      <FileUploadProgress fileUploadInfo={progressFileInfo} open={progressOpen} onClose={()=>{setProgressOpen(false)}} />
       </Box>
       <Backdrop className={classes.backdrop} open={Boolean(pageMessage)}>
         <CircularProgress color="inherit" />
@@ -195,7 +286,7 @@ function DataSetList({history}) {
           {dataSetListMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{dataSetListMessage}</Typography></>}
       <MUIDataTable
         title={<>
-          <Typography color="primary" variant="h8">Please select Data set(s) for Editing</Typography>
+          <Typography color="primary" variant="h8">Please select Data set for Editing</Typography>
         </>}
         data={dataSetlist}
         columns={columns}

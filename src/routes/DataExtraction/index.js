@@ -23,7 +23,7 @@ export default function DataExtraction() {
     <CommonTabs tabs={
       {
         "Upload file": <UploadFile successCB={updateUploadCounter}/>,
-        "Data list": <DataList uploadCounter={uploadCounter} annotationSuccessCB={updateUploadCounter}/>,
+        "Data list": <DataList uploadCounter={uploadCounter}/>,
         "Results": <Results uploadCounter={uploadCounter} />,
         "Download reports": <Downloads />,
       }
