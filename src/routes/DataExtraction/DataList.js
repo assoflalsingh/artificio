@@ -484,7 +484,12 @@ function DataList(props) {
   const ResetAllFilters = () => {
     setDatalist([...unFilteredData]);
   }
-
+  const closeAnnotationTool = (wasUpdated) => {
+    if(wasUpdated){
+      fetchDataList();
+    }
+    setAnnotateOpenV2(false)
+  }
   useEffect(() => {
     if (!uploadCounter) return
       fetchDataList();
@@ -558,7 +563,7 @@ function DataList(props) {
 
       <ImageAnnotationDialog
         open={annotateOpenV2}
-        onClose={()=>{setAnnotateOpenV2(false)}}
+        onClose={(wasUpdated)=>{closeAnnotationTool(wasUpdated)}}
         api={api}
         getImages={()=>rowsSelected.map((i)=>datalist[i])}
       />

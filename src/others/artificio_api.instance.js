@@ -69,6 +69,7 @@ export const URL_MAP = {
   GET_APP_USAGE: 'label/get-appusage/',
   GET_DATA_SETS: 'label/get-datasets/',
   CREATE_DATA_SETS: 'label/post-datasets/',
+  GET_DATA_SETS_RESULTS: '/label/get-dataset-results/',
 
   CREATE_STRUCTURE: 'label/post-structure/',
   GET_STRUCTURES: 'label/get-structures/',
