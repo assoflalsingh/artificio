@@ -7,10 +7,8 @@ import MUIDataTable from "mui-datatables";
 import {RefreshIconButton} from '../../components/CustomButtons';
 import TableFilterPanel from "../../components/TableFilterPanel";
 import {Stacked, StackItem} from '../../components/Stacked';
-import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -38,6 +36,7 @@ export default function Results(props) {
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setDownloadAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
+  const [] = useState(false);
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
@@ -48,7 +47,7 @@ export default function Results(props) {
   const columns = [
     {
       name: "file",
-      label: "Filename",
+      label: "File name",
       options: {
         filter: true,
         sort: true,
@@ -59,7 +58,7 @@ export default function Results(props) {
     },
     {
       name: "page_no",
-      label: "Page",
+      label: "Page no",
       options: {
         filter: true,
         sort: true,
@@ -69,8 +68,8 @@ export default function Results(props) {
       type:"string"
     },
     {
-      name: "datagroup_name",
-      label: "Data group",
+      name: "dataset_id",
+      label: "Data set id",
       options: {
         filter: true,
         sort: true,
@@ -80,7 +79,18 @@ export default function Results(props) {
       type:"string"
     },
     {
-      name: "img_status",
+        name: "datastructure_id",
+        label: "Data structure id",
+        options: {
+          filter: true,
+          sort: true,
+          draggable: true
+        },
+        possibleComparisons: ["eq", "bw", "ct", "ew"],
+        type:"string"
+      },
+    {
+      name: "status",
       label: "Status",
       options: {
         filter: true,
@@ -104,7 +114,7 @@ export default function Results(props) {
     },
     {
       name: "timestamp",
-      label: "Date time",
+      label: "Created on",
       options: {
         filter: false,
         sort: true,
@@ -152,35 +162,6 @@ export default function Results(props) {
   };
 
   const parseGetDataList = (data) => {
-  //   {
-  //     "_id": "5f9c3594920d9e5fad533c19",
-  //     "timestamp": "2020-10-30T15:47:32",
-  //     "id": 202010305407,
-  //     "created_by": "name last_name",
-  //     "file": "skipper_logo.jpg",
-  //     "images": [
-  //         {
-  //             "page_1": {
-  //                 "img_name": "202010305407-skipper_logo.jpg",
-  //                 "img_thumb": "thumbnail_202010305407-skipper_logo.jpg",
-  //                 "img_status": "new",
-  //                 "datagroup_id": "",
-  //                 "datagroup_name": ""
-  //             },
-  //             "page_2": {
-  //                 "img_name": "202010305407-skipper_logo1.jpg",
-  //                 "img_thumb": "thumbnail_202010305407-skipper_logo1.jpg",
-  //                 "img_status": "new",
-  //                 "datagroup_id": "",
-  //                 "datagroup_name": ""
-  //             }
-  //         }
-  //     ],
-  //     "account": 12345,
-  //     "status": "new",
-  //     "idStr": "202010305407"
-  // }
-
     let newData = [];
     data.forEach((datum)=>{
       let newRecord = {
@@ -188,6 +169,7 @@ export default function Results(props) {
         timestamp: datum.timestamp,
         created_by: datum.created_by,
         file: datum.file,
+        status: datum.status,
       }
 
       Object.keys(datum.images).forEach((page)=>{
@@ -197,7 +179,6 @@ export default function Results(props) {
           img_json:datum.images[page].img_json,
           page_no: page,
           image_name: datum.images[page].img_name,
-          img_status: datum.images[page].img_status,
           datagroup_id: datum.images[page].datagroup_id,
           datagroup_name: datum.images[page].datagroup_name,
           img_thumb: datum.images[page].img_thumb
@@ -211,7 +192,7 @@ export default function Results(props) {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process', 'completed']})
+    api.post(URL_MAP.GET_DATA_SETS_RESULTS, {status: [], app_id: ["10","20"]})
       .then((res)=>{
         let data = res.data.data;
         let contr = refreshCounter+1;
@@ -272,12 +253,6 @@ export default function Results(props) {
       setPageMessage(null);
     })
   }
-  const closeAnnotationTool = (wasUpdated) => {
-    if(wasUpdated){
-      fetchDataList();
-    }
-    setAnnotateOpenV2(false)
-  }
   useEffect(() => {
     if (!uploadCounter) return
       fetchDataList();
@@ -300,15 +275,9 @@ export default function Results(props) {
           <Box display="flex" style={{margin: "15px 0px"}}>
             <Typography color="primary" variant="h6">Results</Typography>
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
-            <Box className={classes.rightAlign}>
-              {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
-							<Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
-            </Box>
           </Box>
           <>
           <Box display="flex">
-              <Button disabled={rowsSelected.length == 0} variant='outlined' style={{height: '2rem'}} size="small"
-                endIcon={<ChevronRightOutlinedIcon />} onClick={onDownloadMenuClick}>Download</Button>
               {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
               {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
               <TableFilterPanel refreshCounter={refreshCounter} unFilteredData={unFilteredData} disabled={unFilteredData.length === 0} onApplyFilter={filterDataList} coloumnDetails={columns} onResetAllFilters={ResetAllFilters} />
@@ -340,14 +309,6 @@ export default function Results(props) {
       </StackItem>
       </Stacked>
     </Box>
-    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={true} />
-		<ImageAnnotationDialog
-			open={annotateOpenV2}
-			onClose={(wasUpdated)=>{closeAnnotationTool(wasUpdated)}}
-			api={api}
-			getImages={()=>rowsSelected.map((i)=>datalist[i])}
-			inReview={true}
-		/>
     </>
   )
 }

@@ -5,7 +5,7 @@ import MUIDataTable from "mui-datatables";
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
 import Alert from '@material-ui/lab/Alert';
 import { MemoryRouter, Route, Switch as RouteSwitch, useHistory, useLocation, Link } from 'react-router-dom';
-import {CompactButton} from '../../components/CustomButtons';
+import {CompactButton, CompactAddButton} from '../../components/CustomButtons';
 import DataSets from './DataSets';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { DropzoneDialog } from 'material-ui-dropzone';
@@ -254,9 +254,9 @@ function DataSetList({history}) {
         <Typography color="primary" variant="h6">Data sets</Typography>
         <CompactButton className={classes.ml1} label="Create Data set" variant="contained" color="primary"
           onClick={()=>{history.push('create-dataset')}} />
-        {rowsSelected.length > 0 && <Button disabled={rowsSelected.length !== 1} className={classes.fileUpload} variant="contained" color="secondary" onClick={() => setOpenUpload(true)}>
+        {<CompactAddButton disabled={rowsSelected.length !== 1} className={classes.fileUpload} variant="contained" color="secondary" onClick={() => setOpenUpload(true)}>
             Upload File(s)
-        </Button>}
+        </CompactAddButton>}
         <MuiThemeProvider theme={DMUploaderCustomTheme}>
             <DropzoneDialog
             dropzoneClass="nishant"
@@ -286,7 +286,7 @@ function DataSetList({history}) {
           {dataSetListMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{dataSetListMessage}</Typography></>}
       <MUIDataTable
         title={<>
-          <Typography color="primary" variant="h8">Please select Data set for Editing</Typography>
+          <Typography color="primary" variant="h8">Please select the data set for uploading files.</Typography>
         </>}
         data={dataSetlist}
         columns={columns}

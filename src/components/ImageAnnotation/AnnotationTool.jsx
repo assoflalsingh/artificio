@@ -219,7 +219,7 @@ export default class AnnotationTool extends React.Component {
     this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
   };
 
-  async fetchImageData(index) {
+  async fetchImageData(index, isSaved=false) {
     this.setLoader(true);
     this.setState({ activeImageIndex: index });
     const selectedImage = this.props.images[index];
@@ -238,6 +238,7 @@ export default class AnnotationTool extends React.Component {
         imageLabels: this.imageData?.image_labels,
         imageMetadata: this.imageData?.image_json.metadata,
         imageName: this.imageData?.document_file_name,
+        isSaved:isSaved
       });
       this.initializeCanvas();
     } else {
@@ -301,7 +302,7 @@ export default class AnnotationTool extends React.Component {
       .then(() => {
         this.setLoader(false);
         this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
-        this.fetchImageData(this.state.activeImageIndex);
+        this.fetchImageData(this.state.activeImageIndex, true);
         this.setState({
           deleteAllAnnotation: false,
           isSaved: true,
@@ -474,6 +475,7 @@ export default class AnnotationTool extends React.Component {
     return (
       <Box display="flex" style={{ height: "100%" }}>
         <LeftToolBar
+          isSaved={this.state.isSaved}
           regions={activeImage ? activeImage.regions : []}
           undo={this.canvasManager && this.canvasManager.undo}
           redo={this.canvasManager && this.canvasManager.redo}
@@ -500,7 +502,7 @@ export default class AnnotationTool extends React.Component {
             unsetActiveTool={
               this.canvasManager && this.canvasManager.unsetActiveTool
             }
-            onAnnotationToolClose={onAnnotationToolClose}
+            onAnnotationToolClose={onAnnotationToolClose.bind(this,this.state.isSaved)}
             showProposals={this.showProposals}
             blockAnnotationClick={
               this.canvasManager && this.canvasManager.blockAnnotationClick
