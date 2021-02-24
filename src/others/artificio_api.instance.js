@@ -65,7 +65,7 @@ export const URL_MAP = {
   GET_DATAGROUP_NAMES: 'label/get-datagroup-names/',
   GET_DATAGROUPS: 'label/get-datagroups/',
   ASSIGN_DATA: 'label/assign-data/',
-  
+
   GET_APP_USAGE: 'label/get-appusage/',
   GET_DATA_SETS: 'label/get-datasets/',
   CREATE_DATA_SETS: 'label/post-datasets/',

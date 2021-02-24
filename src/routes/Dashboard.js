@@ -91,7 +91,7 @@ const Dashboard = ({match, ...props}) => {
   )
 }
 
-export default connect(()=>{}, (dispatch)=>({
+export default connect(()=>({}), (dispatch)=>({
   setUser: (user)=>dispatch(setUser(user)),
   setUserLoading: ()=>dispatch(setUserLoading()),
 }))(Dashboard);

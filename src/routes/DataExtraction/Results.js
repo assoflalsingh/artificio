@@ -80,6 +80,17 @@ export default function Results(props) {
       type:"string"
     },
     {
+      name: "struct_name",
+      label: "Data structure",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
+    },
+    {
       name: "img_status",
       label: "Status",
       options: {
@@ -125,6 +136,7 @@ export default function Results(props) {
     elevation: 0,
     filter: false,
     print: false,
+    download: false,
     draggableColumns: {enabled: true},
     selectToolbarPlacement: 'none',
     sortOrder: {
@@ -200,6 +212,7 @@ export default function Results(props) {
           img_status: datum.images[page].img_status,
           datagroup_id: datum.images[page].datagroup_id,
           datagroup_name: datum.images[page].datagroup_name,
+          struct_name: datum.images[page].struct_name,
           img_thumb: datum.images[page].img_thumb
         });
       });
@@ -237,13 +250,35 @@ export default function Results(props) {
   const ResetAllFilters = () => {
     setDatalist([...unFilteredData]);
   }
-  const postDownloadRequest = (file_type) => {
+  const postDownloadRequest = (file_type, is_datagroup) => {
     handleClose();
-    if(!datalist[rowsSelected[0]]['datagroup_id']) {
-      setAjaxMessage({
-        error: true, text: "Datagroup must be assigned.",
-      });
-      return;
+    let dgStructId = '';
+
+    for (const rowInd of rowsSelected) {
+      if(is_datagroup && !datalist[rowInd]['datagroup_id']) {
+        setAjaxMessage({
+          error: true, text: "Data group must be assigned to all the selected files.",
+        });
+        return;
+      } else if(!is_datagroup && !datalist[rowInd]['struct_id']) {
+        setAjaxMessage({
+          error: true, text: "Data structure must be assigned to all the selected files.",
+        });
+        return;
+      }
+
+      if(is_datagroup && dgStructId != '' && dgStructId != datalist[rowInd]['datagroup_id']) {
+        setAjaxMessage({
+          error: true, text: "All the files must have same data group for the report to be generated.",
+        });
+        return;
+      } else if(!is_datagroup && dgStructId != '' && dgStructId != datalist[rowInd]['struct_id']) {
+        setAjaxMessage({
+          error: true, text: "All the files must have same data structure for the report to be generated.",
+        });
+        return;
+      }
+      dgStructId = is_datagroup ? datalist[rowInd]['datagroup_id'] : datalist[rowInd]['struct_id'];
     }
     setPageMessage('Requesting...');
     let data_lists = {};
@@ -254,7 +289,7 @@ export default function Results(props) {
     });
     api.post(URL_MAP.SCHEDULE_DOWNLOAD_REQUEST, {
       file_type: file_type,
-      datagroup_id: datalist[rowsSelected[0]]['datagroup_id'],
+      datagroup_struct_id: dgStructId,
       data_lists: data_lists,
     }).then(()=>{
       setAjaxMessage({
@@ -282,7 +317,7 @@ export default function Results(props) {
     if (!uploadCounter) return
       fetchDataList();
   }, [uploadCounter]);
-  
+
   return (
     <>
     <Box className={classes.root}>
@@ -326,7 +361,8 @@ export default function Results(props) {
                   horizontal: 'left',
                 }}
               >
-                <MenuItem onClick={()=>{setDownloadAnchorEl(null); postDownloadRequest('csv')}}>CSV</MenuItem>
+                <MenuItem onClick={()=>{setDownloadAnchorEl(null); postDownloadRequest('csv', true)}}>CSV by data group</MenuItem>
+                <MenuItem onClick={()=>{setDownloadAnchorEl(null); postDownloadRequest('csv', false)}}>CSV by data structure</MenuItem>
               </Popover>
             </>
           <MUIDataTable

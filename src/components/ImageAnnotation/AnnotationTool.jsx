@@ -266,12 +266,11 @@ export default class AnnotationTool extends React.Component {
           data += ',';
         }
         header += label['label_name'];
-        data += '"' + label['label_value'] + '"';
+        data += `"${label['label_value'].replace(/"/g, '""')}"`;
       });
-      let csvContent = "data:text/csv;charset=utf-8,"+header+'\n'+data;
-      var encodedUri = encodeURI(csvContent);
+      let csvContent = "data:text/csv;charset=utf-8,"+encodeURIComponent(header+'\n'+data);
       var link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
+      link.setAttribute("href", csvContent);
       link.setAttribute("download", `${this.state.imageName}-${selectedImage.page_no}.csv`);
       document.body.appendChild(link);
       link.click();
