@@ -485,7 +485,6 @@ function DataList(props) {
     setDatalist([...unFilteredData]);
   }
   const closeAnnotationTool = (wasUpdated) => {
-    debugger;
     if(wasUpdated){
       fetchDataList();
     }

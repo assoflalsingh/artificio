@@ -188,9 +188,6 @@ function DataSetList({history}) {
     formData.append('data_set_id',latestSelectionDetails._id);
     formData.append('app_id',CURRENT_APP_ID);
     formData.append('app_usage',JSON.stringify(Object.values(latestSelectionDetails.app_usage)));
-    
-    debugger
-    
     api.post(URL_MAP.UPLOAD_DATA_SET_FILE, formData,{
       headers :{
         'Content-Type': 'multipart/form-data',
