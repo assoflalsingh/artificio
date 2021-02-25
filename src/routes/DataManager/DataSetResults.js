@@ -68,8 +68,8 @@ export default function Results(props) {
       type:"string"
     },
     {
-      name: "data_set_id",
-      label: "Data set id",
+      name: "data_set_value",
+      label: "Data set value",
       options: {
         filter: true,
         sort: true,
@@ -180,7 +180,7 @@ export default function Results(props) {
           page_no: page,
           image_name: datum.images[page].img_name,
           datastructure_id: datum.images[page].datastructure_id,
-          data_set_id: datum.images[page].data_set_id
+          data_set_value: datum.images[page].data_set_value
         });
       });
     });
