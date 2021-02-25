@@ -68,8 +68,8 @@ export default function Results(props) {
       type:"string"
     },
     {
-      name: "dataset_id",
-      label: "Data set id",
+      name: "data_set_value",
+      label: "Data set value",
       options: {
         filter: true,
         sort: true,
@@ -179,9 +179,8 @@ export default function Results(props) {
           img_json:datum.images[page].img_json,
           page_no: page,
           image_name: datum.images[page].img_name,
-          datagroup_id: datum.images[page].datagroup_id,
-          datagroup_name: datum.images[page].datagroup_name,
-          img_thumb: datum.images[page].img_thumb
+          datastructure_id: datum.images[page].datastructure_id,
+          data_set_value: datum.images[page].data_set_value
         });
       });
     });
@@ -192,7 +191,7 @@ export default function Results(props) {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.post(URL_MAP.GET_DATA_SETS_RESULTS, {status: [], app_id: ["10","20"]})
+    api.post(URL_MAP.GET_DATA_SETS_RESULTS, {status: [], app_id: ["10"]})
       .then((res)=>{
         let data = res.data.data;
         let contr = refreshCounter+1;
@@ -218,41 +217,7 @@ export default function Results(props) {
   const ResetAllFilters = () => {
     setDatalist([...unFilteredData]);
   }
-  const postDownloadRequest = (file_type) => {
-    handleClose();
-    if(!datalist[rowsSelected[0]]['datagroup_id']) {
-      setAjaxMessage({
-        error: true, text: "Datagroup must be assigned.",
-      });
-      return;
-    }
-    setPageMessage('Requesting...');
-    let data_lists = {};
-    rowsSelected.map((i)=>{
-      let row = datalist[i];
-      data_lists[row._id] = data_lists[row._id] || [];
-      data_lists[row._id].push(row.page_no);
-    });
-    api.post(URL_MAP.SCHEDULE_DOWNLOAD_REQUEST, {
-      file_type: file_type,
-      datagroup_id: datalist[rowsSelected[0]]['datagroup_id'],
-      data_lists: data_lists,
-    }).then(()=>{
-      setAjaxMessage({
-        error: false, text: 'Request success. Please check downloads !!',
-      });
-    }).catch((error)=>{
-      if(error.response) {
-        setAjaxMessage({
-          error: true, text: error.response.data.message,
-        });
-      } else {
-        console.error(error);
-      }
-    }).then(()=>{
-      setPageMessage(null);
-    })
-  }
+
   useEffect(() => {
     if (!uploadCounter) return
       fetchDataList();
@@ -281,22 +246,7 @@ export default function Results(props) {
               {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
               {datalistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{datalistMessage}</Typography></>}
               <TableFilterPanel refreshCounter={refreshCounter} unFilteredData={unFilteredData} disabled={unFilteredData.length === 0} onApplyFilter={filterDataList} coloumnDetails={columns} onResetAllFilters={ResetAllFilters} />
-              </Box>
-              <Popover
-                open={Boolean(massAnchorEl)}
-                onClose={handleClose}
-                anchorEl={massAnchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-              >
-                <MenuItem onClick={()=>{setDownloadAnchorEl(null); postDownloadRequest('csv')}}>CSV</MenuItem>
-              </Popover>
+          </Box>
             </>
           <MUIDataTable
             title={<>

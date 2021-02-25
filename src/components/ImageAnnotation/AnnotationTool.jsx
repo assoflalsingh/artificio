@@ -301,10 +301,10 @@ export default class AnnotationTool extends React.Component {
       .then(() => {
         this.setLoader(false);
         this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
-        this.fetchImageData(this.state.activeImageIndex, true);
+        this.fetchImageData(this.state.activeImageIndex, !!inReview);
         this.setState({
           deleteAllAnnotation: false,
-          isSaved: true,
+          isSaved: !!inReview,
           ajaxMessage: {
             error: false,
             text: "Annotation details saved successfully !!",
