@@ -387,7 +387,7 @@ function DataList(props) {
       }
     }).then(()=>{
       setPageMessage(null);
-    })
+    });
   }
 
   const onDeleteFiles = async () => {

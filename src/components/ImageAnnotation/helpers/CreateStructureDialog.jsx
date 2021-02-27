@@ -67,12 +67,12 @@ export const CreateStructureDialog = ({ modalOpen, onClose, createStructure }) =
     validateField(name, value);
   };
 
-  const create = () => {
+  const create = (assign=false) => {
     if (!formData.name) {
       setFormError("Structure name is empty");
     } else {
       setFormData(defaults);
-      createStructure(formData);
+      createStructure(formData, assign);
     }
   };
 
@@ -118,7 +118,10 @@ export const CreateStructureDialog = ({ modalOpen, onClose, createStructure }) =
         </Form>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={create} color="primary" variant="contained">
+        <Button onClick={()=>create(true)} color="primary" variant="contained">
+          Save and Assign
+        </Button>
+        <Button autoFocus onClick={()=>create()} color="primary" variant="contained">
           Save
         </Button>
         <Button autoFocus onClick={onClose} color="primary" variant="contained">
