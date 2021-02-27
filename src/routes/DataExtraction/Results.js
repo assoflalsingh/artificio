@@ -7,7 +7,6 @@ import MUIDataTable from "mui-datatables";
 import {RefreshIconButton} from '../../components/CustomButtons';
 import TableFilterPanel from "../../components/TableFilterPanel";
 import {Stacked, StackItem} from '../../components/Stacked';
-import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
@@ -33,8 +32,7 @@ export default function Results(props) {
   const {uploadCounter} = props;
   const classes = useStyles();
   const [stackPath] = useState('home');
-  const [annotateOpen, setAnnotateOpen] = useState(false);
-	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
+	const [annotateOpen, setAnnotateOpen] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setDownloadAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -311,7 +309,7 @@ export default function Results(props) {
     if(wasUpdated){
       fetchDataList();
     }
-    setAnnotateOpenV2(false)
+    setAnnotateOpen(false)
   }
   useEffect(() => {
     if (!uploadCounter) return
@@ -337,7 +335,7 @@ export default function Results(props) {
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
             <Box className={classes.rightAlign}>
               {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
-							<Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
+							<Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
             </Box>
           </Box>
           <>
@@ -376,9 +374,8 @@ export default function Results(props) {
       </StackItem>
       </Stacked>
     </Box>
-    <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api} getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={true} />
 		<ImageAnnotationDialog
-			open={annotateOpenV2}
+			open={annotateOpen}
 			onClose={(wasUpdated)=>{closeAnnotationTool(wasUpdated)}}
 			api={api}
 			getImages={()=>rowsSelected.map((i)=>datalist[i])}

@@ -7,7 +7,6 @@ import MUIDataTable from "mui-datatables";
 import {CompactButton, RefreshIconButton} from '../../components/CustomButtons';
 import TableFilterPanel from "../../components/TableFilterPanel";
 import ChevronLeftOutlinedIcon from '@material-ui/icons/ChevronLeftOutlined';
-import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
@@ -140,8 +139,7 @@ function AsssignDataStructure({open, onClose, onOK, api}) {
 function DataList(props) {
   const {history, uploadCounter, annotationSuccessCB} = props;
   const classes = useStyles();
-  const [annotateOpen, setAnnotateOpen] = useState(false);
-	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
+	const [annotateOpen, setAnnotateOpen] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
@@ -488,7 +486,7 @@ function DataList(props) {
     if(wasUpdated){
       fetchDataList();
     }
-    setAnnotateOpenV2(false)
+    setAnnotateOpen(false)
   }
   useEffect(() => {
     if (!uploadCounter) return
@@ -516,7 +514,7 @@ function DataList(props) {
         <CompactButton className={classes.ml1} label="Data groups" variant="contained" color="primary"
           onClick={()=>{history.push('dg')}} />
         <Box className={classes.rightAlign}>
-          <Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpenV2(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
+          <Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Annotation</Button>
         </Box>
       </Box>
       <AsssignDataGroup open={showAssignDG} onClose={()=>{setShowAssignDG(false)}}
@@ -558,11 +556,8 @@ function DataList(props) {
         columns={columns}
         options={options}
       />
-      <AnnotateTool open={annotateOpen} onClose={()=>{setAnnotateOpen(false)}} api={api}
-                getAnnotateImages={()=>rowsSelected.map((i)=>datalist[i])} inReview={false}/>
-
       <ImageAnnotationDialog
-        open={annotateOpenV2}
+        open={annotateOpen}
         onClose={(wasUpdated)=>{closeAnnotationTool(wasUpdated)}}
         api={api}
         getImages={()=>rowsSelected.map((i)=>datalist[i])}
