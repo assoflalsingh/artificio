@@ -79,16 +79,29 @@ function DataSetList({history}) {
   const columns = [
     {
       name: "data_set_id",
-      label: "Data set ID",
+      label: "Data set",
       options: {
       filter: true,
       sort: true,
       draggable: true,
       customBodyRender: (value, tableMeta)=>{
-        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, desc:tableMeta.rowData[1],app_usage:tableMeta.rowData[3], _id:tableMeta.rowData[4]}}}>
+        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1].map(a => a.id), desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5]}}}>
                 {value}
             </Link>;
       }
+      },
+      type:"string"
+    },
+    {
+      name: "email_ids",
+      label: "Email",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true,
+        customBodyRender: (value)=>{
+          return value && (typeof value === "string" ? value : (typeof value === "object" ? value.reduce((acc,item)=> `${acc} ${item.email},`,"") : value.join(", ")));
+        }
       },
       type:"string"
     },
@@ -98,7 +111,8 @@ function DataSetList({history}) {
       options: {
         filter: true,
         sort: true,
-        draggable: true
+        draggable: true,
+
       },
       type:"string"
     },
@@ -251,7 +265,7 @@ function DataSetList({history}) {
       </Snackbar>
       <Box style={{display: 'flex', flexWrap: 'wrap', margin: "15px 0px"}}>
         <Typography color="primary" variant="h6">Data sets</Typography>
-        <CompactButton className={classes.ml1} label="Create Data set" variant="contained" color="primary"
+        <CompactAddButton color="secondary" className={classes.ml1} label="Create Data set" variant="contained"
           onClick={()=>{history.push('create-dataset')}} />
         {<CompactAddButton disabled={rowsSelected.length !== 1} className={classes.fileUpload} variant="contained" color="secondary" onClick={() => setOpenUpload(true)}>
             Upload File(s)

@@ -8,9 +8,10 @@ import {RefreshIconButton} from '../../components/CustomButtons';
 import TableFilterPanel from "../../components/TableFilterPanel";
 import {Stacked, StackItem} from '../../components/Stacked';
 import { AnnotateTool } from './AnnotateTool';
+import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
+
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {

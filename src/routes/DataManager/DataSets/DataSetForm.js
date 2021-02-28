@@ -10,6 +10,7 @@ export default function LabelForm({initFormData, ...props}) {
     desc: '',
     app_usage: [],
     data_type: '',
+    emails: []
   }
   const editMode = (initFormData != null);
   const [formData, setFormData] = useState(defaults);
@@ -21,6 +22,8 @@ export default function LabelForm({initFormData, ...props}) {
   const [opLoading, setOpLoading] = useState(false);
 
   const [appUsageOpts, setAppUsageOpts] = useState([]);
+  
+  const [emailsOpts, setEmailsOpts] = useState([]);
 
   const api = getInstance(localStorage.getItem('token'));
 
@@ -30,7 +33,7 @@ export default function LabelForm({initFormData, ...props}) {
       messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
     },
     desc: {
-      validators: ['required', {type:'regex', param:'^[a-zA-Z0-9-@!%#$&()_ ]{1,200}$'}],
+      validators: ['required', {type:'regex', param:'^.{0,200}$'}],
       messages: ['This field is required', 'Text allowed with max length of 200.'],
     },
     app_usage: {
@@ -42,17 +45,25 @@ export default function LabelForm({initFormData, ...props}) {
   useEffect(()=>{
     setOpLoading(true);
     api.get(URL_MAP.GET_APP_USAGE).then((resp)=>{
-      let data = resp.data.data;
-      setAppUsageOpts(data);
-      if(editMode) {
-        let formAppUsage = data.filter((label)=>{
-          return Object.keys(initFormData.app_usage).indexOf(label._id) > -1;
-        });
-        setFormData({
-          ...initFormData,
-          app_usage: formAppUsage,
-        });
-      }
+      let usageData = resp.data.data;
+      setAppUsageOpts(usageData);
+      api.get(URL_MAP.GET_DATASET_EMAILS).then((resp)=>{
+        let emailData = resp.data.data;
+        setEmailsOpts(emailData);
+        if(editMode) {
+          let formAppUsage = usageData.filter((label)=>{
+            return Object.keys(initFormData.app_usage).indexOf(label._id) > -1;
+          });
+          let formEmails = emailData.filter(function(itm){
+            return initFormData.emails.indexOf(itm.id) > -1;
+          });
+          setFormData({
+            ...initFormData,
+            app_usage: formAppUsage,
+            emails: formEmails
+          });
+        }
+      })
     }).catch((err)=>{
       setOpLoading(false);
       if (err.response) {
@@ -77,6 +88,7 @@ export default function LabelForm({initFormData, ...props}) {
     let errMsg = '';
     let fieldValidators = formValidators[name];
     if(fieldValidators) {
+      value = (value && value?.toString().length>0) ? value : "";
       errMsg = doValidation(value, fieldValidators.validators, fieldValidators.messages);
       setFormDataErr((prevErr)=>({
         ...prevErr,
@@ -115,6 +127,7 @@ export default function LabelForm({initFormData, ...props}) {
       let dataSetPayload = {
         "data_set_id":formData.data_set_id,
         "desc": formData.desc ,
+        "email_ids": formData.emails.map((label)=>{return {'id':label.id, "email":label.email}}),
         "app_usage": formData.app_usage.map((label)=>label._id),
         "app_id": CURRENT_APP_ID,
         "update":editMode || false,
@@ -146,7 +159,7 @@ export default function LabelForm({initFormData, ...props}) {
   return (
     <>
     <Box display="flex">
-      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} label</Typography>
+      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data Set</Typography>
       {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
     </Box>
     <Form>
@@ -167,9 +180,11 @@ export default function LabelForm({initFormData, ...props}) {
             value={formData.app_usage} options={appUsageOpts} 
           />
         </FormRowItem>
-        <FormRowItem style={{visibility:"hidden"}}>
-          <FormInputSelect label="Import Data" name='data_type' onChange={onTextChange}
-            firstEmpty={true} loading={opLoading} value={formData.data_type} options={appUsageOpts} />
+        <FormRowItem>
+        <FormInputSelect multiple label="Email Id(s)" hasSearch required name='emails' onChange={(e, value)=>{onTextChange(value, 'emails')}}
+            labelKey='email' valueKey='id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.emails} 
+            value={formData.emails} options={emailsOpts} 
+          />
         </FormRowItem>
       </FormRow>
       {(formError || formSuccess) &&
