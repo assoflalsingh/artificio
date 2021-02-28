@@ -226,12 +226,14 @@ export function FormInputSelect({
   if(hasSearch) {
     return (
       <FormInput required={required} label={label}>
+        <FormControl error={Boolean(errorMsg)} fullWidth>
         <Autocomplete
           multiple={multiple}
           options={options}
           loading={loading}
           filterSelectedOptions
           onChange={onChange}
+          helperText={errorMsg}
           className={classes.formInput}
           getOptionLabel={(option) => typeof(option) === 'string' ? option : option[labelKey]}
           renderInput={(params) => (
@@ -246,6 +248,8 @@ export function FormInputSelect({
           }}
           {...props}
         />
+        <FormHelperText>{errorMsg}</FormHelperText>
+        </FormControl>
       </FormInput>
     );
   } else {

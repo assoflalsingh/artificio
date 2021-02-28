@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
+import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 import MUIDataTable from "mui-datatables";
 import {RefreshIconButton} from '../../components/CustomButtons';
 import TableFilterPanel from "../../components/TableFilterPanel";
@@ -32,11 +32,8 @@ export default function Results(props) {
   const classes = useStyles();
   const [stackPath] = useState('home');
   const [annotateOpen, setAnnotateOpen] = useState(false);
-	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
-  const api = getInstance(localStorage.getItem('token'));
-  const [massAnchorEl, setDownloadAnchorEl] = useState();
+	const api = getInstance(localStorage.getItem('token'));
   const [rowsSelected, setRowsSelected] = useState([]);
-  const [] = useState(false);
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
@@ -69,7 +66,7 @@ export default function Results(props) {
     },
     {
       name: "data_set_value",
-      label: "Data set value",
+      label: "Data set",
       options: {
         filter: true,
         sort: true,
@@ -79,8 +76,8 @@ export default function Results(props) {
       type:"string"
     },
     {
-        name: "datastructure_id",
-        label: "Data structure id",
+        name: "struct_name",
+        label: "Data structure",
         options: {
           filter: true,
           sort: true,
@@ -131,7 +128,6 @@ export default function Results(props) {
   const options = {
     selectableRows: 'multiple',
     filterType: 'checkbox',
-    filterType: 'dropdown',
     elevation: 0,
     filter: false,
     print: false,
@@ -153,13 +149,7 @@ export default function Results(props) {
     isRowSelectable: ()=> true
   };
 
-  const onDownloadMenuClick = (event) => {
-    setDownloadAnchorEl(event.currentTarget);
-  };
 
-  const handleClose = () => {
-    setDownloadAnchorEl(null);
-  };
 
   const parseGetDataList = (data) => {
     let newData = [];
@@ -179,8 +169,9 @@ export default function Results(props) {
           img_json:datum.images[page].img_json,
           page_no: page,
           image_name: datum.images[page].img_name,
-          datastructure_id: datum.images[page].datastructure_id,
-          data_set_value: datum.images[page].data_set_value
+          struct_name: datum.images[page].struct_name,
+          data_set_value: datum.images[page].data_set_value,
+          img_thumb: datum.images[page].img_thumb
         });
       });
     });
@@ -217,7 +208,12 @@ export default function Results(props) {
   const ResetAllFilters = () => {
     setDatalist([...unFilteredData]);
   }
-
+  const closeAnnotationTool = (wasUpdated) => {
+    if(wasUpdated){
+      fetchDataList();
+    }
+    setAnnotateOpen(false)
+  }
   useEffect(() => {
     if (!uploadCounter) return
       fetchDataList();
@@ -240,6 +236,10 @@ export default function Results(props) {
           <Box display="flex" style={{margin: "15px 0px"}}>
             <Typography color="primary" variant="h6">Results</Typography>
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
+            <Box className={classes.rightAlign}>
+              {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
+							<Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
+            </Box>
           </Box>
           <>
           <Box display="flex">
@@ -259,6 +259,13 @@ export default function Results(props) {
       </StackItem>
       </Stacked>
     </Box>
+    <ImageAnnotationDialog
+			open={annotateOpen}
+			onClose={(wasUpdated)=>{closeAnnotationTool(wasUpdated)}}
+			api={api}
+			getImages={()=>rowsSelected.map((i)=>datalist[i])}
+			inReview={true}
+		/>
     </>
   )
 }

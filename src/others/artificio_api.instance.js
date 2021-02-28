@@ -75,6 +75,7 @@ export const URL_MAP = {
   GET_STRUCTURES: 'label/get-structures/',
   GET_STRUCTURE_TEMPLATE: 'label/get-structure-template/',
 
+  GET_DATASET_EMAILS: 'label/get-dataset-emails/',
   GET_THUMBNAILS: 'label/get-thumbnails/',
   GET_DATA_LIST: 'label/get-data-list/',
   GET_ANNOTATION_DETAILS: 'label/get-image-annotation-details/',
