@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Link, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
-import SyncIcon from '@material-ui/icons/Sync';
-import {CompactAddButton, RefreshIconButton} from '../../components/CustomButtons';
+import {RefreshIconButton} from '../../components/CustomButtons';
 
 import {Stacked, StackItem} from '../../components/Stacked';
-import { AnnotateTool } from './AnnotateTool';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {

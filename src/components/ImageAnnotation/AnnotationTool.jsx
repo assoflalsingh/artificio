@@ -8,7 +8,7 @@ import {ToolBar} from "./helpers/ToolBar";
 import {LabelSelector} from "./label/LabelSelector";
 import {LabelsContainer} from "./label/LabelsContainer";
 import {CustomEventType, ToolType} from "../../canvas/core/constants";
-import {getImageData, getStructureTemplate, saveAnnotationData, saveStructure} from "./apiMethods";
+import {getImageData, getStructureTemplate, saveAnnotationData, saveStructure, assignData} from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
 import {findTextAnnotations, generateAnnotationsFromData,} from "./utilities";
 import {LeftToolBar} from "./helpers/LeftToolBar";
@@ -53,7 +53,7 @@ export default class AnnotationTool extends React.Component {
     deleteAllAnnotation: false,
     isSaved: false
   };
-  
+
   deleteProposalInModelData = (proposal) => {
     const ids = proposal.id.split("-");
     const proposalIndex = parseInt(ids[0]);
@@ -338,7 +338,7 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
-  createStructure = (otherData) => {
+  createStructure = (otherData, assign=false) => {
     const dataStructure = this.canvasManager.getDataStructure();
     let data = {
       ...otherData,
@@ -349,27 +349,60 @@ export default class AnnotationTool extends React.Component {
     saveStructure(
       this.props.api,data
     )
-      .then(() => {
-        this.setLoader(false);
-        this.setState({
-          ajaxMessage: {
-            error: false,
-            text: "Data structure saved successfully !!",
-          },
-        });
+      .then((res) => {
+        if(assign) {
+          const selectedImage = this.props.images[this.state.activeImageIndex];
+          assignData(this.props.api, {
+            type: 'structure',
+            datum: res.data.data.id,
+            data_lists: {
+              [selectedImage._id]:[selectedImage.page_no],
+            }
+          }).then(()=>{
+            this.setLoader(false);
+            this.setState({
+              ajaxMessage: {
+                error: false,
+                text: "Data structure saved and assigned successfully !!",
+              },
+            });
+          }).catch((error)=>{
+            this.setLoader(false);
+            console.error(error);
+            let message = 'Unknow error occurred. Check console.';
+            if (error.response) {
+              message = error.response.data.message;
+            }
+            this.setState({
+              ajaxMessage: {
+                error: true,
+                text: message,
+              },
+            });
+          });
+        } else {
+          this.setLoader(false);
+          this.setState({
+            ajaxMessage: {
+              error: false,
+              text: "Data structure saved successfully !!",
+            },
+          });
+        }
       })
       .catch((error) => {
         this.setLoader(false);
+        console.error(error);
+        let message = 'Unknow error occurred. Check console.';
         if (error.response) {
-          this.setState({
-            ajaxMessage: {
-              error: true,
-              text: error.response.data.message,
-            },
-          });
-        } else {
-          console.error(error);
+          message = error.response.data.message;
         }
+        this.setState({
+          ajaxMessage: {
+            error: true,
+            text: message,
+          },
+        });
       });
   }
 
