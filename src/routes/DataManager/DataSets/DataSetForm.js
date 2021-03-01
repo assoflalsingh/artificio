@@ -54,13 +54,10 @@ export default function LabelForm({initFormData, ...props}) {
           let formAppUsage = usageData.filter((label)=>{
             return Object.keys(initFormData.app_usage).indexOf(label._id) > -1;
           });
-          let formEmails = emailData.filter(function(itm){
-            return initFormData.emails.indexOf(itm.id) > -1;
-          });
           setFormData({
             ...initFormData,
             app_usage: formAppUsage,
-            emails: formEmails
+            emails: initFormData.emails
           });
         }
       })
