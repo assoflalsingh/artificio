@@ -85,7 +85,7 @@ function DataSetList({history}) {
       sort: true,
       draggable: true,
       customBodyRender: (value, tableMeta)=>{
-        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1].map(a => a.id), desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5]}}}>
+        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1], desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5]}}}>
                 {value}
             </Link>;
       }
