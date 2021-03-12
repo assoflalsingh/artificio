@@ -316,6 +316,7 @@ const Label = ({
             </Button>
             <Box style={{ flexGrow: 1 }} />
             <Button
+              disabled={(!labelValue?.value || labelValue.value===DefaultLabel.label_value) ? true : false}
               onClick={() => {
                 if (proposalMode) {
                   // point to active too assign label
