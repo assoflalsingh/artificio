@@ -76,6 +76,17 @@ export default function Results(props) {
       type:"string"
     },
     {
+      name: "app_id",
+      label: "Source",
+      options: {
+        filter: true,
+        sort: true,
+        draggable: true
+      },
+      possibleComparisons: ["eq", "bw", "ct", "ew"],
+      type:"string"
+    },
+    {
         name: "struct_name",
         label: "Data structure",
         options: {
@@ -165,6 +176,7 @@ export default function Results(props) {
       Object.keys(datum.images).forEach((page)=>{
         newData.push({
           ...newRecord,
+          app_id: datum.images[page].app_id === "10" ? "Manual upload" : (datum.images[page].app_id === "11" ? "Email" : "Other"),
           struct_id:datum.images[page].struct_id,
           img_json:datum.images[page].img_json,
           page_no: page,
@@ -182,7 +194,7 @@ export default function Results(props) {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.post(URL_MAP.GET_DATA_SETS_RESULTS, {status: [], app_id: ["10"]})
+    api.post(URL_MAP.GET_DATA_SETS_RESULTS, {status: [], app_id: ["10", "11"]})
       .then((res)=>{
         let data = res.data.data;
         let contr = refreshCounter+1;
