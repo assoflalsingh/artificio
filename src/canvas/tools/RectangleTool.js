@@ -108,6 +108,11 @@ export class RectangleTool extends Tool {
       this.canvasManager.stage.scaleX(),
       this.imageLabels
     );
+    // check if previous added Rectangle was assigned a label if not then remove it...
+    let previousAddedRect = this.canvasManager.annotations[this.canvasManager.annotations.length - 1];
+    if(previousAddedRect.annotationData.label === DefaultLabel.label_value){
+      this.canvasManager.deleteAnnotation(previousAddedRect.id);
+    }
     this.canvasManager.addAnnotation(rectangle);
     this.canvasManager.setStageDraggable(true);
     this.tempRectangle &&
