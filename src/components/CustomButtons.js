@@ -4,7 +4,7 @@ import { Button, Chip, IconButton, Tooltip, withStyles } from '@material-ui/core
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CachedIcon from '@material-ui/icons/Cached';
 import { Link } from 'react-router-dom';
-
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 const YellowButton = withStyles((theme) => ({
   root: {
@@ -16,8 +16,21 @@ const YellowButton = withStyles((theme) => ({
   },
 }))(Button);
 
-export function CompactButton({className, label, onClick, children, ...props}) {
+export function CompactButton({className, label, onClick, children, name,...props}) {
   return (
+    <Button size="small" className={className} name={name || label}
+      onClick={onClick} {...props} style={{
+          height: '2rem'
+        }}>
+        {label}
+        {children}
+    </Button>
+  )
+}
+
+export function CompactButtonWithArrow({className, label, onClick, children, arrowBtnClass,arrowBtnOnClick, name, ...props}) {
+  return (
+    <>
     <Button size="small" className={className}
       onClick={onClick} {...props} style={{
           height: '2rem'
@@ -25,6 +38,13 @@ export function CompactButton({className, label, onClick, children, ...props}) {
         {label}
         {children}
     </Button>
+    <Button size="small" className={arrowBtnClass} name={name}
+      onClick={arrowBtnOnClick} {...props} style={{
+          height: '2rem'
+        }}>
+        <ArrowDropDownIcon />
+    </Button>
+    </>
   )
 }
 
