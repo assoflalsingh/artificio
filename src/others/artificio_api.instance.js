@@ -66,6 +66,11 @@ export const URL_MAP = {
   GET_DATAGROUPS: 'label/get-datagroups/',
   ASSIGN_DATA: 'label/assign-data/',
 
+  
+  GET_ALL_MODELS:'classification/get-model-details/',
+
+  TRAIN_RETRAIN_MODEL:'classification/prediction-model/',
+
   GET_APP_USAGE: 'label/get-appusage/',
   GET_DATA_SETS: 'label/get-datasets/',
   CREATE_DATA_SETS: 'label/post-datasets/',
