@@ -594,6 +594,8 @@ function DataList(props) {
       createModelPayload["version"]=version || "";
     }
     rowsSelected.map((row) => {
+      if(model_action === "predict")
+        datalist[row].struct_id = "temp_strucutre_to_remove_for_predict"
       if (datalist[row].img_status !== "ready" && !datalist[row].struct_id) {
         errorMessage =
           "Structure id and Ready Status is missing for the selection.";
@@ -630,7 +632,7 @@ function DataList(props) {
           createModelPayload["data_lists"][
             existingFileIndexWithSameId
           ].images.push({
-            struct_id: datalist[row].struct_id,
+            struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
             datagroup_name: datalist[row].datagroup_name,
             datagroup_id: datalist[row].datagroup_id,
             img_json: datalist[row].img_json,
@@ -869,42 +871,15 @@ function DataList(props) {
           }}
         />
         <Box className={classes.rightAlign}>
-        <CompactButtonWithArrow
-            className={classes.arrowbutton}
-            name="trainmodel"
-            arrowBtnClass={classes.arrowBtnClass}
-            arrowBtnOnClick={onCreateModelArrowBtn}
-            variant="contained"
-            color="primary"
+          <Button
             disabled={rowsSelected.length === 0}
             onClick={() => {
-              onTrainRetrainModel(null, null, null, "predict",null)
+              setAnnotateOpen(true);
             }}
           >
-           Predict
-          </CompactButtonWithArrow>
-          <Popover
-            open={Boolean(massAnchorEl) && massAnchorEl.name === "trainmodel"}
-            onClose={handleClose}
-            anchorEl={massAnchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                setMassAnchorEl(null);
-                setShowModelListDialog("predict");
-              }}
-            >
-              Predict with Model
-            </MenuItem>
-          </Popover>
+            <PlayCircleFilledIcon color="primary" />
+            &nbsp; Annotation
+          </Button>
           <CompactButtonWithArrow
             className={classes.arrowbutton}
             name="predictmodel"
@@ -945,6 +920,42 @@ function DataList(props) {
               }}
             >
               Re-Train
+            </MenuItem>
+          </Popover>
+          <CompactButtonWithArrow
+            className={classes.arrowbutton}
+            name="trainmodel"
+            arrowBtnClass={classes.arrowBtnClass}
+            arrowBtnOnClick={onCreateModelArrowBtn}
+            variant="contained"
+            color="primary"
+            disabled={rowsSelected.length === 0}
+            onClick={() => {
+              onTrainRetrainModel(null, null, null, "predict",null)
+            }}
+          >
+           Predict
+          </CompactButtonWithArrow>
+          <Popover
+            open={Boolean(massAnchorEl) && massAnchorEl.name === "trainmodel"}
+            onClose={handleClose}
+            anchorEl={massAnchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                setMassAnchorEl(null);
+                setShowModelListDialog("predict");
+              }}
+            >
+              Predict with Model
             </MenuItem>
           </Popover>
           {isTrainingReqInProcess && <Loader />}
@@ -994,15 +1005,6 @@ function DataList(props) {
               </Button>
             </DialogActions>
           </Dialog>
-          <Button
-            disabled={rowsSelected.length === 0}
-            onClick={() => {
-              setAnnotateOpen(true);
-            }}
-          >
-            <PlayCircleFilledIcon color="primary" />
-            &nbsp; Annotation
-          </Button>
         </Box>
       </Box>
       <AsssignDataGroup
