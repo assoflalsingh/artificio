@@ -99,7 +99,7 @@ export default function SelectModelDialog(props) {
       <MUIDataTable
           title={<>
             <Box display="flex">
-            <Typography variant="h5">Select Model</Typography>
+            <Typography variant="h5">{showFilterPanel === "predict" ? "Predict" : "select model to retrain(update)"}</Typography>
             </Box>
           </>}
           data={modelData}
