@@ -6,7 +6,7 @@ export default function SelectModelDialog(props) {
     const columns = [
         {
           name: "model_name",
-          label: "Name",
+          label: "Model Name",
           options: {
             filter: true,
             sort: true,
@@ -99,7 +99,7 @@ export default function SelectModelDialog(props) {
       <MUIDataTable
           title={<>
             <Box display="flex">
-            <Typography variant="h5">{showFilterPanel === "predict" ? "Predict" : "select model to retrain(update)"}</Typography>
+            <Typography variant="h5">{showFilterPanel === "predict" ? "Select the Model Name to Predict" : "Select Model Name to Retrain(update)"}</Typography>
             </Box>
           </>}
           data={modelData}
