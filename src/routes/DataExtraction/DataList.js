@@ -596,24 +596,24 @@ function DataList(props) {
     rowsSelected.map((row) => {
       if(model_action === "predict")
         datalist[row].struct_id = "temp_strucutre_to_remove_for_predict"
-      if (datalist[row].img_status !== "ready" && !datalist[row].struct_id) {
+      if ((datalist[row].img_status !== "ready" || datalist[row].img_status !== "classified") && !datalist[row].struct_id) {
         errorMessage =
-          "Structure id and Ready Status is missing for the selection.";
+          "Structure id and Ready/Classified Status is missing for the selection.";
         setAjaxMessage({
           error: true,
           text: errorMessage,
         });
       } else if (
-        datalist[row].img_status !== "ready" &&
+        (datalist[row].img_status !== "ready" || datalist[row].img_status !== "classified") &&
         datalist[row].struct_id
       ) {
-        errorMessage = "Status is not Ready for the selection.";
+        errorMessage = "Status is not Ready or Classified for the selection.";
         setAjaxMessage({
           error: true,
           text: errorMessage,
         });
       } else if (
-        datalist[row].img_status === "ready" &&
+        (datalist[row].img_status === "ready" || datalist[row].img_status === "classified") &&
         !datalist[row].struct_id
       ) {
         errorMessage = "Structure id is missing for the selection.";
