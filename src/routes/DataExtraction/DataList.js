@@ -629,25 +629,25 @@ function DataList(props) {
           createModelPayload.data_lists &&
           existingFileIndexWithSameId >= 0
         ) {
+          
           createModelPayload["data_lists"][
             existingFileIndexWithSameId
           ].images.push({
             struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
-            datagroup_name: datalist[row].datagroup_name,
-            datagroup_id: datalist[row].datagroup_id,
+            datagroup_id: datalist[row].datagroup_id ? datalist[row].datagroup_id:"",
             img_json: datalist[row].img_json,
             img_status: datalist[row].img_status,
             img_name: datalist[row].image_name,
             page_no: datalist[row].page_no,
           });
         } else {
+
           createModelPayload.data_lists.push({
             _id: datalist[row]._id,
             images: [
               {
                 struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
-                datagroup_name: datalist[row].datagroup_name,
-                datagroup_id: datalist[row].datagroup_id,
+                datagroup_id: datalist[row].datagroup_id ? datalist[row].datagroup_id:"",
                 img_json: datalist[row].img_json,
                 img_status: datalist[row].img_status,
                 img_name: datalist[row].image_name,
@@ -745,9 +745,10 @@ function DataList(props) {
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
           datagroup_name: datum.images[page].datagroup_name,
+          datagroup_id: datum.images[page].datagroup_id,
           struct_name: datum.images[page].struct_name,
           struct_id: datum.images[page].struct_id,
-          img_thumb: datum.images[page].img_thumb,
+          img_thumb: datum.images[page].img_thumb
         });
       });
     });
