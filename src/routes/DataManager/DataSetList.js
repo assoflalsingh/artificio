@@ -282,6 +282,7 @@ function DataSetList({history}) {
             onSave={(files) => uploadFiles(files)}
             showPreviews={true}
             showFileNamesInPreview={true}
+            filesLimit={10}
           />
       </MuiThemeProvider>
       <FileUploadProgress fileUploadInfo={progressFileInfo} open={progressOpen} onClose={()=>{setProgressOpen(false)}} />

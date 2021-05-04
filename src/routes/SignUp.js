@@ -177,7 +177,7 @@ export default function SignUp({match, history}) {
           api.post(URL_MAP.SIGN_UP, {
             first_name: formData.first_name,
             last_name: formData.last_name,
-            email: formData.email,
+            email: formData.email.toLowerCase(),
             org: formData.org,
             phone_no: formData.phone_no,
             password: formData.password,
