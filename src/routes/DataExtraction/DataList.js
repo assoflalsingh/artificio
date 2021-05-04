@@ -596,32 +596,32 @@ function DataList(props) {
     rowsSelected.map((row) => {
       if(model_action === "predict")
         datalist[row].struct_id = "temp_strucutre_to_remove_for_predict"
-      if ((datalist[row].img_status !== "ready" && datalist[row].img_status !== "classified") && !datalist[row].struct_id) {
-        errorMessage =
-          "Structure id and Ready/Classified Status is missing for the selection.";
-        setAjaxMessage({
-          error: true,
-          text: errorMessage,
-        });
-      } else if (
-        (datalist[row].img_status !== "ready" && datalist[row].img_status !== "classified") &&
-        datalist[row].struct_id
-      ) {
-        errorMessage = "Status is not Ready or Classified for the selection.";
-        setAjaxMessage({
-          error: true,
-          text: errorMessage,
-        });
-      } else if (
-        (datalist[row].img_status === "ready" || datalist[row].img_status === "classified") &&
-        !datalist[row].struct_id
-      ) {
-        errorMessage = "Structure id is missing for the selection.";
-        setAjaxMessage({
-          error: true,
-          text: errorMessage,
-        });
-      } else {
+        // show error if selected file has status new
+        if((datalist[row].img_status==="new")){
+          errorMessage = "Status is not Ready or Classified for the selection.";
+          setAjaxMessage({
+            error: true,
+            text: errorMessage,
+          });
+          return false;
+        }
+        // structure id is missing
+        if(model_action !== "predict" && !datalist[row].struct_id){
+          errorMessage = "Structure id is missing for the selection.";
+          setAjaxMessage({
+            error: true,
+            text: errorMessage,
+          });
+        }
+        // Datagroup id is missing
+        else if(model_action !== "predict" && !datalist[row].datagroup_id){
+          errorMessage = "Datagroup id is missing for the selection.";
+          setAjaxMessage({
+            error: true,
+            text: errorMessage,
+          });
+        }     
+      else {
         let existingFileIndexWithSameId = createModelPayload.data_lists.findIndex(
           (o) => o.id === datalist[row]._id
         );
@@ -634,7 +634,7 @@ function DataList(props) {
             existingFileIndexWithSameId
           ].images.push({
             struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
-            datagroup_id: datalist[row].datagroup_id ? datalist[row].datagroup_id:"",
+            datagroup_id: model_action === "predict" ? "" : datalist[row].datagroup_id ? datalist[row].datagroup_id:"",
             img_json: datalist[row].img_json,
             img_status: datalist[row].img_status,
             img_name: datalist[row].image_name,
@@ -647,7 +647,7 @@ function DataList(props) {
             images: [
               {
                 struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
-                datagroup_id: datalist[row].datagroup_id ? datalist[row].datagroup_id:"",
+                datagroup_id: model_action === "predict" ? "" : datalist[row].datagroup_id ? datalist[row].datagroup_id:"",
                 img_json: datalist[row].img_json,
                 img_status: datalist[row].img_status,
                 img_name: datalist[row].image_name,

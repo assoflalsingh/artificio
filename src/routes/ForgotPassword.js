@@ -119,7 +119,7 @@ export default function ForgotPassword({match, history}) {
     if(isFormValid) {
       setSubmitting(true);
       api.post(URL_MAP.FORGOT_PASSWORD, {
-        email: formData.email,
+        email: formData.email.toLowerCase(),
       }).then((resp)=>{
         setFormSuccess('Reset password link sent to the email.');
         setFormData(defaults);
