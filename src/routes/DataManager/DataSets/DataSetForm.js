@@ -10,8 +10,12 @@ export default function LabelForm({initFormData, ...props}) {
     desc: '',
     app_usage: [],
     data_type: '',
-    emails: []
+    emails: [],
+    ocr_model:null,
+    classify_model:null,
+    ner_model:null
   }
+  console.log("initFormData-->",initFormData)
   const editMode = (initFormData != null);
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
@@ -24,6 +28,14 @@ export default function LabelForm({initFormData, ...props}) {
   const [appUsageOpts, setAppUsageOpts] = useState([]);
   
   const [emailsOpts, setEmailsOpts] = useState([]);
+  const [ocrDetails, setOcrDetails] = useState([]);
+  const [clasificationModels, setClasificationModels] = useState([]);
+  const [nerModels, setNerModels] = useState([]);
+  const [ocrPresent,setOcrPresent]=useState(false);
+  const [classifyPresent,setClassifyPresent] = useState(false);
+  const [nerPresent,setNerPresent] = useState(false);
+
+
 
   const api = getInstance(localStorage.getItem('token'));
 
@@ -39,7 +51,20 @@ export default function LabelForm({initFormData, ...props}) {
     app_usage: {
       validators: ['required'],
       messages: ['This field is required'],
-    }
+    },
+    ocr_model: {
+      validators: ['required'],
+      messages: ['This field is required'],
+    },
+    classify_model: {
+      validators: ['required'],
+      messages: ['This field is required'],
+    },
+    ner_model: {
+      validators: ['required'],
+      messages: ['This field is required'],
+    },
+
   }
 
   useEffect(()=>{
@@ -81,6 +106,48 @@ export default function LabelForm({initFormData, ...props}) {
     });
   }, []);
 
+  useEffect(() => {
+    const ocr = formData.app_usage.findIndex((el)=>el.app_usage==="20-AI OCR")!== -1;
+    const classy = formData.app_usage.findIndex((el)=>el.app_usage==="30-Classification")!== -1;
+    const ner = formData.app_usage.findIndex((el)=>el.app_usage==="40-Entity Extraction")!== -1;
+    setOcrPresent(ocr);
+    setClassifyPresent(classy);
+    setNerPresent(ner);
+    console.log('app usage change-->',formData.app_usage);
+  }, [formData.app_usage]);
+  useEffect(() => {
+    api.post(URL_MAP.GET_OCR_DETAILS).then((resp)=>{
+      const ocrDetails = resp.data.data;
+      setOcrDetails(ocrDetails);
+    }).catch((err)=>{
+      if (err.response && err.response.data.message) {
+        setFormError("Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.");
+      }
+    })
+  }, []);
+
+  useEffect(() => {
+    api.post(URL_MAP.GET_ALL_MODELS,{model_type:"classifier"}).then((resp)=>{
+      const models = resp.data.model_list;
+      setClasificationModels(models);
+    }).catch((err)=>{
+      if (err.response && err.response.data.message) {
+        setFormError("Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.");
+      }
+    })
+  }, []);
+
+  useEffect(() => {
+    api.post(URL_MAP.GET_ALL_MODELS,{model_type:"NER"}).then((resp)=>{
+      const models = resp?.data?.model_list;
+      setNerModels(models);
+    }).catch((err)=>{
+      if (err.response && err.response.data.message) {
+        setFormError("Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.");
+      }
+    })
+  }, []);
+
   const validateField = (name, value) => {
     let errMsg = '';
     let fieldValidators = formValidators[name];
@@ -97,7 +164,7 @@ export default function LabelForm({initFormData, ...props}) {
 
   const onTextChange = (e, name) => {
     let value = e;
-    if(e.target) {
+    if(e?.target) {
       name = e.target.name;
       value = e.target.value;
     }
@@ -105,7 +172,6 @@ export default function LabelForm({initFormData, ...props}) {
       ...prevData,
       [name]: value
     }));
-
     validateField(name, value);
   }
 
@@ -130,6 +196,19 @@ export default function LabelForm({initFormData, ...props}) {
         "update":editMode || false,
         "_id": editMode ? formData._id : null
       };
+      
+        if(ocrPresent){
+          dataSetPayload.ocr_model_id = formData.ocr_model._id;
+        }
+        if(classifyPresent){
+          dataSetPayload.classify_model_id = formData.classify_model._id;
+          dataSetPayload.classify_model_version = formData.classify_model.version;
+        }
+        if(nerPresent){
+          dataSetPayload.ner_model_id = formData.ner_model._id;
+          dataSetPayload.ner_model_version = formData.ner_model.version;
+        }
+       
       api.post(URL_MAP.CREATE_DATA_SETS, dataSetPayload).then((resp)=>{
         setFormSuccess('Dataset created sucessfully.');
         if(!editMode) setFormData(defaults);
@@ -152,6 +231,8 @@ export default function LabelForm({initFormData, ...props}) {
       });
     }
   }
+  console.log("formData-->",formData)
+  console.log("form errors",formDataErr);
 
   return (
     <>
@@ -184,6 +265,38 @@ export default function LabelForm({initFormData, ...props}) {
           />
         </FormRowItem>
       </FormRow>
+      {formData.app_usage.length>0 && (
+        <FormRow>
+          <>
+          {ocrPresent && (
+              <FormRowItem xs={6}>
+                <FormInputSelect  label="OCR Model" hasSearch required name='ocr_model' onChange={(e, value)=>{onTextChange(value, 'ocr_model')}}
+                  labelKey='ocr_type' valueKey='_id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.ocr_model} 
+                  value={formData.ocr_model?._id} options={ocrDetails} 
+                />
+              </FormRowItem>
+          )}
+          {classifyPresent && (
+            <FormRowItem xs={6}>
+              <FormInputSelect  label="Document classification model" hasSearch required name='classify_model' onChange={(e, value)=>{onTextChange(value, 'classify_model')}}
+                labelKey='model_name' valueKey='_id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.classify_model} 
+                value={formData.classify_model?._id} options={clasificationModels} 
+              />
+            </FormRowItem>
+          )}
+          {nerPresent && (
+            <FormRowItem xs={6}>
+              <FormInputSelect  label="Named entity recognition(NER) model" hasSearch required name='ner_model' onChange={(e, value)=>{onTextChange(value, 'ner_model')}}
+                labelKey='model_name' valueKey='_id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.ner_model} 
+                value={formData.ner_model?._id} options={nerModels} 
+              />
+            </FormRowItem>
+          )}
+        
+        </>
+      </FormRow>
+      )}
+      
       {(formError || formSuccess) &&
       <FormRow>
         <FormRowItem>

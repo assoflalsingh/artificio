@@ -93,6 +93,8 @@ export const URL_MAP = {
 
   RECAPTCHA_API: `https://www.google.com/recaptcha/api.js?render=${APP_CONFIGS.CAPTCHA_SITE_KEY}`,
 
-  MASS_EXTRACTION_API: `label/mass-data-extraction/`
+  MASS_EXTRACTION_API: `label/mass-data-extraction/`,
+
+  GET_OCR_DETAILS: 'classification/get-ocr-details/',
 
 };
