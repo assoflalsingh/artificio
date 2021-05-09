@@ -155,7 +155,7 @@ export default function DataGroupForm({initFormData, ...props}) {
       });
     }
   }
-
+  console.log("form data->",formData);
   return (
     <>
     <Box display="flex">
