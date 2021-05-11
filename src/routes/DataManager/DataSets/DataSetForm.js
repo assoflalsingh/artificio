@@ -208,11 +208,11 @@ export default function LabelForm({initFormData, ...props}) {
         }
         if(classifyPresent){
           dataSetPayload.classify_model_id = formData.classify_model;
-          dataSetPayload.classify_version = clasificationModels.filter((model)=>model._id===formData.classify_model)[0].version;
+          dataSetPayload.classify_version = clasificationModels.filter((model)=>model.model_id===formData.classify_model)[0].version;
         }
         if(nerPresent){
           dataSetPayload.ner_model_id = formData.ner_model;
-          dataSetPayload.ner_version = nerModels.filter((model)=>model._id===formData.ner_model)[0].version;
+          dataSetPayload.ner_version = nerModels.filter((model)=>model.model_id===formData.ner_model)[0].version;
         }
        
       api.post(URL_MAP.CREATE_DATA_SETS, dataSetPayload).then((resp)=>{
@@ -283,7 +283,7 @@ export default function LabelForm({initFormData, ...props}) {
           {classifyPresent && (
             <FormRowItem xs={6}>
               <FormInputSelect  label="Document classification model"  required name='classify_model' onChange={onTextChange}
-                labelKey='model_name' valueKey='_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.classify_model} 
+                labelKey='model_name' valueKey='model_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.classify_model} 
                 value={formData.classify_model} options={clasificationModels} 
               />
             </FormRowItem>
@@ -291,7 +291,7 @@ export default function LabelForm({initFormData, ...props}) {
           {nerPresent && (
             <FormRowItem xs={6} >
               <FormInputSelect label="Named entity recognition(NER) model"  required name='ner_model' onChange={onTextChange}
-                labelKey='model_name' valueKey='_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.ner_model} 
+                labelKey='model_name' valueKey='model_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.ner_model} 
                 value={formData.ner_model} options={nerModels} 
               />
             </FormRowItem>
