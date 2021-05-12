@@ -102,11 +102,15 @@ export default function LabelForm({initFormData, ...props}) {
           let formAppUsage = usageResponse?.data?.data.filter((label)=>{
             return Object.keys(initFormData.app_usage).indexOf(label._id) > -1;
           });
-           
+          
+          const classifyModel = classifyData.filter((model)=>(model.model_id === initFormData.classify_model && model.version===initFormData.classify_version))[0]?._id || "" ;
+          const nerModel = nerData.filter((model)=>(model.model_id === initFormData.ner_model && model.version===initFormData.ner_version))[0]?._id || "";
           setFormData({
             ...initFormData,
             app_usage: formAppUsage,
-            emails: initFormData.emails
+            emails: initFormData.emails,
+            classify_model:classifyModel,
+            ner_model:nerModel
           });
         }
 
@@ -202,17 +206,32 @@ export default function LabelForm({initFormData, ...props}) {
         "update":editMode || false,
         "_id": editMode ? formData._id : null
       };
-        // add additiona model details      
+        // add additional model details 
+        // for OCR MODEL     
         if(ocrPresent){
           dataSetPayload.ocr_model_id = formData.ocr_model;
         }
-        if(classifyPresent){
-          dataSetPayload.classify_model_id = formData.classify_model;
-          dataSetPayload.classify_version = clasificationModels.filter((model)=>model.model_id===formData.classify_model)[0].version;
+        else{
+          dataSetPayload.ocr_model_id = "";
         }
+   
+        //FOR CLASSIFICATION MODEL
+        if(classifyPresent){
+          dataSetPayload.classify_model_id = clasificationModels.filter((model)=>model._id===formData.classify_model)[0].model_id;
+          dataSetPayload.classify_version = clasificationModels.filter((model)=>model._id===formData.classify_model)[0].version;
+        }
+        else{
+          dataSetPayload.classify_model_id = "";
+          dataSetPayload.classify_version = "";
+        }
+        // FOR NER MODEL
         if(nerPresent){
-          dataSetPayload.ner_model_id = formData.ner_model;
-          dataSetPayload.ner_version = nerModels.filter((model)=>model.model_id===formData.ner_model)[0].version;
+          dataSetPayload.ner_model_id = nerModels.filter((model)=>model._id===formData.ner_model)[0].model_id;
+          dataSetPayload.ner_version =  nerModels.filter((model)=>model._id===formData.ner_model)[0].version;
+        }
+        else{
+          dataSetPayload.ner_model_id = "";
+          dataSetPayload.ner_version = "";
         }
        
       api.post(URL_MAP.CREATE_DATA_SETS, dataSetPayload).then((resp)=>{
@@ -283,7 +302,7 @@ export default function LabelForm({initFormData, ...props}) {
           {classifyPresent && (
             <FormRowItem xs={6}>
               <FormInputSelect  label="Document classification model"  required name='classify_model' onChange={onTextChange}
-                labelKey='model_name' valueKey='model_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.classify_model} 
+                labelKey='model_name' valueKey='_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.classify_model} 
                 value={formData.classify_model} options={clasificationModels} 
               />
             </FormRowItem>
@@ -291,7 +310,7 @@ export default function LabelForm({initFormData, ...props}) {
           {nerPresent && (
             <FormRowItem xs={6} >
               <FormInputSelect label="Named entity recognition(NER) model"  required name='ner_model' onChange={onTextChange}
-                labelKey='model_name' valueKey='model_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.ner_model} 
+                labelKey='model_name' valueKey='_id' firstEmpty={false} loading={opLoading} errorMsg={formDataErr.ner_model} 
                 value={formData.ner_model} options={nerModels} 
               />
             </FormRowItem>

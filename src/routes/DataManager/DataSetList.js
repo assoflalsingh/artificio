@@ -85,7 +85,7 @@ function DataSetList({history}) {
       sort: true,
       draggable: true,
       customBodyRender: (value, tableMeta)=>{
-        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1], desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5],ocr_model:tableMeta.rowData[6],classify_model:tableMeta.rowData[7],ner_model:tableMeta.rowData[8]}}}>
+        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1], desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5],ocr_model:tableMeta.rowData[6],classify_model:tableMeta.rowData[7],ner_model:tableMeta.rowData[8],classify_version:dataSetlist[tableMeta.rowIndex].classify_version,ner_version:dataSetlist[tableMeta.rowIndex].ner_version}}}>
                 {value}
             </Link>;
       }
