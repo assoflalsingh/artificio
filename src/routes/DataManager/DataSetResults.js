@@ -98,7 +98,7 @@ export default function Results(props) {
         type:"string"
       },
     {
-      name: "status",
+      name: "img_status",
       label: "Status",
       options: {
         filter: true,
@@ -170,7 +170,7 @@ export default function Results(props) {
         timestamp: datum.timestamp,
         created_by: datum.created_by,
         file: datum.file,
-        status: datum.status,
+         
       }
 
       Object.keys(datum.images).forEach((page)=>{
@@ -183,7 +183,8 @@ export default function Results(props) {
           image_name: datum.images[page].img_name,
           struct_name: datum.images[page].struct_name,
           data_set_value: datum.images[page].data_set_value,
-          img_thumb: datum.images[page].img_thumb
+          img_thumb: datum.images[page].img_thumb,
+          img_status: datum.images[page].img_status,
         });
       });
     });
