@@ -28,14 +28,17 @@ export async function saveAnnotationData(
   imageMetadata,
   textAnnotations,
   userAnnotatedData,
-  reviewMode = false
+  reviewMode = false,
+  table_annotations
 ) {
+  // Changes for passing table_annotations to the API.
   return api.post(URL_MAP.UPDATE_FILE_STATUS, {
     document_id: documentId,
     page_no: pageNo,
     json_data: {
       initial_model_data: {
         text_annotations: textAnnotations,
+        table_annotations: table_annotations,
         metadata: imageMetadata,
       },
       user_annotate_data: userAnnotatedData,
@@ -44,17 +47,11 @@ export async function saveAnnotationData(
   });
 }
 
-export async function saveStructure(
-  api,
-  payload
-) {
+export async function saveStructure(api, payload) {
   return api.post(URL_MAP.CREATE_STRUCTURE, payload);
 }
 
-export async function assignData(
-  api,
-  payload
-) {
+export async function assignData(api, payload) {
   return api.post(URL_MAP.ASSIGN_DATA, payload);
 }
 
@@ -64,6 +61,6 @@ export async function getStructuresList(api) {
 
 export async function getStructureTemplate(api, id) {
   return api.post(URL_MAP.GET_STRUCTURE_TEMPLATE, {
-    _id: id
+    _id: id,
   });
 }

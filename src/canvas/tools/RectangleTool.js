@@ -109,8 +109,14 @@ export class RectangleTool extends Tool {
       this.imageLabels
     );
     // check if previous added Rectangle was assigned a label if not then remove it...
-    let previousAddedRect = this.canvasManager.annotations[this.canvasManager.annotations.length - 1] || [];
-    if(previousAddedRect && previousAddedRect.annotationData?.label === DefaultLabel.label_value){
+    let previousAddedRect =
+      this.canvasManager.annotations[
+        this.canvasManager.annotations.length - 1
+      ] || [];
+    if (
+      previousAddedRect &&
+      previousAddedRect.annotationData?.label === DefaultLabel.label_value
+    ) {
       this.canvasManager.deleteAnnotation(previousAddedRect.id);
     }
     this.canvasManager.addAnnotation(rectangle);

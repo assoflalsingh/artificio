@@ -129,41 +129,42 @@ export function findTextAnnotations(annotation, proposals) {
         });
       }
 
-			const r1 = { x: px1, y: py1, width: px2 - px1, height: py2 - py1 }
-			const r2 = { x: x1, y: y1, width: x2 - x1, height: y2 - y1 }
+      const r1 = { x: px1, y: py1, width: px2 - px1, height: py2 - py1 };
+      const r2 = { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
 
-			// Intersecting boxes logic
-			const intersectingRectangle = getIntersectingRectangle(r1, r2);
-			if (intersectingRectangle) {
-				const rectArea = (x2 - x1) * (y2 - y1);
-				const intersectingRectArea =
-					Math.abs((intersectingRectangle.x2 - intersectingRectangle.x1) *
-					(intersectingRectangle.y2 - intersectingRectangle.y1));
-				const ratio = intersectingRectArea / rectArea;
-				// if intersected area is greater then 50% then select those boxes
-				if (ratio >= 0.5) {
-					if (
-						!words.find(
-							(w) => w.word_description === proposal.word.word_description
-						)
-					) {
-						words.push({
-							confidence_score: proposal?.word?.confidence_score,
-							entity_label: proposal.word.entity_label,
-							word_description: proposal.word.word_description,
-							vertices,
-							index
-						});
-					}
-				}
-			}
+      // Intersecting boxes logic
+      const intersectingRectangle = getIntersectingRectangle(r1, r2);
+      if (intersectingRectangle) {
+        const rectArea = (x2 - x1) * (y2 - y1);
+        const intersectingRectArea = Math.abs(
+          (intersectingRectangle.x2 - intersectingRectangle.x1) *
+            (intersectingRectangle.y2 - intersectingRectangle.y1)
+        );
+        const ratio = intersectingRectArea / rectArea;
+        // if intersected area is greater then 50% then select those boxes
+        if (ratio >= 0.5) {
+          if (
+            !words.find(
+              (w) => w.word_description === proposal.word.word_description
+            )
+          ) {
+            words.push({
+              confidence_score: proposal?.word?.confidence_score,
+              entity_label: proposal.word.entity_label,
+              word_description: proposal.word.word_description,
+              vertices,
+              index,
+            });
+          }
+        }
+      }
     });
   }
   return words;
 }
 
-export function getLabelValueFromProposals(annotation, proposals) {
-  const words = findTextAnnotations(annotation, proposals);
+export function getLabelValueFromProposals(annotation, source) {
+  const words = findTextAnnotations(annotation, source);
   let labelValue = "";
   let confidence = 0;
   let count = 0;
@@ -211,4 +212,59 @@ export function generateAnnotationsFromData(
       id: uuid.v4(),
     };
   });
+}
+
+// Function to check if the annotation is intersecting with the table boundry.
+export function checkIfIntersectionsWithTable(
+  annotation,
+  tables,
+  konvaImage,
+  imageDimensions
+) {
+  if (!tables?.length) return false;
+  const annotationCoordinates = annotation.getData().coordinates;
+  const px1 = annotationCoordinates[0];
+  const py1 = annotationCoordinates[1];
+  const px2 = annotationCoordinates[2];
+  const py2 = annotationCoordinates[3];
+  let isInterSecting = false;
+  tables.forEach((proposal, index) => {
+    if (!isInterSecting) {
+      const coordinates = proposal.vertices;
+      const imagePosition = konvaImage.position();
+      const topLeft = coordinates[0];
+      const bottomRight = coordinates[2];
+      const width =
+        ((bottomRight.x - topLeft.x) / imageDimensions.width) *
+        konvaImage.width();
+      const height =
+        ((bottomRight.y - topLeft.y) / imageDimensions.height) *
+        konvaImage.height();
+      const x1 =
+        (topLeft.x / imageDimensions.width) * konvaImage.width() +
+        imagePosition.x -
+        1;
+      const y1 =
+        (topLeft.y / imageDimensions.height) * konvaImage.height() +
+        imagePosition.y -
+        1;
+      const x2 = x1 + width;
+      const y2 = y1 + height;
+
+      const r1 = { x: px1, y: py1, width: px2 - px1, height: py2 - py1 };
+      const r2 = { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
+      // Intersecting boxes logic
+      const intersectingRectangle = getIntersectingRectangle(r1, r2);
+
+      // Containing boxes logic
+      if (px1 >= x1 && py1 >= y1 && px2 <= x2 && py2 <= y2) {
+        isInterSecting = true;
+      } else if (intersectingRectangle) {
+        isInterSecting = true;
+      } else {
+        isInterSecting = false;
+      }
+    }
+  });
+  return isInterSecting;
 }

@@ -8,19 +8,28 @@ import {
 import { getScaledCoordinates, getUnScaledCoordinates } from "./core/utilities";
 import Proposal from "./annotations/Proposal";
 import {
-  AnnotationEventType,
   AnnotationProposalColor,
   AnnotationProposalLowConfidenceScoreColor,
 } from "./annotations/Annotation";
 import { UndoRedoStack } from "./core/UndoRedoStack";
 import Rectangle from "./annotations/Rectangle";
-import { getLabelValueFromProposals } from "../components/ImageAnnotation/utilities";
+import {
+  getLabelValueFromProposals,
+  generateAnnotationsFromData,
+  checkIfIntersectionsWithTable,
+} from "../components/ImageAnnotation/utilities";
 import { ConnectingLine } from "./core/connectingLine";
+import { DefaultLabel } from "../components/ImageAnnotation/label/LabelSelector";
+import * as cloneDeep from "lodash.clonedeep";
 
 export class CanvasManager extends CanvasScene {
   activeTool;
   proposalTool;
   annotations = [];
+  tablesBoundries = [];
+  allTableAnnotations = [];
+  tableAnnProposal = [];
+  edittedAnnotations = new Set();
   proposals = [];
   selectedAnnotation;
   undoRedoStack = new UndoRedoStack();
@@ -35,7 +44,7 @@ export class CanvasManager extends CanvasScene {
   textAnnotations;
   blockAnnotationSelect = false;
   connectingLine;
-
+  isTableAnnotation = false;
   // ApplicationConfig is of type {appId: string}
   constructor(
     appConfig,
@@ -62,7 +71,59 @@ export class CanvasManager extends CanvasScene {
   setTextAnnotations(textAnnotations) {
     this.textAnnotations = textAnnotations;
   }
-
+  // Below logic related to Table annotations and changes in the table data
+  setTablesBoundries(boundries) {
+    this.tablesBoundries = [...boundries];
+  }
+  setAllTablesAnnotations = (tableAnnotations) => {
+    this.allTableAnnotations = cloneDeep(tableAnnotations);
+    this.allTableAnnotations_Initial = cloneDeep(tableAnnotations);
+  };
+  resetTableAnnotations = () => {
+    this.allTableAnnotations = cloneDeep(this.allTableAnnotations_Initial);
+  };
+  getAllTablesAnnotations = () => {
+    return this.allTableAnnotations;
+  };
+  updateTableAnnotation = (updatedValue, cellIndex, selectedTableIndex) => {
+    const updateValArray = updatedValue.split(" ");
+    let allExistingTableAnnotations = cloneDeep(this.allTableAnnotations);
+    let existingTableAnnotationsForSelectedTable =
+      allExistingTableAnnotations[selectedTableIndex].cell_details;
+    let wordDetails =
+      existingTableAnnotationsForSelectedTable[cellIndex]?.word_details;
+    if (wordDetails?.length) {
+      wordDetails.map((word, index, allWords) => {
+        word.user_modified = 1;
+        if (allWords[index + 1]) {
+          word.word_description = updateValArray[index] || "";
+        } else {
+          word.word_description = updateValArray
+            .slice(index, updatedValue.split(" ").length)
+            .join(" ");
+        }
+        return word;
+      });
+    } else {
+      wordDetails = [
+        {
+          entity_label: "arto_others",
+          word_description: updatedValue,
+          user_modified: 1,
+        },
+      ];
+    }
+    existingTableAnnotationsForSelectedTable[cellIndex].word_details = [
+      ...wordDetails,
+    ];
+    allExistingTableAnnotations[
+      selectedTableIndex
+    ].cell_details = existingTableAnnotationsForSelectedTable;
+    this.allTableAnnotations = cloneDeep(allExistingTableAnnotations);
+  };
+  getTablesBoundries() {
+    return this.tablesBoundries;
+  }
   // Show is of type boolean
   setLoader(show) {
     this.dispatch(CustomEventType.SHOW_LOADER, { loading: show });
@@ -114,8 +175,8 @@ export class CanvasManager extends CanvasScene {
     annotation.select();
     this.addSelectedAnnotationEventListeners();
     this.annotationLayerDraw();
-    this.addConnectingLine();
-    this.showLabelSelectorDropdown();
+    !this.isTableAnnotation && this.addConnectingLine();
+    this.showLabelSelectorDropdown("SELECTED");
     this.dispatch(CustomEventType.ON_ANNOTATION_SELECT, { id: annotation.id });
   }
 
@@ -141,25 +202,42 @@ export class CanvasManager extends CanvasScene {
       this.hideLabelSelectorDropdown();
     });
     this.selectedAnnotation.getShape().on("dragend.select", () => {
-      // set label value
+      const isTableInterSection = this.checkIFAnnotationIntersectingWithTables();
+      const source = isTableInterSection
+        ? this.tableAnnProposal
+        : this.proposals;
       const labelValue = getLabelValueFromProposals(
         this.selectedAnnotation,
-        this.proposals
+        source
       );
       this.selectedAnnotation.setLabelValue(labelValue?.value);
-      this.showLabelSelectorDropdown();
+      this.showLabelSelectorDropdown("UPDATED");
       this.notifyLabelCreation();
       this.updateUndoStack();
     });
   }
 
+  updateTableAnnotationAndSelectedValue(
+    annId,
+    updatedValue,
+    cellIndex,
+    selectedTableIndex
+  ) {
+    const selectedAnnotation = this.getAnnotationById(annId);
+    selectedAnnotation.setLabelValue(updatedValue);
+    this.updateTableAnnotation(updatedValue, cellIndex, selectedTableIndex);
+  }
   hideLabelSelectorDropdown = () => {
     this.dispatch(CustomEventType.HIDE_LABEL_DROPDOWN);
   };
 
-  showLabelSelectorDropdown = () => {
+  showLabelSelectorDropdown = (action) => {
     if (this.selectedAnnotation) {
       // Show label selector dropdown
+      this.dispatch(CustomEventType.ON_ANNOTATION_VALUE_CHANGE, {
+        labelValue: this.selectedAnnotation.getLabelValue(),
+        action: action,
+      });
       this.dispatch(CustomEventType.SHOW_LABEL_DROPDOWN, {
         position: this.getLabelSelectorPosition(),
       });
@@ -192,6 +270,7 @@ export class CanvasManager extends CanvasScene {
 	 * @param annotation
 	 */
   addAnnotation = (annotation, select = true) => {
+    this.edittedAnnotations.add(annotation.id);
     this.annotationLayer.add(annotation.getShape());
     this.annotationLayerDraw();
     this.annotations.push(annotation);
@@ -203,6 +282,17 @@ export class CanvasManager extends CanvasScene {
     }
   };
 
+  checkIFAnnotationIntersectingWithTables = (
+    annotation = this.selectedAnnotation
+  ) =>
+    checkIfIntersectionsWithTable(
+      annotation,
+      this.tablesBoundries,
+      this.konvaImage,
+      this.imageDimensions
+    );
+  getEdittedAnnotationCount = () => this.edittedAnnotations.size;
+
   deleteAnnotation(id) {
     const index = this.annotations.findIndex((ann) => ann.id === id);
     const annotation = this.annotations[index];
@@ -213,20 +303,25 @@ export class CanvasManager extends CanvasScene {
     this.hideLabelSelectorDropdown();
     this.notifyLabelCreation();
     this.updateUndoStack();
+    if (this.edittedAnnotations.has(id)) {
+      this.edittedAnnotations.delete(id);
+    } else {
+      this.edittedAnnotations.add(id);
+    }
   }
 
   deleteAllAnnotations() {
-    this.annotations.map((ann)=> { 
+    this.annotations.map((ann) => {
       const index = this.annotations.findIndex((anns) => anns.id === ann.id);
       const annotation = this.annotations[index];
       this.selectedAnnotation && this.deSelectActiveAnnotation();
       annotation.getShape().destroy();
-    })
+    });
     this.annotations.splice(0, this.annotations.length);
     this.annotationLayer.batchDraw();
     this.hideLabelSelectorDropdown();
     this.notifyLabelCreation();
-    this.updateUndoStack();  
+    this.updateUndoStack();
   }
 
   /**
@@ -264,16 +359,17 @@ export class CanvasManager extends CanvasScene {
 
   resetCanvas(resetProposals = true) {
     this.unsetActiveTool();
+    this.edittedAnnotations.clear();
     this.deSelectActiveAnnotation();
     this.annotationLayer.destroyChildren();
     this.annotations = [];
     this.annotationLayer.show();
     this.annotationLayer.batchDraw();
     if (resetProposals) {
-			this.proposalLayer.destroyChildren();
-			this.proposals = [];
-			this.proposalLayer.batchDraw();
-		}
+      this.proposalLayer.destroyChildren();
+      this.proposals = [];
+      this.proposalLayer.batchDraw();
+    }
     this.toolLayer.destroyChildren();
     this.toolLayerDraw();
     this.blockAnnotationSelect = false;
@@ -351,6 +447,13 @@ export class CanvasManager extends CanvasScene {
     return this.proposalTool;
   };
 
+  checkIfTableAnnotation = () => {
+    return this.isTableAnnotation;
+  };
+  setTableAnnotationInProgress = (status) => {
+    this.deSelectActiveAnnotation();
+    this.isTableAnnotation = status;
+  };
   setActiveTool = (toolType, data, imageLabels) => {
     const tool = ToolTypeClassNameMap[toolType];
     this.activeTool = new tool(this, data, imageLabels);
@@ -409,7 +512,113 @@ export class CanvasManager extends CanvasScene {
     });
     this.annotationLayerDraw();
   };
+  // This logic is for showing and hiding of highlighted border on the table.
+  removeHighlights = (elementName) => {
+    this.annotationLayer.find(`.${elementName}`).destroy();
+    // this.isTableAnnotation = false;
+    this.edittedAnnotations.clear();
+    this.annotationLayer.draw();
+  };
 
+  highlightTableToggle = (tableName, mode, boundingDetails) => {
+    if (mode === "REMOVE") {
+      // this.isTableAnnotation = false;
+      if (this.annotations.length) {
+        this.annotations.map((annotation) => {
+          if (annotation.getLabel().indexOf("TABLE_ANN_") > -1) {
+            return this.deleteAnnotation(annotation.id);
+          }
+        });
+      }
+      return setTimeout(() => {
+        // this.isTableAnnotation = false;
+        this.removeHighlights(tableName);
+      }, 500);
+    }
+    const coordinates = boundingDetails.vertices;
+    const imagePosition = this.konvaImage.position();
+    const topLeft = coordinates[0];
+    const bottomRight = coordinates[2];
+    const width =
+      ((bottomRight.x - topLeft.x) / this.imageDimensions.width) *
+      this.konvaImage.width();
+    const height =
+      ((bottomRight.y - topLeft.y) / this.imageDimensions.height) *
+      this.konvaImage.height();
+    const xPos =
+      (topLeft.x / this.imageDimensions.width) * this.konvaImage.width() +
+      imagePosition.x -
+      1;
+    const yPos =
+      (topLeft.y / this.imageDimensions.height) * this.konvaImage.height() +
+      imagePosition.y -
+      1;
+    this.updateImagePostion(this.konvaImage.position().x, yPos);
+    let rect = new Konva.Rect({
+      x: xPos,
+      y: yPos,
+      stroke: "#b71a3b",
+      strokeWidth: 1,
+      width: width + 1,
+      height: height + 1,
+      name: tableName,
+      cornerRadius: 2,
+      dash: [10, 10, 0.001, 5],
+    });
+    this.annotationLayer.add(rect);
+    this.annotationLayer.draw();
+    if (mode === "DISPLAY") {
+      setTimeout(() => {
+        this.removeHighlights(tableName);
+      }, 1000);
+    }
+  };
+
+  toggleHighlightCell = (cellToHighlight, cellDetails, annIDToDelete) => {
+    if (annIDToDelete) {
+      const ann = this.getAnnotationById(annIDToDelete);
+      if (ann.getLabel().indexOf("TABLE_ANN_") > -1) {
+        this.deleteAnnotation(ann.id);
+      }
+    }
+    this.edittedAnnotations.clear();
+    if (cellToHighlight) {
+      const userAnnotatedData = {
+        labels: [
+          {
+            label_name: `TABLE_ANN_${cellDetails.row_index}${cellDetails.column_index}${DefaultLabel.label_name}`,
+            label_value: cellDetails.cellValue,
+            label_color: "blue",
+            label_points: cellDetails.bounding_box.vertices.map((a) => [
+              a.x,
+              a.y,
+            ]),
+            label_shape: "box",
+          },
+        ],
+      };
+      const annotations = generateAnnotationsFromData(
+        userAnnotatedData,
+        this.stage,
+        [
+          {
+            label_name: `TABLE_ANN_${cellDetails.row_index}${cellDetails.column_index}${DefaultLabel.label_name}`,
+            label_color: "blue",
+          },
+        ],
+        this.imageDimensions,
+        this.konvaImage.position(),
+        {
+          width: this.konvaImage.width(),
+          height: this.konvaImage.height(),
+        }
+      );
+      // this.isTableAnnotation = true;
+      this.addAnnotationsFromData(annotations);
+      return annotations;
+    }
+    return null;
+  };
   getLabelSelectorPosition = () => {
     const annotation = this.selectedAnnotation;
     if (annotation) {
@@ -471,58 +680,83 @@ export class CanvasManager extends CanvasScene {
       }
     });
     proposal.getShape().on("click", () => {
-       // logic to get the word description
-       let proposalLayer = this.proposalLayer;
-       let allAnnotations = this.textAnnotations;
-       const ids = proposal.id.split("-");
-       const proposalIndex = parseInt(ids[0]);
-       const wordIndex = parseInt(ids[1]);
-       const textToDisplay = allAnnotations[proposalIndex]?.word_details[wordIndex].word_description;
+      // logic to get the word description
+      let proposalLayer = this.proposalLayer;
+      let allAnnotations = this.textAnnotations;
+      const ids = proposal.id.split("-");
+      const proposalIndex = parseInt(ids[0]);
+      const wordIndex = parseInt(ids[1]);
+      const textToDisplay =
+        allAnnotations[proposalIndex]?.word_details[wordIndex].word_description;
       if (proposal.isSelected) {
-        this.proposalLayer.find(`.T${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.R${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.TR${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
+        this.proposalLayer
+          .find(
+            `.T${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+              proposal.getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.proposalLayer
+          .find(
+            `.R${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+              proposal.getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.proposalLayer
+          .find(
+            `.TR${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+              proposal.getShape().attrs.id
+            }`
+          )
+          .remove();
         proposal.deSelect();
         proposalLayer.draw();
       } else {
         proposal.select();
         let text = new Konva.Text({
           x: proposal.annotationData.dimensions.x,
-          y: proposal.annotationData.dimensions.y-12,
+          y: proposal.annotationData.dimensions.y - 12,
           text: textToDisplay,
           fontSize: 5,
-          name:`T${textToDisplay.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
+          name: `T${textToDisplay.replace(/[\s, ,]/g, "")}-${
+            proposal.getShape().attrs.id
+          }`,
           padding: 4,
           fill: "black",
           fontStyle: "bold",
-          fontFamily: 'Nunito'
+          fontFamily: "Nunito",
         });
         let rect = new Konva.Rect({
-          x: proposal.annotationData.dimensions.x+2,
-          y: proposal.annotationData.dimensions.y-10,
-          stroke: proposal.word.user_modified===1 ? "#e73cd0" : "#ffb600",
-          fill:  proposal.word.user_modified===1 ? "#e73cd0" : "#ffb600",
+          x: proposal.annotationData.dimensions.x + 2,
+          y: proposal.annotationData.dimensions.y - 10,
+          stroke: proposal.word.user_modified === 1 ? "#e73cd0" : "#ffb600",
+          fill: proposal.word.user_modified === 1 ? "#e73cd0" : "#ffb600",
           strokeWidth: 1,
           width: text.width(),
           height: text.height() - 4,
-          name:`R${textToDisplay.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
+          name: `R${textToDisplay.replace(/[\s, ,]/g, "")}-${
+            proposal.getShape().attrs.id
+          }`,
           cornerRadius: 10,
         });
         proposalLayer.add(rect);
         proposalLayer.add(text);
-        
+
         let transformer = new Konva.Transformer({
           nodes: [rect],
-          enabledAnchors: ['middle-left', 'middle-right'],
+          enabledAnchors: ["middle-left", "middle-right"],
           width: 75,
-          name:`TR${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`,
+          name: `TR${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+            proposal.getShape().attrs.id
+          }`,
           // set minimum width of text
-          boundBoxFunc: function (oldBox, newBox) {
+          boundBoxFunc: function(oldBox, newBox) {
             newBox.width = Math.max(30, newBox.width);
             return newBox;
           },
         });
-        text.on('transform', function () {
+        text.on("transform", function() {
           // reset scale, so only with is changing by transformer
           text.setAttrs({
             width: text.width() * text.scaleX(),
@@ -530,15 +764,13 @@ export class CanvasManager extends CanvasScene {
           });
         });
 
-
         proposalLayer.add(transformer);
         proposalLayer.draw();
 
-
-        text.on('dblclick', () => {
+        text.on("dblclick", () => {
           // hide text node and transformer:
           text.hide();
-          rect.hide()
+          rect.hide();
           transformer.hide();
           proposalLayer.draw();
           // create textarea over canvas with absolute position
@@ -554,45 +786,53 @@ export class CanvasManager extends CanvasScene {
             y: stageBox.top + textPosition.y - 10,
           };
           // create textarea and style it
-          let textarea = document.createElement('textarea');
+          let textarea = document.createElement("textarea");
           document.body.appendChild(textarea);
           // apply many styles to match text on canvas as close as possible
           // remember that text rendering on canvas and on the textarea can be different
           // and sometimes it is hard to make it 100% the same. But we will try...
           textarea.value = text.text();
-          document.getElementsByClassName("MuiDialog-container MuiDialog-scrollPaper")[0].setAttribute("tabindex", "inherit");
-          textarea.name="ediable-"+text.text();
-          textarea.maxLength=200;
-          textarea.cols=2;
-          textarea.rows=2;
-          textarea.style.position = 'absolute';
-          textarea.style.top = areaPosition.y + 'px';
-          textarea.style.left = areaPosition.x + 'px';
+          document
+            .getElementsByClassName(
+              "MuiDialog-container MuiDialog-scrollPaper"
+            )[0]
+            .setAttribute("tabindex", "inherit");
+          textarea.name = "ediable-" + text.text();
+          textarea.maxLength = 200;
+          textarea.cols = 2;
+          textarea.rows = 2;
+          textarea.style.position = "absolute";
+          textarea.style.top = areaPosition.y + "px";
+          textarea.style.left = areaPosition.x + "px";
           textarea.style.border = "2px dashed blueviolet";
-          textarea.style.background = "whitesmoke"
-          textarea.style.height = text.height() - text.padding() * 2 + 5 + 'px';
+          textarea.style.background = "whitesmoke";
+          textarea.style.height = text.height() - text.padding() * 2 + 5 + "px";
           textarea.style.width = "100px";
-          textarea.style.fontSize = '16px';
-          textarea.style.padding = '2px';
-          textarea.style.margin = '0px';
-          textarea.style.overflow = 'hidden';
-          textarea.style.outline = 'none';
-          textarea.style.resize = 'none';
+          textarea.style.fontSize = "16px";
+          textarea.style.padding = "2px";
+          textarea.style.margin = "0px";
+          textarea.style.overflow = "hidden";
+          textarea.style.outline = "none";
+          textarea.style.resize = "none";
           textarea.style.lineHeight = text.lineHeight();
           textarea.style.fontFamily = text.fontFamily();
-          textarea.style.transformOrigin = 'left top';
+          textarea.style.transformOrigin = "left top";
           textarea.style.textAlign = text.align();
           textarea.style.zIndex = 99999;
           textarea.style.color = "blueviolet";
           // reset height
-          textarea.style.height = 'auto';
+          textarea.style.height = "auto";
           // after browsers resized it we can set actual value
-          textarea.style.height = textarea.scrollHeight + 3 + 'px';
+          textarea.style.height = textarea.scrollHeight + 3 + "px";
           textarea.focus();
           function removeTextarea() {
             textarea.parentNode.removeChild(textarea);
-            window.removeEventListener('click', handleOutsideClick);
-            document.getElementsByClassName("MuiDialog-container MuiDialog-scrollPaper")[0].setAttribute("tabindex", "-1");
+            window.removeEventListener("click", handleOutsideClick);
+            document
+              .getElementsByClassName(
+                "MuiDialog-container MuiDialog-scrollPaper"
+              )[0]
+              .setAttribute("tabindex", "-1");
             text.show();
             text.width(150);
             transformer.width(70);
@@ -602,7 +842,7 @@ export class CanvasManager extends CanvasScene {
             transformer.forceUpdate();
             proposalLayer.draw();
           }
-  
+
           function setTextareaWidth(newWidth) {
             if (!newWidth) {
               // set width for placeholder
@@ -613,19 +853,19 @@ export class CanvasManager extends CanvasScene {
               navigator.userAgent
             );
             let isFirefox =
-              navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+              navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
             if (isSafari || isFirefox) {
               newWidth = Math.ceil(newWidth);
             }
-  
+
             let isEdge =
               document.documentMode || /Edge/.test(navigator.userAgent);
             if (isEdge) {
               newWidth += 1;
             }
-            textarea.style.width = newWidth + 'px';
+            textarea.style.width = newWidth + "px";
           }
-  
+
           // textarea.addEventListener('keydown', function (e) {
           //   // hide on enter
           //   // but don't hide on shift + enter
@@ -638,59 +878,77 @@ export class CanvasManager extends CanvasScene {
           //     removeTextarea.call(this);
           //   }
           // });
-  
-          textarea.addEventListener('keydown', function (e) {
+
+          textarea.addEventListener("keydown", function(e) {
             if (e.which === 13) {
               handleOutsideClick(e);
-            }
-            else if (e.which === 27) {
+            } else if (e.which === 27) {
               removeTextarea.call(this);
-            }
-            else {
+            } else {
               let scale = rect.getAbsoluteScale().x;
-            setTextareaWidth(rect.width() * scale);
-            textarea.style.height = 'auto';
-            textarea.style.height =
-              textarea.scrollHeight + text.fontSize() + 'px';
-          }
+              setTextareaWidth(rect.width() * scale);
+              textarea.style.height = "auto";
+              textarea.style.height =
+                textarea.scrollHeight + text.fontSize() + "px";
+            }
           });
-  
+
           function handleOutsideClick(e) {
-            if (e.target !== textarea || (e.target === textarea && e.which === 13)) {
+            if (
+              e.target !== textarea ||
+              (e.target === textarea && e.which === 13)
+            ) {
               const ids = proposal.id.split("-");
               const proposalIndex = parseInt(ids[0]);
               const wordIndex = parseInt(ids[1]);
-              if (allAnnotations[proposalIndex] && text.text() !== textarea.value) {
-                allAnnotations[proposalIndex].word_details[wordIndex].word_description = textarea.value;
-                allAnnotations[proposalIndex].word_details[wordIndex].["user_modified"] = 1;
+              if (
+                allAnnotations[proposalIndex] &&
+                text.text() !== textarea.value
+              ) {
+                allAnnotations[proposalIndex].word_details[
+                  wordIndex
+                ].word_description = textarea.value;
+                allAnnotations[proposalIndex].word_details[wordIndex][
+                  "user_modified"
+                ] = 1;
                 // update existing text, rect and transformer name
-                text.name(`T${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`)
-                rect.name(`R${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`)
+                text.name(
+                  `T${textarea.value.replace(/[\s, ,]/g, "")}-${
+                    proposal.getShape().attrs.id
+                  }`
+                );
+                rect.name(
+                  `R${textarea.value.replace(/[\s, ,]/g, "")}-${
+                    proposal.getShape().attrs.id
+                  }`
+                );
                 rect.stroke("#e73cd0");
                 rect.fill("#e73cd0");
-                transformer.name(`TR${textarea.value.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`);
+                transformer.name(
+                  `TR${textarea.value.replace(/[\s, ,]/g, "")}-${
+                    proposal.getShape().attrs.id
+                  }`
+                );
               }
               text.text(textarea.value);
               removeTextarea.call(this);
-              if(textarea.value.length > 5) {
-                rect.width(textarea.value.length*3)
+              if (textarea.value.length > 5) {
+                rect.width(textarea.value.length * 3);
+              } else {
+                rect.width(25);
               }
-              else
-                {
-                  rect.width(25)  
-                }
               proposalLayer.draw();
             }
           }
           setTimeout(() => {
-            window.addEventListener('click', handleOutsideClick);
+            window.addEventListener("click", handleOutsideClick);
           });
         });
 
         // this.proposalLayer.add(rect);
         // this.proposalLayer.add(text);
       }
-      
+
       // proposal.draw();
       // this.proposalLayer.draw();
     });
@@ -720,54 +978,71 @@ export class CanvasManager extends CanvasScene {
       const imagePosition = this.konvaImage.position();
       proposals.forEach((proposal, proposalIndex) => {
         proposal.word_details.forEach((word, wordIndex) => {
-        if(word)
-          {
-          const coordinates = word.bounding_box.vertices;
-          const topLeft = coordinates[0];
-          const bottomRight = coordinates[2];
-          const width =
-            ((bottomRight.x - topLeft.x) / this.imageDimensions.width) *
-            this.konvaImage.width();
-          const height =
-            ((bottomRight.y - topLeft.y) / this.imageDimensions.height) *
-            this.konvaImage.height();
-          const annotationData = {
-            dimensions: {
-              x:
-                (topLeft.x / this.imageDimensions.width) *
-                  this.konvaImage.width() +
-                imagePosition.x,
-              y:
-                (topLeft.y / this.imageDimensions.height) *
-                  this.konvaImage.height() +
-                imagePosition.y,
-              w: width,
-              h: height,
-            },
-            id: `${proposalIndex}-${wordIndex}`,
-            label: word.bounding_box.entity_label,
-            color:
-              word?.confidence_score > 0.5
-                ? AnnotationProposalColor
-                : AnnotationProposalLowConfidenceScoreColor,
-          };
-          const proposal = new Proposal(
-            annotationData,
-            this.stage.scaleX(),
-            word
-          );
-          this.addProposalEventListeners(proposal);
-          this.proposals.push(proposal);
-          this.proposalLayer.add(proposal.getShape());
-        }
+          if (word) {
+            const coordinates = word.bounding_box.vertices;
+            const topLeft = coordinates[0];
+            const bottomRight = coordinates[2];
+            const width =
+              ((bottomRight.x - topLeft.x) / this.imageDimensions.width) *
+              this.konvaImage.width();
+            const height =
+              ((bottomRight.y - topLeft.y) / this.imageDimensions.height) *
+              this.konvaImage.height();
+            const annotationData = {
+              dimensions: {
+                x:
+                  (topLeft.x / this.imageDimensions.width) *
+                    this.konvaImage.width() +
+                  imagePosition.x,
+                y:
+                  (topLeft.y / this.imageDimensions.height) *
+                    this.konvaImage.height() +
+                  imagePosition.y,
+                w: width,
+                h: height,
+              },
+              id: `${proposalIndex}-${wordIndex}`,
+              label: word.bounding_box.entity_label,
+              color:
+                word?.confidence_score > 0.5
+                  ? AnnotationProposalColor
+                  : AnnotationProposalLowConfidenceScoreColor,
+            };
+            const proposal = new Proposal(
+              annotationData,
+              this.stage.scaleX(),
+              word
+            );
+            this.addProposalEventListeners(proposal);
+            this.proposals.push(proposal);
+            this.proposalLayer.add(proposal.getShape());
+          }
         });
       });
     } else {
       this.proposals.forEach((p) => {
-        this.proposalLayer.find(`.T${p.word.word_description.replace(/[\s, ,]/g, '')}-${p.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.R${p.word.word_description.replace(/[\s, ,]/g, '')}-${p.getShape().attrs.id}`).remove();
-        this.proposalLayer.find(`.TR${p.word.word_description.replace(/[\s, ,]/g, '')}-${p.getShape().attrs.id}`).remove();
-        p.deSelect()
+        this.proposalLayer
+          .find(
+            `.T${p.word.word_description.replace(/[\s, ,]/g, "")}-${
+              p.getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.proposalLayer
+          .find(
+            `.R${p.word.word_description.replace(/[\s, ,]/g, "")}-${
+              p.getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.proposalLayer
+          .find(
+            `.TR${p.word.word_description.replace(/[\s, ,]/g, "")}-${
+              p.getShape().attrs.id
+            }`
+          )
+          .remove();
+        p.deSelect();
       });
     }
     if (showProposals) {
@@ -776,15 +1051,84 @@ export class CanvasManager extends CanvasScene {
     }
   }
 
+  // Logic for consuming the tableAnnotations on load and create proposal instances of it.
+  addOrResetTableAnnotationProposals(tableAnnotations) {
+    this.tableAnnProposal = []; // Reset Table anotations as new will be created after re-fetch.
+    const imagePosition = this.konvaImage.position();
+    tableAnnotations.forEach((tableAnnotations, selectedTableIndex) => {
+      tableAnnotations.cell_details.map((cell, cellIndex) => {
+        return (
+          cell.word_details &&
+          cell.word_details.forEach((word, wordIndex) => {
+            if (word) {
+              const coordinates =
+                word?.bounding_box?.vertices || cell.bounding_box?.vertices;
+              const topLeft = coordinates[0];
+              const bottomRight = coordinates[2];
+              const width =
+                ((bottomRight.x - topLeft.x) / this.imageDimensions.width) *
+                this.konvaImage.width();
+              const height =
+                ((bottomRight.y - topLeft.y) / this.imageDimensions.height) *
+                this.konvaImage.height();
+              const annotationData = {
+                dimensions: {
+                  x:
+                    (topLeft.x / this.imageDimensions.width) *
+                      this.konvaImage.width() +
+                    imagePosition.x,
+                  y:
+                    (topLeft.y / this.imageDimensions.height) *
+                      this.konvaImage.height() +
+                    imagePosition.y,
+                  w: width,
+                  h: height,
+                },
+                selectedTableIndex: selectedTableIndex,
+              };
+              const proposal = new Proposal(
+                annotationData,
+                this.stage.scaleX(),
+                word
+              );
+              this.tableAnnProposal.push(proposal);
+            }
+          })
+        );
+      });
+    });
+  }
+
+  getAllTableAnnProposals = () => {
+    return this.tableAnnProposal;
+  };
   hideProposals() {
     this.proposalLayer.hide();
     this.proposalLayer.batchDraw();
   }
 
   deleteProposal(proposal) {
-    this.proposalLayer.find(`.T${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
-    this.proposalLayer.find(`.R${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
-    this.proposalLayer.find(`.TR${proposal.word.word_description.replace(/[\s, ,]/g, '')}-${proposal.getShape().attrs.id}`).remove();
+    this.proposalLayer
+      .find(
+        `.T${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+          proposal.getShape().attrs.id
+        }`
+      )
+      .remove();
+    this.proposalLayer
+      .find(
+        `.R${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+          proposal.getShape().attrs.id
+        }`
+      )
+      .remove();
+    this.proposalLayer
+      .find(
+        `.TR${proposal.word.word_description.replace(/[\s, ,]/g, "")}-${
+          proposal.getShape().attrs.id
+        }`
+      )
+      .remove();
     const id = proposal.id;
     const index = this.proposals.find((p) => p.id === id);
     this.proposals.splice(index, 1);
@@ -886,8 +1230,8 @@ export class CanvasManager extends CanvasScene {
   getDataStructure = (scaled = false) => {
     const data = this.getData(scaled);
     const ds = [];
-    data.labels.forEach((label)=>{
-      delete label['label_value'];
+    data.labels.forEach((label) => {
+      delete label["label_value"];
       ds.push(label);
     });
     return ds;
@@ -969,7 +1313,7 @@ export class CanvasManager extends CanvasScene {
 
   addConnectingLine = () => {
     const selectedAnnotation = this.getSelectedAnnotation();
-    if (selectedAnnotation) {
+    if (selectedAnnotation && !this.isTableAnnotation) {
       this.connectingLine = new ConnectingLine(this);
       const line = this.connectingLine.getShape();
       if (line) {
@@ -980,11 +1324,13 @@ export class CanvasManager extends CanvasScene {
   };
 
   notifyLabelCreation(addConnectingLine = true) {
-    this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
-    // setTimeout is required to make the label elements appear as it depends on async setState in LabelContainer
-    setTimeout(() => {
-      addConnectingLine && this.addConnectingLine();
-    });
+    if (!this.isTableAnnotation) {
+      this.dispatch(CustomEventType.NOTIFY_LABEL_CREATION);
+      // setTimeout is required to make the label elements appear as it depends on async setState in LabelContainer
+      setTimeout(() => {
+        addConnectingLine && this.addConnectingLine();
+      });
+    }
   }
 
   handleScrollZoomStart = () => {
@@ -993,7 +1339,7 @@ export class CanvasManager extends CanvasScene {
   };
 
   handleScrollZoomEnd = () => {
-    this.showLabelSelectorDropdown();
+    this.showLabelSelectorDropdown("ZOOMEND");
     this.addConnectingLine();
   };
 

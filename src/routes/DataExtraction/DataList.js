@@ -37,8 +37,15 @@ import {
   useLocation,
 } from "react-router-dom";
 import Loader from "../../components/ImageAnnotation/helpers/Loader";
-import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../components/FormElements';
-import SelectModelDialog from "../../components/SelectModelDialog"
+import {
+  Form,
+  FormInputText,
+  FormInputSelect,
+  FormRow,
+  FormRowItem,
+  doValidation,
+} from "../../components/FormElements";
+import SelectModelDialog from "../../components/SelectModelDialog";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -54,8 +61,8 @@ const useStyles = makeStyles((theme) => ({
     "border-top-right-radius": 0,
     background: "#0575CF",
     border: "solid 1px #0575CF",
-    width: 'auto',
-    "min-width": 40
+    width: "auto",
+    "min-width": 40,
   },
   arrowBtnClass: {
     "border-bottom-left-radius": 0,
@@ -223,17 +230,19 @@ function AsssignDataStructure({ open, onClose, onOK, api }) {
 }
 
 function DataList(props) {
-  const createModelDefault = {    
-    new_model_name: '',
-    new_model_desc: ''
-  }
+  const createModelDefault = {
+    new_model_name: "",
+    new_model_desc: "",
+  };
   const { history, uploadCounter, annotationSuccessCB } = props;
   const classes = useStyles();
   const [annotateOpen, setAnnotateOpen] = useState(false);
   const api = getInstance(localStorage.getItem("token"));
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [createModelDialogStatus, setCreateModelDialogStatus] = useState();
-  const [createModelFormData, setCreateModelFormData] = useState(createModelDefault);
+  const [createModelFormData, setCreateModelFormData] = useState(
+    createModelDefault
+  );
   const [showModelListDialog, setShowModelListDialog] = useState();
   const [isTrainingReqInProcess, setIsTrainingReqInProcess] = useState(false);
   const [createModelErr, setCreateModelErr] = useState({});
@@ -250,14 +259,23 @@ function DataList(props) {
 
   const createModelFormValidators = {
     new_model_name: {
-      validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
-      messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
+      validators: [
+        "required",
+        { type: "regex", param: "^[A-Za-z0-9_]{1,20}$" },
+      ],
+      messages: [
+        "This field is required",
+        "Only alpha-numeric & underscore allowed with max length of 20.",
+      ],
     },
     new_model_desc: {
-      validators: ['required', {type:'regex', param:'^.{0,200}$'}],
-      messages: ['This field is required', 'Text allowed with max length of 200.'],
-    }
-  }
+      validators: ["required", { type: "regex", param: "^.{0,200}$" }],
+      messages: [
+        "This field is required",
+        "Text allowed with max length of 200.",
+      ],
+    },
+  };
   const columns = [
     {
       name: "file",
@@ -573,30 +591,45 @@ function DataList(props) {
     setPageMessage(null);
   };
   const onCreateModelAPI = () => {
-    onTrainRetrainModel(createModelFormData.new_model_name , createModelFormData.new_model_desc, 'classifier',"train")
-  }
-  
-  const onTrainRetrainModel  = async (model_name, model_desc,model_type,model_action,version,modelID)=>{
+    onTrainRetrainModel(
+      createModelFormData.new_model_name,
+      createModelFormData.new_model_desc,
+      "classifier",
+      "train"
+    );
+  };
+
+  const onTrainRetrainModel = async (
+    model_name,
+    model_desc,
+    model_type,
+    model_action,
+    version,
+    modelID
+  ) => {
     let errorMessage = "";
-    let createModelPayload = 
-    {
-      "model_name" : model_name,
-      "model_desc":model_desc,
-      "model_type":model_type,
-      "action" :model_action,
-      "data_lists": []
-    }
-    if(model_action === "predict" || model_action === "retrain") {
+    let createModelPayload = {
+      model_name: model_name,
+      model_desc: model_desc,
+      model_type: model_type,
+      action: model_action,
+      data_lists: [],
+    };
+    if (model_action === "predict" || model_action === "retrain") {
       delete createModelPayload["model_type"];
       delete createModelPayload["model_name"];
       delete createModelPayload["model_desc"];
-      createModelPayload["model_id"]=modelID || "";
-      createModelPayload["version"]=version || "";
+      createModelPayload["model_id"] = modelID || "";
+      createModelPayload["version"] = version || "";
     }
     rowsSelected.map((row) => {
-      if(model_action === "predict")
-        datalist[row].struct_id = "temp_strucutre_to_remove_for_predict"
-      if ((datalist[row].img_status !== "ready" && datalist[row].img_status !== "classified") && !datalist[row].struct_id) {
+      if (model_action === "predict")
+        datalist[row].struct_id = "temp_strucutre_to_remove_for_predict";
+      if (
+        datalist[row].img_status !== "ready" &&
+        datalist[row].img_status !== "classified" &&
+        !datalist[row].struct_id
+      ) {
         errorMessage =
           "Structure id and Ready/Classified Status is missing for the selection.";
         setAjaxMessage({
@@ -604,7 +637,8 @@ function DataList(props) {
           text: errorMessage,
         });
       } else if (
-        (datalist[row].img_status !== "ready" && datalist[row].img_status !== "classified") &&
+        datalist[row].img_status !== "ready" &&
+        datalist[row].img_status !== "classified" &&
         datalist[row].struct_id
       ) {
         errorMessage = "Status is not Ready or Classified for the selection.";
@@ -613,7 +647,8 @@ function DataList(props) {
           text: errorMessage,
         });
       } else if (
-        (datalist[row].img_status === "ready" || datalist[row].img_status === "classified") &&
+        (datalist[row].img_status === "ready" ||
+          datalist[row].img_status === "classified") &&
         !datalist[row].struct_id
       ) {
         errorMessage = "Structure id is missing for the selection.";
@@ -625,14 +660,12 @@ function DataList(props) {
         let existingFileIndexWithSameId = createModelPayload.data_lists.findIndex(
           (o) => o.id === datalist[row]._id
         );
-        if (
-          createModelPayload.data_lists &&
-          existingFileIndexWithSameId >= 0
-        ) {
+        if (createModelPayload.data_lists && existingFileIndexWithSameId >= 0) {
           createModelPayload["data_lists"][
             existingFileIndexWithSameId
           ].images.push({
-            struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
+            struct_id:
+              model_action === "predict" ? "" : datalist[row].struct_id,
             datagroup_name: datalist[row].datagroup_name,
             datagroup_id: datalist[row].datagroup_id,
             img_json: datalist[row].img_json,
@@ -645,7 +678,8 @@ function DataList(props) {
             _id: datalist[row]._id,
             images: [
               {
-                struct_id: model_action === "predict" ? "" : datalist[row].struct_id,
+                struct_id:
+                  model_action === "predict" ? "" : datalist[row].struct_id,
                 datagroup_name: datalist[row].datagroup_name,
                 datagroup_id: datalist[row].datagroup_id,
                 img_json: datalist[row].img_json,
@@ -699,34 +733,38 @@ function DataList(props) {
           setPageMessage(null);
         });
     }
-  }
+  };
   const validateField = (name, value) => {
-    let errMsg = '';
+    let errMsg = "";
     let fieldValidators = createModelFormValidators[name];
-    if(fieldValidators) {
-      value = (value && value?.toString().length>0) ? value : "";
-      errMsg = doValidation(value, fieldValidators.validators, fieldValidators.messages);
-      setCreateModelErr((prevErr)=>({
+    if (fieldValidators) {
+      value = value && value?.toString().length > 0 ? value : "";
+      errMsg = doValidation(
+        value,
+        fieldValidators.validators,
+        fieldValidators.messages
+      );
+      setCreateModelErr((prevErr) => ({
         ...prevErr,
         [name]: errMsg,
       }));
     }
     return errMsg;
-  }
+  };
 
   const onTextChange = (e, name) => {
     let value = e;
-    if(e.target) {
+    if (e.target) {
       name = e.target.name;
       value = e.target.value;
     }
-    setCreateModelFormData((prevData)=>({
+    setCreateModelFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
 
     validateField(name, value);
-  }
+  };
 
   const parseGetDataList = (data) => {
     let newData = [];
@@ -790,11 +828,11 @@ function DataList(props) {
     }
     setAnnotateOpen(false);
   };
-  const fetchModels = async ()=> {
+  const fetchModels = async () => {
     try {
       setIsTrainingReqInProcess(true);
       const models = await api.post(URL_MAP.GET_ALL_MODELS, {
-        model_type: 'classifier'
+        model_type: "classifier",
       });
       setModelsList(models.data?.model_list || []);
       setIsTrainingReqInProcess(false);
@@ -802,10 +840,11 @@ function DataList(props) {
       setIsTrainingReqInProcess(false);
       setAjaxMessage({
         error: true,
-        text: "Could not fetch all the available models, Please refresh the page",
-      });    
-  }
-}
+        text:
+          "Could not fetch all the available models, Please refresh the page",
+      });
+    }
+  };
   useEffect(() => {
     if (!uploadCounter) return;
     fetchDataList();
@@ -916,7 +955,7 @@ function DataList(props) {
             <MenuItem
               onClick={() => {
                 setMassAnchorEl(null);
-                setShowModelListDialog('retrain');
+                setShowModelListDialog("retrain");
               }}
             >
               Re-Train
@@ -931,10 +970,10 @@ function DataList(props) {
             color="primary"
             disabled={rowsSelected.length === 0}
             onClick={() => {
-              onTrainRetrainModel(null, null, null, "predict",null)
+              onTrainRetrainModel(null, null, null, "predict", null);
             }}
           >
-           Predict
+            Predict
           </CompactButtonWithArrow>
           <Popover
             open={Boolean(massAnchorEl) && massAnchorEl.name === "trainmodel"}
@@ -960,11 +999,21 @@ function DataList(props) {
           </Popover>
           {isTrainingReqInProcess && <Loader />}
           {/* Dialog for Selecting Existing Model */}
-          <SelectModelDialog 
-            showFilterPanel = {showModelListDialog}
-            setDialogDisplay = {setShowModelListDialog}
-            modelData = {modelsList}
-            onModelSelection = {(name,desc,modelID,version)=> {onTrainRetrainModel(name, desc,  null, showModelListDialog ,version, modelID); setShowModelListDialog(false)}}
+          <SelectModelDialog
+            showFilterPanel={showModelListDialog}
+            setDialogDisplay={setShowModelListDialog}
+            modelData={modelsList}
+            onModelSelection={(name, desc, modelID, version) => {
+              onTrainRetrainModel(
+                name,
+                desc,
+                null,
+                showModelListDialog,
+                version,
+                modelID
+              );
+              setShowModelListDialog(false);
+            }}
           />
           {/* Dialog for Creating Model */}
           <Dialog
@@ -978,28 +1027,52 @@ function DataList(props) {
             <DialogContent>
               <Typography variant="h5">Enter Model Details</Typography>
               <Form>
-              <FormRow>
-                <FormRowItem>
-                  <FormInputText label="Model name:" required name='new_model_name' placeholder="Model name here."
-                    value={createModelFormData.new_model_name} errorMsg={createModelErr.new_model_name} onChange={onTextChange}/>
-                </FormRowItem>
-                <FormRowItem>
-                  <FormInputText label="Model Description:" required name='new_model_desc' placeholder="Model description here.."
-                    value={createModelFormData.new_model_desc} errorMsg={createModelErr.new_model_desc} onChange={onTextChange}/>
-                </FormRowItem>
-              </FormRow>
+                <FormRow>
+                  <FormRowItem>
+                    <FormInputText
+                      label="Model name:"
+                      required
+                      name="new_model_name"
+                      placeholder="Model name here."
+                      value={createModelFormData.new_model_name}
+                      errorMsg={createModelErr.new_model_name}
+                      onChange={onTextChange}
+                    />
+                  </FormRowItem>
+                  <FormRowItem>
+                    <FormInputText
+                      label="Model Description:"
+                      required
+                      name="new_model_desc"
+                      placeholder="Model description here.."
+                      value={createModelFormData.new_model_desc}
+                      errorMsg={createModelErr.new_model_desc}
+                      onChange={onTextChange}
+                    />
+                  </FormRowItem>
+                </FormRow>
               </Form>
             </DialogContent>
             <DialogActions>
-              <Button onClick={()=>{setCreateModelDialogStatus(false)}} variant="outlined">
+              <Button
+                onClick={() => {
+                  setCreateModelDialogStatus(false);
+                }}
+                variant="outlined"
+              >
                 Cancel
               </Button>
               <Button
                 autoFocus
-                onClick={()=>{onCreateModelAPI()}}
+                onClick={() => {
+                  onCreateModelAPI();
+                }}
                 color="primary"
                 variant="contained"
-                disabled={!createModelFormData.new_model_name || !createModelFormData.new_model_desc}
+                disabled={
+                  !createModelFormData.new_model_name ||
+                  !createModelFormData.new_model_desc
+                }
               >
                 OK
               </Button>

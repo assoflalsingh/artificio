@@ -254,32 +254,18 @@ export default class Proposal extends Annotation {
   select() {
     this.group.moveToTop();
     this.rectangle.stroke(ProposalHoverColor);
-		this.rectangle.fill('rgba(0, 256 , 0, 0.5)')
+    this.rectangle.fill("rgba(0, 256 , 0, 0.5)");
     this.isSelected = true;
   }
 
   deSelect() {
     this.rectangle.stroke(this.annotationData.color);
-		this.rectangle.fill('rgba(0, 256 , 0, 0)')
+    this.rectangle.fill("rgba(0, 256 , 0, 0)");
     this.isSelected = false;
   }
 
   getArea() {
     return Math.abs(this.rectangle.width() * this.rectangle.height());
-  }
-
-  getTopLeftCoordinates() {
-    const coor = { x: Infinity, y: Infinity };
-    // Get max position for circles
-    this.circles.forEach((c) => {
-      if (c.x() < coor.x) {
-        coor.x = c.x();
-      }
-      if (c.y() < coor.y) {
-        coor.y = c.y();
-      }
-    });
-    return coor;
   }
 
   getData() {
