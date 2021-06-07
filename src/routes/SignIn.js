@@ -127,7 +127,7 @@ export default function SignIn({history, location}) {
     if(validateForm()) {
       setAuthorizing(true);
       api.post(URL_MAP.SIGN_IN, {
-        'email': fields.username,
+        'email': fields.username.toLowerCase(),
         'password': fields.password,
       }).then((resp)=>{
         localStorage.setItem('token', resp.data.data);

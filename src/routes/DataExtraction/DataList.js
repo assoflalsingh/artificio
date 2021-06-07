@@ -625,33 +625,26 @@ function DataList(props) {
     rowsSelected.map((row) => {
       if (model_action === "predict")
         datalist[row].struct_id = "temp_strucutre_to_remove_for_predict";
-      if (
-        datalist[row].img_status !== "ready" &&
-        datalist[row].img_status !== "classified" &&
-        !datalist[row].struct_id
-      ) {
-        errorMessage =
-          "Structure id and Ready/Classified Status is missing for the selection.";
-        setAjaxMessage({
-          error: true,
-          text: errorMessage,
-        });
-      } else if (
-        datalist[row].img_status !== "ready" &&
-        datalist[row].img_status !== "classified" &&
-        datalist[row].struct_id
-      ) {
+      // show error if selected file has status new
+      if (datalist[row].img_status === "new") {
         errorMessage = "Status is not Ready or Classified for the selection.";
         setAjaxMessage({
           error: true,
           text: errorMessage,
         });
-      } else if (
-        (datalist[row].img_status === "ready" ||
-          datalist[row].img_status === "classified") &&
-        !datalist[row].struct_id
-      ) {
+        return false;
+      }
+      // structure id is missing
+      if (model_action !== "predict" && !datalist[row].struct_id) {
         errorMessage = "Structure id is missing for the selection.";
+        setAjaxMessage({
+          error: true,
+          text: errorMessage,
+        });
+      }
+      // Datagroup id is missing
+      else if (model_action !== "predict" && !datalist[row].datagroup_id) {
+        errorMessage = "Datagroup id is missing for the selection.";
         setAjaxMessage({
           error: true,
           text: errorMessage,
@@ -666,8 +659,12 @@ function DataList(props) {
           ].images.push({
             struct_id:
               model_action === "predict" ? "" : datalist[row].struct_id,
-            datagroup_name: datalist[row].datagroup_name,
-            datagroup_id: datalist[row].datagroup_id,
+            datagroup_id:
+              model_action === "predict"
+                ? ""
+                : datalist[row].datagroup_id
+                ? datalist[row].datagroup_id
+                : "",
             img_json: datalist[row].img_json,
             img_status: datalist[row].img_status,
             img_name: datalist[row].image_name,
@@ -680,8 +677,12 @@ function DataList(props) {
               {
                 struct_id:
                   model_action === "predict" ? "" : datalist[row].struct_id,
-                datagroup_name: datalist[row].datagroup_name,
-                datagroup_id: datalist[row].datagroup_id,
+                datagroup_id:
+                  model_action === "predict"
+                    ? ""
+                    : datalist[row].datagroup_id
+                    ? datalist[row].datagroup_id
+                    : "",
                 img_json: datalist[row].img_json,
                 img_status: datalist[row].img_status,
                 img_name: datalist[row].image_name,
@@ -783,6 +784,7 @@ function DataList(props) {
           image_name: datum.images[page].img_name,
           img_status: datum.images[page].img_status,
           datagroup_name: datum.images[page].datagroup_name,
+          datagroup_id: datum.images[page].datagroup_id,
           struct_name: datum.images[page].struct_name,
           struct_id: datum.images[page].struct_id,
           img_thumb: datum.images[page].img_thumb,

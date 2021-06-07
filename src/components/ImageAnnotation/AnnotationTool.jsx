@@ -261,7 +261,7 @@ export default class AnnotationTool extends React.Component {
     this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
   };
 
-  async fetchImageData(index, isSaved = false) {
+  async fetchImageData(index, isSaved = false, afterSave) {
     this.setLoader(true);
     this.setState({ activeImageIndex: index });
     const selectedImage = this.props.images[index];
@@ -292,7 +292,9 @@ export default class AnnotationTool extends React.Component {
         imageName: this.imageData?.document_file_name,
         isSaved: isSaved,
       });
-      this.initializeCanvas();
+      // donot call after save
+      if (!afterSave) this.initializeCanvas();
+      else this.setLoader(false);
     } else {
       this.setLoader(false);
     }
@@ -343,7 +345,7 @@ export default class AnnotationTool extends React.Component {
       .then(() => {
         this.setLoader(false);
         this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
-        this.fetchImageData(this.state.activeImageIndex, !!inReview);
+        this.fetchImageData(this.state.activeImageIndex, !!inReview, true);
         this.setState({
           deleteAllAnnotation: false,
           isSaved: !!inReview,

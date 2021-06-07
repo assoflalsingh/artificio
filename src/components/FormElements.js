@@ -223,7 +223,7 @@ export function FormInputSelect({
 
   const noOptions = (options.length == 0);
 
-  if(hasSearch) {
+  if(hasSearch ) {
     return (
       <FormInput required={required} label={label}>
         <FormControl error={Boolean(errorMsg)} fullWidth>
@@ -252,7 +252,8 @@ export function FormInputSelect({
         </FormControl>
       </FormInput>
     );
-  } else {
+  }
+  else {
     return (
       <FormInput required={required} label={label}>
         <FormControl error={Boolean(errorMsg)} fullWidth>

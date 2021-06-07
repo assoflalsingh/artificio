@@ -85,7 +85,7 @@ function DataSetList({history}) {
       sort: true,
       draggable: true,
       customBodyRender: (value, tableMeta)=>{
-        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1], desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5]}}}>
+        return <Link  label={value} to={{pathname: "/create-dataset", params: { data_set_id:value, emails:tableMeta.rowData[1], desc:tableMeta.rowData[2],app_usage:tableMeta.rowData[4], _id:tableMeta.rowData[5],ocr_model:tableMeta.rowData[6],classify_model:tableMeta.rowData[7],ner_model:tableMeta.rowData[8],classify_version:dataSetlist[tableMeta.rowIndex].classify_version,ner_version:dataSetlist[tableMeta.rowIndex].ner_version}}}>
                 {value}
             </Link>;
       }
@@ -141,6 +141,27 @@ function DataSetList({history}) {
     {
       name: "_id",
       label: "ID",
+      options: {
+        display: false,
+      },
+    },
+    {
+      name: "ocr_model_id",
+      label: "OCR Model",
+      options: {
+        display: false,
+      },
+    },
+    {
+      name: "classify_model_id",
+      label: "Clasification Model",
+      options: {
+        display: false,
+      },
+    },
+    {
+      name: "ner_model_id",
+      label: "NER Model",
       options: {
         display: false,
       },
@@ -282,6 +303,7 @@ function DataSetList({history}) {
             onSave={(files) => uploadFiles(files)}
             showPreviews={true}
             showFileNamesInPreview={true}
+            filesLimit={10}
           />
       </MuiThemeProvider>
       <FileUploadProgress fileUploadInfo={progressFileInfo} open={progressOpen} onClose={()=>{setProgressOpen(false)}} />
