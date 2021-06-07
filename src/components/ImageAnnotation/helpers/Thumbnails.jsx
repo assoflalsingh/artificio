@@ -24,7 +24,7 @@ const Thumbnails = (props) => {
   const { images, activeImageIndex, fetchImageData } = props;
   const classes = useClasses();
   return (
-    <Box style={{ overflowY: "hidden", overflowX: "auto" }} display="flex" className="nishant">
+    <Box style={{ overflowY: "hidden", overflowX: "auto" }} display="flex">
       <Box display="flex">
         {images.map((thumb, i) => (
           <Card
