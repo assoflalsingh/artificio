@@ -1,17 +1,24 @@
 import * as React from "react";
-import {Box, Snackbar, Typography} from "@material-ui/core";
+import { Box, Snackbar, Typography } from "@material-ui/core";
 import CanvasWrapper from "./canvas/CanvasWrapper";
-import {CanvasManager} from "../../canvas/CanvasManager";
+import { CanvasManager } from "../../canvas/CanvasManager";
 import Thumbnails from "./helpers/Thumbnails";
 import Loader from "./helpers/Loader";
-import {ToolBar} from "./helpers/ToolBar";
-import {LabelSelector} from "./label/LabelSelector";
-import {LabelsContainer} from "./label/LabelsContainer";
-import {CustomEventType, ToolType} from "../../canvas/core/constants";
-import {getImageData, getStructureTemplate, saveAnnotationData, saveStructure, assignData} from "./apiMethods";
+import { ToolBar } from "./helpers/ToolBar";
+import { LabelSelector } from "./label/LabelSelector";
+import { LabelsContainer } from "./label/LabelsContainer";
+import { CustomEventType, ToolType } from "../../canvas/core/constants";
+import {
+  getImageData,
+  getStructureTemplate,
+  saveAnnotationData,
+  saveStructure,
+  assignData,
+} from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
-import {findTextAnnotations, generateAnnotationsFromData,} from "./utilities";
-import {LeftToolBar} from "./helpers/LeftToolBar";
+import { findTextAnnotations, generateAnnotationsFromData } from "./utilities";
+import exportToCSV from "./csvHelper";
+import { LeftToolBar } from "./helpers/LeftToolBar";
 import { CreateStructureDialog } from "./helpers/CreateStructureDialog";
 import { ChooseStructureDialog } from "./helpers/ChooseStructureDialog";
 
@@ -23,6 +30,7 @@ export const DefaultLabel = {
 export default class AnnotationTool extends React.Component {
   canvasManager;
   textAnnotations;
+  tableAnnotations;
   annotationAccuracy = {};
   imageData;
   state = {
@@ -51,7 +59,7 @@ export default class AnnotationTool extends React.Component {
     createStructOpen: false,
     chooseStructOpen: false,
     deleteAllAnnotation: false,
-    isSaved: false
+    isSaved: false,
   };
 
   deleteProposalInModelData = (proposal) => {
@@ -59,7 +67,7 @@ export default class AnnotationTool extends React.Component {
     const proposalIndex = parseInt(ids[0]);
     const wordIndex = parseInt(ids[1]);
     if (this.textAnnotations[proposalIndex]) {
-      this.textAnnotations[proposalIndex].word_details[wordIndex] = null
+      this.textAnnotations[proposalIndex].word_details[wordIndex] = null;
     }
   };
 
@@ -73,39 +81,59 @@ export default class AnnotationTool extends React.Component {
         const index = w.index;
         const proposal = proposals[index];
         if (proposal) {
-					const ids = proposal.id.split("-");
-					const proposalIndex = parseInt(ids[0]);
+          const ids = proposal.id.split("-");
+          const proposalIndex = parseInt(ids[0]);
           const wordIndex = parseInt(ids[1]);
-          if(this.textAnnotations[proposalIndex].word_details[wordIndex])
-          {
-            this.textAnnotations[proposalIndex].word_details[wordIndex].entity_label = labelValue || label;
+          if (this.textAnnotations[proposalIndex].word_details[wordIndex]) {
+            this.textAnnotations[proposalIndex].word_details[
+              wordIndex
+            ].entity_label = labelValue || label;
           }
-				}
+        }
       });
     });
   };
 
   updateModelLabelsForDeletedAnnotation = (annId) => {
-      const annotation = this.canvasManager.getAnnotationById(annId);
-      const proposals = this.canvasManager.getProposals();
-      const words = findTextAnnotations(annotation, proposals);
-      words.forEach((w) => {
-        const index = w.index;
-        const proposal = proposals[index];
-        if (proposal) {
-          this.canvasManager.proposalLayer.find(`.T${w.word_description.replace(/[\s, ,]/g, '')}-${proposals[index].getShape().attrs.id}`).remove();
-          this.canvasManager.proposalLayer.find(`.R${w.word_description.replace(/[\s, ,]/g, '')}-${proposals[index].getShape().attrs.id}`).remove();
-          this.canvasManager.proposalLayer.find(`.TR${w.word_description.replace(/[\s, ,]/g, '')}-${proposals[index].getShape().attrs.id}`).remove();
-          this.canvasManager.proposalLayer.draw();
-          const ids = proposal.id.split("-");
-					const proposalIndex = parseInt(ids[0]);
-          const wordIndex = parseInt(ids[1]);
-          if(this.textAnnotations[proposalIndex].word_details[wordIndex])
-          {
-            this.textAnnotations[proposalIndex].word_details[wordIndex].entity_label = DefaultLabel.label_value;
-          }
-				}
-      });
+    const annotation = this.canvasManager.getAnnotationById(annId);
+    const proposals = this.canvasManager.getProposals();
+    const words = findTextAnnotations(annotation, proposals);
+    words.forEach((w) => {
+      const index = w.index;
+      const proposal = proposals[index];
+      if (proposal) {
+        this.canvasManager.proposalLayer
+          .find(
+            `.T${w.word_description?.replace(/[\s, ,]/g, "")}-${
+              proposals[index].getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.canvasManager.proposalLayer
+          .find(
+            `.R${w.word_description?.replace(/[\s, ,]/g, "")}-${
+              proposals[index].getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.canvasManager.proposalLayer
+          .find(
+            `.TR${w.word_description?.replace(/[\s, ,]/g, "")}-${
+              proposals[index].getShape().attrs.id
+            }`
+          )
+          .remove();
+        this.canvasManager.proposalLayer.draw();
+        const ids = proposal.id.split("-");
+        const proposalIndex = parseInt(ids[0]);
+        const wordIndex = parseInt(ids[1]);
+        if (this.textAnnotations[proposalIndex].word_details[wordIndex]) {
+          this.textAnnotations[proposalIndex].word_details[
+            wordIndex
+          ].entity_label = DefaultLabel.label_value;
+        }
+      }
+    });
   };
 
   updateModelAnnotationLabel = (proposals, labelName) => {
@@ -114,8 +142,10 @@ export default class AnnotationTool extends React.Component {
         const ids = proposal.id.split("-");
         const proposalIndex = parseInt(ids[0]);
         const wordIndex = parseInt(ids[1]);
-        if(this.textAnnotations[proposalIndex].word_details[wordIndex]) {
-          this.textAnnotations[proposalIndex].word_details[wordIndex].entity_label = labelName;
+        if (this.textAnnotations[proposalIndex].word_details[wordIndex]) {
+          this.textAnnotations[proposalIndex].word_details[
+            wordIndex
+          ].entity_label = labelName;
         }
       });
     }
@@ -147,14 +177,15 @@ export default class AnnotationTool extends React.Component {
           const index = w.index;
           const proposal = proposals[index];
           if (proposal) {
-						const ids = proposal.id.split("-");
-						const proposalIndex = parseInt(ids[0]);
-						const wordIndex = parseInt(ids[1]);
-            if(this.textAnnotations[proposalIndex].word_details[wordIndex])
-            {
-              this.textAnnotations[proposalIndex].word_details[wordIndex].confidence_score = 1.00;
+            const ids = proposal.id.split("-");
+            const proposalIndex = parseInt(ids[0]);
+            const wordIndex = parseInt(ids[1]);
+            if (this.textAnnotations[proposalIndex].word_details[wordIndex]) {
+              this.textAnnotations[proposalIndex].word_details[
+                wordIndex
+              ].confidence_score = 1.0;
             }
-					}
+          }
         });
       }
     }
@@ -167,6 +198,13 @@ export default class AnnotationTool extends React.Component {
   setAnnotationAccuracy = (annotationId, confidence) => {
     this.annotationAccuracy[annotationId] = confidence;
   };
+
+  setTableEdditingInPrgressTrigerRender(...arr) {
+    this.canvasManager.setTableAnnotationInProgress(...arr);
+    this.setState({
+      toggleCell: true,
+    });
+  }
 
   addAnnotations(userAnnotatedData) {
     if (
@@ -193,6 +231,7 @@ export default class AnnotationTool extends React.Component {
   initializeCanvas = () => {
     const imageData = this.imageData;
     const proposals = this.textAnnotations;
+    const tableAnnotations = this.tableAnnotations;
     // Clear canvas
     this.canvasManager.resetCanvas();
     // Reset undo redo stack
@@ -207,8 +246,11 @@ export default class AnnotationTool extends React.Component {
         imageData.image_json ? imageData?.image_json.user_annotate_data : {}
       );
       this.canvasManager.addOrResetProposals(proposals, false);
+      if (tableAnnotations?.length > 0) {
+        this.canvasManager.addOrResetTableAnnotationProposals(tableAnnotations);
+      }
       this.canvasManager.notifyLabelCreation();
-      if(imageData.struct_id && !this.props.inReview) {
+      if (imageData.struct_id && !this.props.inReview) {
         this.chooseStructure(imageData?.struct_id);
       } else {
         this.setLoader(false);
@@ -219,7 +261,7 @@ export default class AnnotationTool extends React.Component {
     this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
   };
 
-  async fetchImageData(index, isSaved=false,afterSave) {
+  async fetchImageData(index, isSaved = false, afterSave) {
     this.setLoader(true);
     this.setState({ activeImageIndex: index });
     const selectedImage = this.props.images[index];
@@ -234,25 +276,37 @@ export default class AnnotationTool extends React.Component {
         ? this.imageData?.image_json?.text_annotations ||
           this.imageData?.image_json?.initial_model_data?.text_annotations
         : [];
+      this.tableAnnotations = this.imageData?.image_json
+        ? this.imageData?.image_json?.table_annotations ||
+          this.imageData?.image_json?.initial_model_data?.table_annotations
+        : [];
+      if (this.tableAnnotations?.length > 0) {
+        this.canvasManager.setTablesBoundries(
+          this.tableAnnotations.map((el) => el.bounding_box)
+        );
+        this.canvasManager.setAllTablesAnnotations(this.tableAnnotations);
+      }
       this.setState({
         imageLabels: this.imageData?.image_labels,
         imageMetadata: this.imageData?.image_json.metadata,
         imageName: this.imageData?.document_file_name,
-        isSaved:isSaved
+        isSaved: isSaved,
       });
       // donot call after save
-      if(!afterSave)this.initializeCanvas();
+      if (!afterSave) this.initializeCanvas();
       else this.setLoader(false);
     } else {
       this.setLoader(false);
     }
   }
 
-  downloadCsv() {
+  downloadCsv(csvType) {
     this.setLoader(true);
     const selectedImage = this.props.images[this.state.activeImageIndex];
+    const tableAnnotations = this.canvasManager.getAllTablesAnnotations();
+    let csvName = `${this.state.imageName}-${selectedImage.page_no}.csv`;
     const annotatedData = this.canvasManager.getData();
-    if(annotatedData['labels'].length === 0) {
+    if (annotatedData["labels"].length === 0 && tableAnnotations.length <= 0) {
       this.setState({
         ajaxMessage: {
           error: true,
@@ -260,29 +314,16 @@ export default class AnnotationTool extends React.Component {
         },
       });
     } else {
-      let header = '';
-      let data = '';
-      annotatedData['labels'].forEach((label)=>{
-        if(header != '') {
-          header += ',';
-          data += ',';
-        }
-        header += label['label_name'];
-        data += `"${label['label_value'].replace(/"/g, '""')}"`;
-      });
-      let csvContent = "data:text/csv;charset=utf-8,"+encodeURIComponent(header+'\n'+data);
-      var link = document.createElement("a");
-      link.setAttribute("href", csvContent);
-      link.setAttribute("download", `${this.state.imageName}-${selectedImage.page_no}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      exportToCSV(csvName, annotatedData, tableAnnotations, csvType);
     }
     this.setLoader(false);
   }
 
-  saveImageData = (inReview) => {
-    if(this.state.deleteAllAnnotation) {
+  saveImageData = (
+    inReview = false,
+    updatedTableAnnotation = this.canvasManager.getAllTablesAnnotations()
+  ) => {
+    if (this.state.deleteAllAnnotation) {
       this.updateModelLabelsForAllAnnotations(DefaultLabel.label_value);
       this.canvasManager.deleteAllAnnotations();
     }
@@ -298,12 +339,13 @@ export default class AnnotationTool extends React.Component {
       this.state.imageMetadata,
       this.textAnnotations,
       annotatedData,
-      inReview
+      inReview,
+      updatedTableAnnotation
     )
       .then(() => {
         this.setLoader(false);
         this.canvasManager.dispatch(CustomEventType.NOTIFY_PROPOSAL_RESET);
-        this.fetchImageData(this.state.activeImageIndex, !!inReview,true);
+        this.fetchImageData(this.state.activeImageIndex, !!inReview, true);
         this.setState({
           deleteAllAnnotation: false,
           isSaved: !!inReview,
@@ -340,48 +382,48 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
-  createStructure = (otherData, assign=false) => {
+  createStructure = (otherData, assign = false) => {
     const dataStructure = this.canvasManager.getDataStructure();
     let data = {
       ...otherData,
-      'template': dataStructure
+      template: dataStructure,
     };
-    this.setState({createStructOpen: false});
+    this.setState({ createStructOpen: false });
     this.setLoader(true);
-    saveStructure(
-      this.props.api,data
-    )
+    saveStructure(this.props.api, data)
       .then((res) => {
-        if(assign) {
+        if (assign) {
           const selectedImage = this.props.images[this.state.activeImageIndex];
           assignData(this.props.api, {
-            type: 'structure',
+            type: "structure",
             datum: res.data.data.id,
             data_lists: {
-              [selectedImage._id]:[selectedImage.page_no],
-            }
-          }).then(()=>{
-            this.setLoader(false);
-            this.setState({
-              ajaxMessage: {
-                error: false,
-                text: "Data structure saved and assigned successfully !!",
-              },
+              [selectedImage._id]: [selectedImage.page_no],
+            },
+          })
+            .then(() => {
+              this.setLoader(false);
+              this.setState({
+                ajaxMessage: {
+                  error: false,
+                  text: "Data structure saved and assigned successfully !!",
+                },
+              });
+            })
+            .catch((error) => {
+              this.setLoader(false);
+              console.error(error);
+              let message = "Unknow error occurred. Check console.";
+              if (error.response) {
+                message = error.response.data.message;
+              }
+              this.setState({
+                ajaxMessage: {
+                  error: true,
+                  text: message,
+                },
+              });
             });
-          }).catch((error)=>{
-            this.setLoader(false);
-            console.error(error);
-            let message = 'Unknow error occurred. Check console.';
-            if (error.response) {
-              message = error.response.data.message;
-            }
-            this.setState({
-              ajaxMessage: {
-                error: true,
-                text: message,
-              },
-            });
-          });
         } else {
           this.setLoader(false);
           this.setState({
@@ -395,7 +437,7 @@ export default class AnnotationTool extends React.Component {
       .catch((error) => {
         this.setLoader(false);
         console.error(error);
-        let message = 'Unknow error occurred. Check console.';
+        let message = "Unknow error occurred. Check console.";
         if (error.response) {
           message = error.response.data.message;
         }
@@ -406,16 +448,16 @@ export default class AnnotationTool extends React.Component {
           },
         });
       });
-  }
+  };
 
   chooseStructure = (id) => {
-    this.setState({chooseStructOpen: false});
+    this.setState({ chooseStructOpen: false });
     this.setLoader(true);
     getStructureTemplate(this.props.api, id)
       .then((resp) => {
         let data = {
-          labels: resp.data.data
-        }
+          labels: resp.data.data,
+        };
         this.addAnnotations(data);
         this.setLoader(false);
         this.setState({
@@ -438,7 +480,7 @@ export default class AnnotationTool extends React.Component {
           console.error(error);
         }
       });
-  }
+  };
 
   setLoader(value) {
     this.setState({ loading: value });
@@ -477,22 +519,24 @@ export default class AnnotationTool extends React.Component {
   }
 
   preventZoom = (event) => {
-		if ((event.ctrlKey===true || event.metaKey === true)
-			&& (event.which === 61
-				|| event.which === 107
-				|| event.which === 173
-				|| event.which === 109
-				|| event.which === 187
-				|| event.which === 189  ) ) {
-			event.preventDefault();
-		}
-	}
+    if (
+      (event.ctrlKey === true || event.metaKey === true) &&
+      (event.which === 61 ||
+        event.which === 107 ||
+        event.which === 173 ||
+        event.which === 109 ||
+        event.which === 187 ||
+        event.which === 189)
+    ) {
+      event.preventDefault();
+    }
+  };
 
-	componentWillUnmount() {
-		window.removeEventListener('keydown', this.preventZoom)
-	}
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.preventZoom);
+  }
 
-	componentDidMount() {
+  componentDidMount() {
     this.setLoader(true);
     this.canvasManager = new CanvasManager(
       { appId },
@@ -500,7 +544,7 @@ export default class AnnotationTool extends React.Component {
       this.updateModelAnnotationLabel,
       this.deleteProposalInModelData
     );
-    window.addEventListener('keydown', this.preventZoom)
+    window.addEventListener("keydown", this.preventZoom);
   }
 
   render() {
@@ -520,9 +564,9 @@ export default class AnnotationTool extends React.Component {
             this.canvasManager && this.canvasManager.clickZoomInOut
           }
           inReview={this.props.inReview}
-          deleteAllAnnotation = {this.state.deleteAllAnnotation}
+          deleteAllAnnotation={this.state.deleteAllAnnotation}
         />
-        <Box style={{ flexGrow: 1, overflow: "hidden", width: "75%" }}>
+        <Box style={{ flexGrow: 1, overflow: "hidden", width: "70%" }}>
           <ToolBar
             setActiveTool={
               this.canvasManager &&
@@ -536,14 +580,22 @@ export default class AnnotationTool extends React.Component {
             unsetActiveTool={
               this.canvasManager && this.canvasManager.unsetActiveTool
             }
-            onAnnotationToolClose={onAnnotationToolClose.bind(this,this.state.isSaved)}
+            checkIfTableAnnotation={() =>
+              this.canvasManager && this.canvasManager.checkIfTableAnnotation()
+            }
+            onAnnotationToolClose={onAnnotationToolClose.bind(
+              this,
+              this.state.isSaved
+            )}
             showProposals={this.showProposals}
             blockAnnotationClick={
               this.canvasManager && this.canvasManager.blockAnnotationClick
             }
-            setDeleteAllAnnotation = {(isDeleteAll= false)=> {this.setState({
-              deleteAllAnnotation : isDeleteAll
-            })}}
+            setDeleteAllAnnotation={(isDeleteAll = false) => {
+              this.setState({
+                deleteAllAnnotation: isDeleteAll,
+              });
+            }}
             setStageDraggable={
               this.canvasManager && this.canvasManager.setStageDraggable
             }
@@ -551,8 +603,8 @@ export default class AnnotationTool extends React.Component {
               this.canvasManager && this.canvasManager.showAnnotationLayer
             }
             reset={() => this.fetchImageData(this.state.activeImageIndex)}
-            saveStructure={() => this.setState({createStructOpen: true})}
-            chooseStructure={() => this.setState({chooseStructOpen: true})}
+            saveStructure={() => this.setState({ createStructOpen: true })}
+            chooseStructure={() => this.setState({ chooseStructOpen: true })}
             downloadCsv={() => this.downloadCsv()}
           />
           <Box style={{ backgroundColor: "#383838", height: "80%" }}>
@@ -560,11 +612,6 @@ export default class AnnotationTool extends React.Component {
             <CanvasWrapper id={appId} />
           </Box>
           <Box display="flex">
-            {/*{this.state.selectedImage &&*/}
-            {/*	<Typography style={{margin: 'auto'}}>*/}
-            {/*		{images[this.state.selectedImage].document_file_name} {images[this.state.selectedImage].page_no})*/}
-            {/*	</Typography>*/}
-            {/*}*/}
             {activeImage && (
               <Typography style={{ margin: "auto" }}>
                 {this.state.imageName || "Select an image...."}
@@ -577,19 +624,56 @@ export default class AnnotationTool extends React.Component {
             fetchImageData={this.fetchImageData.bind(this)}
           />
         </Box>
-        <Box style={{ width: "25%", display: "flex", flexDirection: "column" }}>
+        <Box style={{ width: "30%", display: "flex", flexDirection: "column" }}>
           {this.canvasManager && (
             <LabelsContainer
+              updateTableAnnotationAndSelectedValue={(
+                annID,
+                updatedValue,
+                cellIndex,
+                selectedTableIndex
+              ) =>
+                this.canvasManager.updateTableAnnotationAndSelectedValue(
+                  annID,
+                  updatedValue,
+                  cellIndex,
+                  selectedTableIndex
+                )
+              }
+              checkIFAnnotationIntersectingWithTables={
+                this.canvasManager.checkIFAnnotationIntersectingWithTables
+              }
+              getAllTableAnnProposals={
+                this.canvasManager.getAllTableAnnProposals
+              }
+              downloadCsv={(csvType) => this.downloadCsv(csvType)}
+              highlightTableToggle={this.canvasManager.highlightTableToggle}
+              resetTableAnnotations={this.canvasManager.resetTableAnnotations}
+              getAllTablesAnnotations={
+                this.canvasManager.getAllTablesAnnotations
+              }
+              toggleHighlightCell={this.canvasManager.toggleHighlightCell}
+              setTableAnnotationInProgress={this.setTableEdditingInPrgressTrigerRender.bind(
+                this
+              )}
               selectAnnotationById={this.canvasManager.selectAnnotationById}
               getAnnotations={this.canvasManager.getAnnotations}
               getAnnotationData={this.canvasManager.getAnnotationData}
               imageLabels={this.state.imageLabels}
               textAnnotations={this.textAnnotations}
+              tableAnnotations={this.tableAnnotations}
               removeConnectingLine={this.canvasManager.removeConnectingLine}
               addConnectingLine={this.canvasManager.addConnectingLine}
               getProposals={this.canvasManager.getProposals}
               setAnnotationAccuracy={this.setAnnotationAccuracy}
               getAnnotationAccuracy={this.getAnnotationAccuracy}
+              saveImageData={this.saveImageData.bind(this)}
+              resetImageData={() =>
+                this.fetchImageData(this.state.activeImageIndex)
+              }
+              getEdittedAnnotationCount={
+                this.canvasManager.getEdittedAnnotationCount
+              }
             />
           )}
         </Box>
@@ -599,29 +683,47 @@ export default class AnnotationTool extends React.Component {
             deSelectActiveAnnotation={
               this.canvasManager.deSelectActiveAnnotation
             }
+            checkIfTableAnnotation={() =>
+              this.canvasManager && this.canvasManager.checkIfTableAnnotation()
+            }
             deleteAnnotation={() => {
-              this.updateModelLabelsForDeletedAnnotation(this.canvasManager.getSelectedAnnotation().id);
+              this.updateModelLabelsForDeletedAnnotation(
+                this.canvasManager.getSelectedAnnotation().id
+              );
               return this.canvasManager.deleteAnnotation(
                 this.canvasManager.getSelectedAnnotation().id
-              )
-            }
-            }
+              );
+            }}
             getSelectedAnnotation={this.canvasManager.getSelectedAnnotation}
             setAnnotationLabel={this.canvasManager.setAnnotationLabel}
-            // getActiveTool={this.canvasManager.getActiveTool}
-            // unsetActiveTool={this.canvasManager.unsetActiveTool}
             getProposalTool={this.canvasManager.getProposalTool}
+            // isIntersectingWithTable={
+            //   this.canvasManager.checkIFAnnotationIntersectingWithTables
+            // }
+            // saveImageData={this.saveImageData.bind(this)}
+            // resetImageData={() =>
+            //   this.fetchImageData(this.state.activeImageIndex)
+            // }
+            // getEdittedAnnotationCount={
+            //   this.canvasManager.getEdittedAnnotationCount
+            // }
           />
         )}
         <CreateStructureDialog
           modalOpen={this.state.createStructOpen}
-          onClose={()=>{this.setState({createStructOpen: false})}}
-          createStructure = {this.createStructure}/>
+          onClose={() => {
+            this.setState({ createStructOpen: false });
+          }}
+          createStructure={this.createStructure}
+        />
         <ChooseStructureDialog
           api={this.props.api}
           modalOpen={this.state.chooseStructOpen}
-          onClose={()=>{this.setState({chooseStructOpen: false})}}
-          chooseStructure = {this.chooseStructure}/>
+          onClose={() => {
+            this.setState({ chooseStructOpen: false });
+          }}
+          chooseStructure={this.chooseStructure}
+        />
         <Snackbar
           open={Boolean(this.state.ajaxMessage)}
           autoHideDuration={6000}

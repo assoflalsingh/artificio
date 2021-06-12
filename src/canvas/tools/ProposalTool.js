@@ -155,13 +155,15 @@ export class ProposalTool extends Tool {
     this.canvasManager.proposalLayer.batchDraw();
   }
 
-	deleteProposals = () => {
-  	const proposals = this.canvasManager.getProposals().filter(proposal => proposal.isSelected)
-		proposals.forEach(proposal => {
-			this.canvasManager.deleteProposal(proposal);
-			this.canvasManager.deleteProposalInModelData(proposal);
-		})
-	}
+  deleteProposals = () => {
+    const proposals = this.canvasManager
+      .getProposals()
+      .filter((proposal) => proposal.isSelected);
+    proposals.forEach((proposal) => {
+      this.canvasManager.deleteProposal(proposal);
+      this.canvasManager.deleteProposalInModelData(proposal);
+    });
+  };
 
   eventListeners = [
     //   {

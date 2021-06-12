@@ -1,4 +1,4 @@
-import { Box, Tooltip, Typography } from "@material-ui/core";
+import { Box, Tooltip, Typography, Button } from "@material-ui/core";
 import * as React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import CommonTabs from "../../CommonTabs";
@@ -11,10 +11,14 @@ import * as uuid from "uuid";
 import Chip from "@material-ui/core/Chip";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Checkbox from "@material-ui/core/Checkbox";
 import withStyles from "@material-ui/core/styles/withStyles";
+import TableContainer from "./TableContainer";
+import TableChartOutlinedIcon from "@material-ui/icons/TableChartOutlined";
+import TextFieldsOutlinedIcon from "@material-ui/icons/TextFieldsOutlined";
+import ConfirmDialog from "../../ConfirmDialog";
+
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
 
@@ -81,6 +85,7 @@ export const LabelsContainer = ({
   getAnnotations,
   imageLabels,
   textAnnotations,
+  tableAnnotations,
   getAnnotationData,
   removeConnectingLine,
   addConnectingLine,
@@ -88,8 +93,26 @@ export const LabelsContainer = ({
   getProposals,
   setAnnotationAccuracy,
   getAnnotationAccuracy,
+  highlightTableToggle,
+  toggleHighlightCell,
+  saveImageData,
+  resetImageData,
+  getEdittedAnnotationCount,
+  setTableAnnotationInProgress,
+  updateTableAnnotationAndSelectedValue,
+  getAllTablesAnnotations,
+  resetTableAnnotations,
+  checkIFAnnotationIntersectingWithTables,
+  getAllTableAnnProposals,
+  downloadCsv,
 }) => {
   const classes = useStyles();
+  const [dialogState, setDialogState] = React.useState(false);
+  const [selectedTabIndex, setselectedTabIndex] = React.useState(0);
+  const [tabToKeepOpen, setTabToKeepOpen] = React.useState(0);
+  const [isTableEditingInProgress, setTableEditingInProgress] = React.useState(
+    false
+  );
   let wheeling;
   const onScroll = () => {
     if (!wheeling) {
@@ -103,39 +126,111 @@ export const LabelsContainer = ({
       wheeling = undefined;
     }, 70);
   };
-
+  const hanldeTabChange = (selected) => {
+    setselectedTabIndex(selected);
+    setTabToKeepOpen(selected);
+    if (
+      selectedTabIndex !== selected &&
+      tableAnnotations?.length > 0 &&
+      getEdittedAnnotationCount() > 0
+    ) {
+      setDialogState(true);
+    } else {
+      setTableAnnotationInProgress(selected === 1 ? true : false);
+    }
+  };
+  const updateTableEdittingAndToggleHighlight = (...args) => {
+    let mode = args[1];
+    highlightTableToggle(...args);
+    if (mode === "EDIT") {
+      setTableEditingInProgress(true);
+    } else {
+      setTableEditingInProgress(false);
+    }
+  };
   return (
     <Box className={classes.labelContainer}>
       <Typography className={classes.textHead}>LABEL / ANNOTATION</Typography>
       <Box className={classes.tabsContainer}>
         <CommonTabs
           tabs={{
-            "Custom OCR": (
-              <Box
-                className={classes.scrollableLabelsContainer}
-                id={LabelContainerId}
-                onScroll={onScroll}
-              >
-                <ScrollableLabelsContainer
-                  getAnnotations={getAnnotations}
-                  getAnnotationData={getAnnotationData}
-                  imageLabels={imageLabels}
-                  textAnnotations={textAnnotations}
-                  selectAnnotationById={selectAnnotationById}
-                  getProposals={getProposals}
-                  setAnnotationAccuracy={setAnnotationAccuracy}
-                  getAnnotationAccuracy={getAnnotationAccuracy}
-                />
-              </Box>
-            ),
-            "Optimal OCR": (
-              <Box className={classes.scrollableLabelsContainer}>
-                Not Implemented
-              </Box>
-            ),
+            "Custom OCR": {
+              icon: <TextFieldsOutlinedIcon />,
+              disabled: isTableEditingInProgress,
+              componentDetails: (
+                <Box
+                  className={classes.scrollableLabelsContainer}
+                  id={LabelContainerId}
+                  onScroll={onScroll}
+                >
+                  <ScrollableLabelsContainer
+                    getAnnotations={getAnnotations}
+                    getAnnotationData={getAnnotationData}
+                    imageLabels={imageLabels}
+                    textAnnotations={textAnnotations}
+                    selectAnnotationById={selectAnnotationById}
+                    getProposals={getProposals}
+                    setAnnotationAccuracy={setAnnotationAccuracy}
+                    getAnnotationAccuracy={getAnnotationAccuracy}
+                    checkIFAnnotationIntersectingWithTables={
+                      checkIFAnnotationIntersectingWithTables
+                    }
+                    getAllTablesAnnotations={getAllTablesAnnotations}
+                    getAllTableAnnProposals={getAllTableAnnProposals}
+                    downloadCsv={downloadCsv}
+                  />
+                </Box>
+              ),
+            },
+            "Tables Data": {
+              icon: <TableChartOutlinedIcon />,
+              componentDetails: (
+                <Box className={classes.scrollableLabelsContainer}>
+                  <TableContainer
+                    resetTableAnnotations={resetTableAnnotations}
+                    getAllTablesAnnotations={getAllTablesAnnotations}
+                    updateTableAnnotationAndSelectedValue={
+                      updateTableAnnotationAndSelectedValue
+                    }
+                    tableAnnotations={tableAnnotations}
+                    highlightTableToggle={updateTableEdittingAndToggleHighlight.bind(
+                      this
+                    )}
+                    toggleHighlightCell={toggleHighlightCell}
+                    saveImageData={saveImageData}
+                  />
+                </Box>
+              ),
+            },
           }}
+          hanldeTabChange={(selectedIndex) => hanldeTabChange(selectedIndex)}
+          selectedTab={tabToKeepOpen}
         />
       </Box>
+      <ConfirmDialog
+        open={dialogState}
+        onCancel={() => {
+          setDialogState(false);
+          resetImageData();
+          setTableAnnotationInProgress(selectedTabIndex === 1 ? true : false);
+        }}
+        onExtraAction={() => {
+          setTabToKeepOpen(selectedTabIndex === 1 ? 0 : 1);
+          setselectedTabIndex(selectedTabIndex === 1 ? 0 : 1);
+          setDialogState(false);
+        }}
+        title={"Select if you want to save the existing annotations ?"}
+        content={`Are you sure you want to save existing editing, once you select RESET, changes will no longer applicable.`}
+        onConfirm={() => {
+          setDialogState(false);
+          saveImageData();
+          setTableAnnotationInProgress(selectedTabIndex === 1 ? true : false);
+        }}
+        extraAction="Continue Editing"
+        cancelText="Reset changes"
+        okText="Save Changes"
+      />
+      ;
     </Box>
   );
 };
@@ -157,11 +252,17 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
             getProposals,
             setAnnotationAccuracy,
             getAnnotationAccuracy,
+            checkIFAnnotationIntersectingWithTables,
+            getAllTableAnnProposals,
           } = this.props;
           const annotations = getAnnotations() || [];
           const labels = [];
           annotations.forEach((ann, index) => {
-            const labelValue = getLabelValueFromProposals(ann, getProposals());
+            const isTableInterSection = checkIFAnnotationIntersectingWithTables();
+            const source = isTableInterSection
+              ? getAllTableAnnProposals()
+              : getProposals();
+            const labelValue = getLabelValueFromProposals(ann, source);
             if (!ann.getLabelValue()) {
               ann.setLabelValue(labelValue?.value);
             }
@@ -247,8 +348,20 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
           </Box>
         )}
         <Box>
-          <h4 style={{ color: "#0575ce", margin: "0.5rem 0 0.5rem 0" }}>
+          <h4
+            style={{
+              color: "#0575ce",
+              margin: "0.5rem 0 0.5rem 0",
+              borderBottom: "dotted 1px",
+            }}
+          >
             <b>DATA INFORMATION</b>
+            <Button
+              style={{ float: "right", padding: "0", color: "#0575ce" }}
+              onClick={() => this.props.downloadCsv("onlyText")}
+            >
+              <b>DOWNLOAD CSV</b>
+            </Button>
           </h4>
           {this.state.labels}
         </Box>
@@ -283,7 +396,7 @@ const Label = ({
   confidence,
   words,
   setAnnotationAccuracy,
-  getAnnotationAccuracy
+  getAnnotationAccuracy,
 }) => {
   const classes = useStyles();
   const [label, setLabel] = React.useState(labelValue);

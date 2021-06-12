@@ -1,5 +1,5 @@
 import React from "react";
-import CreatableSelect from "react-select/creatable"
+import CreatableSelect from "react-select/creatable";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import classnames from "classnames";
@@ -14,6 +14,7 @@ import CheckIcon from "@material-ui/icons/Check";
 import Box from "@material-ui/core/Box";
 import { CreateModalDialog } from "../helpers/CreateModalDialog";
 import MenuItem from "@material-ui/core/MenuItem";
+import ConfirmDialog from "../../ConfirmDialog";
 
 export const DefaultLabel = {
   label_name: "Label",
@@ -82,10 +83,21 @@ export class LabelSelector extends CanvasEventAttacher {
     super(props);
     this.eventListeners = [
       {
+        event: CustomEventType.ON_TABLE_INTERSECTION,
+        func: (event) => {
+          this.setState({
+            isTableIntersection: true,
+            showDialog: true,
+          });
+        },
+      },
+      {
         event: CustomEventType.SHOW_LABEL_DROPDOWN,
         func: (event) => {
           this.setState({
             position: event.detail.position,
+            isTableIntersection: false,
+            showDialog: false,
             proposalMode: event.detail.proposalMode,
           });
           this.showLabelSelector(true);
@@ -118,27 +130,57 @@ export class LabelSelector extends CanvasEventAttacher {
       },
     ];
   }
-
   componentDidMount() {
     this.bindEventListeners();
   }
-
   componentWillUnmount() {
     this.unbindEventListeners();
   }
 
   renderComponent() {
+    // const {
+    //   saveImageData,
+    //   resetImageData,
+    //   getEdittedAnnotationCount,
+    // } = this.props;
+    // const edditedAnnotationExist = getEdittedAnnotationCount();
     const show = this.state.show;
+    // const isTableIntersection = this.state.isTableIntersection;
+    // isTableIntersection (
+    //   <ConfirmDialog
+    //     open={this.state.showDialog}
+    //     onCancel={() => {
+    //       edditedAnnotationExist && resetImageData();
+    //       this.setState({ showDialog: false });
+    //     }}
+    //     title={"Looks like you want to update a table ?"}
+    //     content={`Why not update the table using our interactive table editing tool.Please save your existing work and go to the table edit view.`}
+    //     onConfirm={() => {
+    //       edditedAnnotationExist && saveImageData();
+    //       this.setState({ showDialog: false });
+    //     }}
+    //     onExtraAction={() => {
+    //       this.setState({ showDialog: false });
+    //     }}
+    //     extraAction="Continue Editing Text"
+    //     cancelText="Reset All Changes"
+    //     okText="Save Existing Changes"
+    //   />
+    // ) :
+    // (
     return (
       <>
-        {show && (
+        {show && !this.props.checkIfTableAnnotation() && (
           <div
             style={{
               height: "auto",
               position: "absolute",
               opacity: 1,
               top: this.state.position.y,
-              left: this.state.position.x <= 150 ? this.state.position.x : this.state.position.x - 80,
+              left:
+                this.state.position.x <= 150
+                  ? this.state.position.x
+                  : this.state.position.x - 80,
               zIndex: 1000,
             }}
           >
@@ -192,15 +234,15 @@ export class LabelSelector extends CanvasEventAttacher {
             >
               Assign Label
             </MenuItem>
-						<MenuItem
-							value={""}
-							onClick={() => {
-								this.props.getProposalTool().deleteProposals();
-								this.setState({ showProposalOptionSelection: false });
-							}}
-						>
-							Delete
-						</MenuItem>
+            <MenuItem
+              value={""}
+              onClick={() => {
+                this.props.getProposalTool().deleteProposals();
+                this.setState({ showProposalOptionSelection: false });
+              }}
+            >
+              Delete
+            </MenuItem>
             <MenuItem
               value={""}
               onClick={() => {
@@ -291,14 +333,14 @@ const Label = ({
             placeholder="Tags"
             value={labelValue}
             onChange={(label) => {
-							if (!label.__isNew__) {
-								!proposalMode && setAnnotationLabel(label);
-								setLabelValue(label);
-							} else {
-								setCreatableLabel(label.value)
-								setModalOpen(true)
-							}
-						}}
+              if (!label.__isNew__) {
+                !proposalMode && setAnnotationLabel(label);
+                setLabelValue(label);
+              } else {
+                setCreatableLabel(label.value);
+                setModalOpen(true);
+              }
+            }}
             options={labels.map((label) => ({
               value: label.label_name,
               label: label.label_name,
@@ -316,7 +358,12 @@ const Label = ({
             </Button>
             <Box style={{ flexGrow: 1 }} />
             <Button
-              disabled={(!labelValue?.value || labelValue.value===DefaultLabel.label_value) ? true : false}
+              disabled={
+                !labelValue?.value ||
+                labelValue.value === DefaultLabel.label_value
+                  ? true
+                  : false
+              }
               onClick={() => {
                 if (proposalMode) {
                   // point to active too assign label
@@ -339,7 +386,7 @@ const Label = ({
 
       <CreateModalDialog
         modalOpen={modalOpen}
-				typedText={creatableLabel}
+        typedText={creatableLabel}
         onClose={() => setModalOpen(false)}
         createLabel={(label) => {
           setAnnotationLabel(label);

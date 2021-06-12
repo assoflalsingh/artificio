@@ -18,12 +18,12 @@ import AppsIcon from "@material-ui/icons/Apps";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import CachedIcon from "@material-ui/icons/Cached";
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ShuffleIcon from '@material-ui/icons/Shuffle';
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import ShuffleIcon from "@material-ui/icons/Shuffle";
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import RestoreFromTrashIcon from "@material-ui/icons/RestoreFromTrash";
+import GetAppIcon from "@material-ui/icons/GetApp";
 
 const useClasses = makeStyles(() => ({
   button: {
@@ -68,18 +68,18 @@ export class ToolBar extends CanvasEventAttacher {
     activeTool: null,
     showProposals: false,
     hideAnnotations: false,
-    deleteAllAnnotation: false
+    deleteAllAnnotation: false,
   };
 
   eventListeners = [
     {
       event: CustomEventType.SET_ACTIVE_TOOL,
       func: (event) => {
-      	const activeTool = event.detail.toolType
-				if (!activeTool) {
-					this.setState({ disableSelectMode: false });
-				}
-				this.setState({ activeTool: event.detail.toolType });
+        const activeTool = event.detail.toolType;
+        if (!activeTool) {
+          this.setState({ disableSelectMode: false });
+        }
+        this.setState({ activeTool: event.detail.toolType });
       },
     },
     {
@@ -93,7 +93,7 @@ export class ToolBar extends CanvasEventAttacher {
           activeTool: null,
           showProposals: false,
           hideAnnotations: false,
-          deleteAllAnnotation: false
+          deleteAllAnnotation: false,
         });
       },
     },
@@ -111,6 +111,14 @@ export class ToolBar extends CanvasEventAttacher {
 
   componentWillUnmount() {
     this.unbindEventListeners();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.activeTool && prevProps.checkIfTableAnnotation()) {
+      this.props.unsetActiveTool();
+      this.props.blockAnnotationClick(!this.state.selectMode);
+      this.setState({ disableSelectMode: false });
+    }
   }
 
   renderComponent() {
@@ -148,7 +156,11 @@ export class ToolBar extends CanvasEventAttacher {
         <ToolBarButton
           active={this.state.activeTool}
           label="Shapes"
-          disabled={this.state.hideAnnotations || this.state.deleteAllAnnotation}
+          disabled={
+            this.state.hideAnnotations ||
+            this.state.deleteAllAnnotation ||
+            this.props.checkIfTableAnnotation()
+          }
           icon={<FormatShapesIcon />}
           onClick={(e) => {
             if (this.state.activeTool) {
@@ -180,6 +192,7 @@ export class ToolBar extends CanvasEventAttacher {
         </Menu>
         <ToolBarButton
           active={this.state.showProposals}
+          disabled={this.props.checkIfTableAnnotation()}
           label="Proposals"
           icon={<AppsIcon />}
           onClick={() => {
@@ -189,6 +202,7 @@ export class ToolBar extends CanvasEventAttacher {
           }}
         />
         <ToolBarButton
+          disabled={this.props.checkIfTableAnnotation()}
           active={this.state.hideAnnotations}
           label={`${this.state.hideAnnotations ? "Show" : "Hide"}`}
           icon={
@@ -200,11 +214,17 @@ export class ToolBar extends CanvasEventAttacher {
           }
           onClick={() => {
             const hide = !this.state.hideAnnotations;
-            this.setState({ hideAnnotations: hide, deleteAllAnnotation: false });
-            this.props.showAnnotationLayer(!hide && !this.state.deleteAllAnnotation);
+            this.setState({
+              hideAnnotations: hide,
+              deleteAllAnnotation: false,
+            });
+            this.props.showAnnotationLayer(
+              !hide && !this.state.deleteAllAnnotation
+            );
           }}
         />
         <ToolBarButton
+          disabled={this.props.checkIfTableAnnotation()}
           active={this.state.deleteAllAnnotation}
           label={`${this.state.deleteAllAnnotation ? "Revert" : "Delete All"}`}
           icon={
@@ -216,28 +236,35 @@ export class ToolBar extends CanvasEventAttacher {
           }
           onClick={() => {
             const hide = !this.state.deleteAllAnnotation;
-            this.setState({ deleteAllAnnotation: hide, hideAnnotations: false });
+            this.setState({
+              deleteAllAnnotation: hide,
+              hideAnnotations: false,
+            });
             this.props.setDeleteAllAnnotation(true);
-            this.props.showAnnotationLayer(!hide && !this.state.hideAnnotations);
+            this.props.showAnnotationLayer(
+              !hide && !this.state.hideAnnotations
+            );
           }}
         />
-				<ToolBarButton
-					label={'Reset/Clear'}
-					icon={<CachedIcon/>}
-					onClick={this.props.reset}
-				/>
         <ToolBarButton
-          label={'Choose structure'}
+          label={"Reset/Clear"}
+          icon={<CachedIcon />}
+          onClick={this.props.reset}
+        />
+        <ToolBarButton
+          disabled={this.props.checkIfTableAnnotation()}
+          label={"Choose structure"}
           icon={<ShuffleIcon />}
           onClick={this.props.chooseStructure}
         />
         <ToolBarButton
-          label={'Save structure'}
+          disabled={this.props.checkIfTableAnnotation()}
+          label={"Save structure"}
           icon={<DashboardIcon />}
           onClick={this.props.saveStructure}
         />
         <ToolBarButton
-          label={'Download CSV'}
+          label={"Download CSV"}
           icon={<GetAppIcon />}
           onClick={this.props.downloadCsv}
         />

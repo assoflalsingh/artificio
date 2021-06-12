@@ -1,20 +1,13 @@
 import React from "react";
 import SaveIcon from "@material-ui/icons/Save";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import {
   Box,
   Button,
   IconButton,
-  ListItemText,
   makeStyles,
-  Menu,
-  MenuItem,
   Tooltip,
   withStyles,
 } from "@material-ui/core";
-import useEventCallback from "react-image-annotate/hooks/use-event-callback";
-import PanToolIcon from "@material-ui/icons/PanTool";
-import FormatShapesIcon from "@material-ui/icons/FormatShapes";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
@@ -48,7 +41,7 @@ export function LeftToolBar({
   fetchPreviousImage,
   save,
   clickZoomInOut,
-  isSaved
+  isSaved,
 }) {
   const classes = useStyles();
 
@@ -57,7 +50,7 @@ export function LeftToolBar({
       <Tooltip title="Save progress">
         <IconButton
           data-name="save"
-          disabled = {isSaved}
+          disabled={isSaved}
           onClick={() => save()}
           className={classes.leftBarButton}
         >

@@ -37,7 +37,6 @@ export default class ImageAnnotation extends React.Component {
           }
         }
         this.setState({ images: newDataImages });
-        // setThumbnails(tmp_thumbs);
       })
       .catch((error) => {
         if (error.response) {

@@ -336,6 +336,22 @@ export class CanvasScene {
     this.stage.draw();
   }
 
+  updateImagePostion(x, y) {
+    const scale = this.stage.width() / this.konvaImage.width();
+    this.stage.scale({
+      x: scale * defaultStageScale,
+      y: scale * defaultStageScale,
+    });
+    this.stage.position({
+      x: -x * this.stage.scaleX() + defaultStagePadding,
+      y: -y * this.stage.scaleX() + defaultStagePadding,
+    });
+    this.oldScale = scale * defaultStageScale;
+    this.repositionScrollBars();
+    this.annotationLayer && this.resizeCanvasStroke(this.initialScale);
+    this.stage.draw();
+  }
+
   getSelectedAnnotation = () => {};
 
   handleScrollZoomStart = () => {};
