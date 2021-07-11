@@ -54,6 +54,9 @@ const useStyles = makeStyles((theme) => ({
   tableActions: {
     borderRadius: 0,
     margin: "0px 10px",
+    "&:hover": {
+      "background-color": "rgba(224, 224, 224, 1)",
+    },
   },
   cellAnnotated: {
     "background-color": "#ffb600",
@@ -72,8 +75,7 @@ function CustomToolbar() {
   return (
     <GridToolbarContainer className={classes["export"]}>
       <span className={classes.tableInfo}>
-        *Verify the data by single click and for edit use doucble click on a
-        cell
+        Use double click to edit the cell.
       </span>
       <GridToolbarExport />
     </GridToolbarContainer>
@@ -149,7 +151,7 @@ function SlideTable(props) {
         rowsData[rowData["row_index"] - 1] = rowsData[
           rowData["row_index"] - 1
         ] || { id: currentRowIndex };
-        rowsData[rowData["row_index"] - 1] =
+        rowsData[rowData["row_index"] - 1][`col_${rowData["column_index"]}`] =
           rowData.word_details &&
           rowData.word_details
             .reduce((acc, current) => `${acc}${current.word_description} `, "")
@@ -194,10 +196,10 @@ function SlideTable(props) {
     selectedTableAnnotations.cell_details
   );
   const [selectedCellDetails, setSelectedCellDetails] = useState({});
-  const totalColumnsPerRow = jsonTableData.columns.length;
+  const totalColumnsPerRow = jsonTableData.columns.length; // added one more for handling the addition of checkboxes.
   const handleCellSingleClick = (cellMeta, event) => {
     const cellIndex =
-      cellMeta.rowIndex * totalColumnsPerRow + cellMeta.colIndex;
+      cellMeta.rowIndex * totalColumnsPerRow + (cellMeta.colIndex - 1);
     if (cellIndex !== selectedCellDetails.selectedCellIndex) {
       const cellAnnotation = toggleHighlightCell(
         `TBL_CELL_${cellIndex}`,
@@ -280,6 +282,7 @@ function SlideTable(props) {
                   handleCellFocus(a, b);
                 }}
                 disableColumnFilter
+                checkboxSelection
                 rows={jsonTableData.rowsData}
                 columns={jsonTableData.columns}
                 hideFooter={true}
