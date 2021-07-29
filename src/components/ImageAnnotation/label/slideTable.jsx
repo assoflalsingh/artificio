@@ -198,8 +198,10 @@ function SlideTable(props) {
   const [selectedCellDetails, setSelectedCellDetails] = useState({});
   const totalColumnsPerRow = jsonTableData.columns.length; // added one more for handling the addition of checkboxes.
   const handleCellSingleClick = (cellMeta, event) => {
-    const cellIndex =
-      cellMeta.rowIndex * totalColumnsPerRow + (cellMeta.colIndex - 1);
+    const colIndex = cellMeta.api.getColumnIndex(cellMeta.field);
+    const rowIndex = cellMeta.api.getRowIndex(cellMeta.row.id);
+
+    const cellIndex = rowIndex * totalColumnsPerRow + (colIndex - 1);
     if (cellIndex !== selectedCellDetails.selectedCellIndex) {
       const cellAnnotation = toggleHighlightCell(
         `TBL_CELL_${cellIndex}`,
@@ -214,8 +216,8 @@ function SlideTable(props) {
       setSelectedCellDetails({
         ...selectedCellDetails,
         selectedCellIndex: cellIndex,
-        row: cellMeta.rowIndex + 1,
-        column: cellMeta.colIndex + 1,
+        row: rowIndex + 1,
+        column: colIndex + 1,
         annotationId: cellAnnotation[0].id,
         coordinates: cellAnnotation[0].coordinates,
         valueChanged: false,
@@ -224,22 +226,29 @@ function SlideTable(props) {
     }
   };
   const handleCellDoubleClick = (cellMeta, event) => {
+    const colIndex = cellMeta.api.getColumnIndex(cellMeta.field);
+    const rowIndex = cellMeta.api.getRowIndex(cellMeta.row.id);
     setSelectedCellDetails({
       ...selectedCellDetails,
-      row: cellMeta.rowIndex + 1,
-      column: cellMeta.colIndex + 1,
+      row: rowIndex + 1,
+      column: colIndex + 1,
       valueAtSelection: cellMeta.value,
     });
   };
   const handleCellFocus = (cellMeta, event) => {
-    if (cellMeta.props.value !== selectedCellDetails?.valueAtSelection) {
+    // debugger;
+    const cellParams = cellMeta.api.getEditCellPropsParams(
+      cellMeta.id,
+      cellMeta.field
+    );
+    if (cellParams.props.value !== selectedCellDetails?.valueAtSelection) {
       setSelectedCellDetails({
         ...selectedCellDetails,
         valueChanged: true,
       });
       updateTableAnnotationAndSelectedValue(
         selectedCellDetails.annotationId,
-        cellMeta.props.value,
+        cellParams.props.value,
         selectedCellDetails.selectedCellIndex,
         selectedTableIndex
       );
