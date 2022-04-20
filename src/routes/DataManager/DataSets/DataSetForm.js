@@ -78,14 +78,14 @@ export default function LabelForm({initFormData, ...props}) {
         const classifyResponse = await api.post(URL_MAP.GET_ALL_MODELS,{model_type:"classifier"});
         const classifyData = classifyResponse?.data?.model_list || []; 
         if(classifyData.length>0){
-          classifyData.map((data)=>{data.model_name = `${data.model_name} ${data.version ? ` - v${data.version}`:""}`})
+          classifyData.map((data)=>{ data.model_name = `${data.model_name} ${data.version ? ` - v${data.version}`:""}`; return data; })
         }
 
         // fetch NER models
         const nerResponse = await api.post(URL_MAP.GET_ALL_MODELS,{model_type:"NER"});
         const nerData = nerResponse?.data?.model_list || [];
         if(nerData.length>0){
-          nerData.map((data)=>{data.model_name = `${data.model_name} ${data.version ? ` - v${data.version}`:""}`})
+          nerData.map((data)=>{data.model_name = `${data.model_name} ${data.version ? ` - v${data.version}`:""}`; return data;})
         }
         if (!isMounted()) return;
 
@@ -126,9 +126,9 @@ export default function LabelForm({initFormData, ...props}) {
         }
       } else if (err.request) {
         // client never received a response, or request never left
-        setFormError('Failed to fetch pre-requisites. Not able to send the request' + '. Contact administrator.');
+        setFormError('Failed to fetch pre-requisites. Not able to send the request. Contact administrator.');
       } else {
-        setFormError('Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.');
+        setFormError('Failed to fetch pre-requisites. Some error occurred. Contact administrator.');
       }
   }
    
@@ -247,9 +247,9 @@ export default function LabelForm({initFormData, ...props}) {
           }
         } else if (err.request) {
           // client never received a response, or request never left
-          setFormError('Not able to send the request' + '. Contact administrator.');
+          setFormError('Not able to send the request. Contact administrator.');
         } else {
-          setFormError('Some error occurred' + '. Contact administrator.');
+          setFormError('Some error occurred. Contact administrator.');
         }
       }).then(()=>{
         setSaving(false);

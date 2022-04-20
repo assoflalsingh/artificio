@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation, PasswordPolicy } from '../../components/FormElements';
+import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, PasswordPolicy } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
-import {getEpochNow, titleCase} from '../../others/utils';
+import {titleCase} from '../../others/utils';
 
 export default function CreateUser({onCancel, ...props}) {
   const defaults = {
@@ -43,7 +43,7 @@ export default function CreateUser({onCancel, ...props}) {
       messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
-      validators: ['required', function(value) { return formData.password == value}],
+      validators: ['required', function(value) { return formData.password === value}],
       messages: ['This field is required', 'Does not match with the password'],
     },
     role_id: {
@@ -74,14 +74,14 @@ export default function CreateUser({onCancel, ...props}) {
         }
       } else if (err.request) {
         // client never received a response, or request never left
-        setFormError('Failed to fetch pre-requisites. Not able to send the request' + '. Contact administrator.');
+        setFormError('Failed to fetch pre-requisites. Not able to send the request. Contact administrator.');
       } else {
-        setFormError('Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.');
+        setFormError('Failed to fetch pre-requisites. Some error occurred. Contact administrator.');
       }
     }).then(()=>{
       setOpLoading(false);
     });
-  }, []);
+  }, [api]);
 
   const validateField = (name, value) => {
     let errMsg = '';
@@ -139,9 +139,9 @@ export default function CreateUser({onCancel, ...props}) {
           }
         } else if (err.request) {
           // client never received a response, or request never left
-          setFormError('Not able to send the request' + '. Contact administrator.');
+          setFormError('Not able to send the request. Contact administrator.');
         } else {
-          setFormError('Some error occurred' + '. Contact administrator.');
+          setFormError('Some error occurred. Contact administrator.');
         }
       }).then(()=>{
         setSaving(false);

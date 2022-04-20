@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
+import { Backdrop, Box, Button, Chip, CircularProgress, Snackbar, Typography } from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
 import MUIDataTable from "mui-datatables";
@@ -191,7 +191,7 @@ export default function Results(props) {
     return newData;
   }
 
-  const fetchDataList = () => {
+  const fetchDataList = useCallback(() => {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
@@ -210,7 +210,7 @@ export default function Results(props) {
       .then(()=>{
         setDatalistMessage(null);
       });
-  }
+  },[]);
   const filterDataList = (filteredResult) => {
     setDatalistMessage('Filtering data...');
     setDatalist([]);
@@ -230,7 +230,7 @@ export default function Results(props) {
   useEffect(() => {
     if (!uploadCounter) return
       fetchDataList();
-  }, [uploadCounter]);
+  }, [uploadCounter, fetchDataList]);
   
   return (
     <>

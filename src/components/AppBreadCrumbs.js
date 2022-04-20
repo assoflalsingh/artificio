@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, Box, Paper, Breadcrumbs, Typography, Link } from '@material-ui/core';
+import { makeStyles, Paper, Breadcrumbs, Typography, Link } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { useLocation } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
@@ -29,10 +29,11 @@ const useStylesContent = makeStyles((theme)=>({
 }));
 
 const breadcrumbNameMap = {
+  'dataFlow': 'Data Flow',
   'createModel': 'Create Model',
   'dataManager': 'Data Manager',
   'annotation': 'Annotation',
-  'dataExtraction': 'Data extraction',
+  'dataExtraction': 'Data Extraction',
   'admin': 'Admin',
   'dashboard': 'Dashboard',
 }

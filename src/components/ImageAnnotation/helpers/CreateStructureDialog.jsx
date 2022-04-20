@@ -7,7 +7,6 @@ import React, { useState } from "react";
 import {
   doValidation,
   Form,
-  FormInputColor,
   FormInputText,
   FormRow,
   FormRowItem,

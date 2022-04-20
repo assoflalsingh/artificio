@@ -16,6 +16,7 @@ export class Tool {
       case KeyMappings.Escape:
         // this.exit();
         break;
+      default:;
     }
   };
 

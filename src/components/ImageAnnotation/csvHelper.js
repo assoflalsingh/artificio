@@ -61,6 +61,7 @@ function convertJSONtoTable(tableData = []) {
           .reduce((acc, current) => `${acc}${current.word_description} `, "")
           .trim();
     }
+    return rowData;
   });
   return {
     columns,
@@ -103,8 +104,10 @@ export default function exportToCSV(
         let rowDataForCSV = ["", `Table Annotation - ${index + 1}:`];
         rowsData.map((row, index) => {
           rowDataForCSV.push(Object.values(row).join(","));
+          return row;
         });
         csv.push(rowDataForCSV.join("\n"));
+        return tableDetails;
       });
   }
   downloadCSV(csv.join("\n"), filename);

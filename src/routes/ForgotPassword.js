@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography } from '@material-ui/core';
-import HomeIcon from '@material-ui/icons/Home';
-import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
+import { Box, Button, Container, Grid, Link, Paper, Typography } from '@material-ui/core';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
-import BusinessIcon from '@material-ui/icons/Business';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import SignUpImg from '../assets/images/signup.png';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { doValidation, FormHeader, FormInputPhoneNo, FormInputText } from '../components/FormElements';
+import { doValidation, FormHeader, FormInputText } from '../components/FormElements';
 import Logo from '../assets/images/logo.svg';
 
 const api = getInstance();
@@ -47,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ForgotPassword({match, history}) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  // const [open, setOpen] = React.useState(true);
   const defaults = {
     email: '',
   }
@@ -90,7 +85,7 @@ export default function ForgotPassword({match, history}) {
     let value = e;
     if(e.target) {
       name = e.target.name;
-      if(name == 'accept') {
+      if(name === 'accept') {
         value = e.target.checked;
       } else {
         value = e.target.value;
@@ -147,7 +142,7 @@ export default function ForgotPassword({match, history}) {
       <Paper display="flex" square>
         <Container maxWidth='lg'>
           <Link href={APP_WEBSITE}>
-            <img style={{marginTop: '0.5rem', height: '2.5rem'}} src={Logo} className={classes.logoImg}></img>
+            <img style={{marginTop: '0.5rem', height: '2.5rem'}} alt="" src={Logo} className={classes.logoImg}></img>
           </Link>
         </Container>
       </Paper>

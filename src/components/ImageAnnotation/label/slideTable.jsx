@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import {
   DataGrid,
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
   },
   wrapper: {
-    width: 100 + theme.spacing.unit * 2,
+    width: 100 + theme.spacing(2),
   },
   elementsContainer: {
     display: "flex",
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     zIndex: 1,
     position: "relative",
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
   },
   tableWrapper: {
     position: "absolute",
@@ -165,6 +165,7 @@ function SlideTable(props) {
             0
           );
       }
+      return rowData;
     });
     columns.map((col) => {
       col.renderCell = (cellValues) => {
@@ -180,6 +181,7 @@ function SlideTable(props) {
           </div>
         );
       };
+      return col;
     });
     return {
       columns,
@@ -235,12 +237,8 @@ function SlideTable(props) {
       valueAtSelection: cellMeta.value,
     });
   };
-  const handleCellFocus = (cellMeta, event) => {
+  const handleCellFocus = (cellParams, event) => {
     // debugger;
-    const cellParams = cellMeta.api.getEditCellPropsParams(
-      cellMeta.id,
-      cellMeta.field
-    );
     if (cellParams.props.value !== selectedCellDetails?.valueAtSelection) {
       setSelectedCellDetails({
         ...selectedCellDetails,
@@ -301,7 +299,7 @@ function SlideTable(props) {
                   Toolbar: CustomToolbar,
                 }}
               />
-              <div class={classes.buttonWrapper}>
+              <div className={classes.buttonWrapper}>
                 <Button
                   className={classes.tableActions}
                   autoFocus

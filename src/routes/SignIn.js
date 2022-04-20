@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography, Divider } from '@material-ui/core';
-import HomeIcon from '@material-ui/icons/Home';
-import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import { Box, Button, Container, FormControlLabel, Grid, Link, Checkbox, Paper, Typography, Divider } from '@material-ui/core';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
-import BusinessIcon from '@material-ui/icons/Business';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Logo from '../assets/images/logo.svg';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { FormInputPhoneNo, FormInputText } from '../components/FormElements';
+import { FormInputText } from '../components/FormElements';
 import SigninImg from '../assets/images/signin.png';
 
 const api = getInstance();
@@ -97,7 +94,7 @@ export default function SignIn({history, location}) {
     let name = e.target.name,
       value = null;
 
-    if(name == 'remember') {
+    if(name === 'remember') {
       value = e.target.checked;
     } else {
       value = e.target.value;
@@ -160,16 +157,16 @@ export default function SignIn({history, location}) {
       <Paper display="flex" square>
         <Container maxWidth='lg'>
           <Link href={APP_WEBSITE}>
-            <img style={{marginTop: '0.5rem', height: '2.5rem'}} src={Logo} className={classes.logoImg}></img>
+            <img style={{marginTop: '0.5rem', height: '2.5rem'}} alt="" src={Logo} className={classes.logoImg}></img>
           </Link>
         </Container>
       </Paper>
       <Container maxWidth='lg' style={{flexGrow: 1, display:'flex', alignItems: 'stretch'}}>
         <Grid container>
           <Grid item lg={7} md={6} sm={12} xs={12} style={{display:'flex'}}>
-            <img src={SigninImg} className={classes.img} style={{alignSelf: 'center'}}/>
+            <img src={SigninImg} className={classes.img} alt="" style={{alignSelf: 'center'}}/>
           </Grid>
-          <Grid item item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
+          <Grid item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
             <Paper className={classes.formRoot} style={{margin: 'auto'}} elevation={3}>
               <Typography variant="h4" color="primary">Welcome to <strong>Artificio</strong></Typography>
               <Typography variant="h7">To keep connected with us, please log in</Typography>

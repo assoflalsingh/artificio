@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography } from '@material-ui/core';
-import HomeIcon from '@material-ui/icons/Home';
-import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import MailOutlineIcon from '@material-ui/icons/MailOutline';
-import BusinessIcon from '@material-ui/icons/Business';
+import { Box, Button, Container, Grid, Link, Paper, Typography } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import SignUpImg from '../assets/images/signup.png';
 import {getInstance, URL_MAP, APP_WEBSITE} from '../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { doValidation, FormHeader, FormInputPhoneNo, FormInputText, PasswordPolicy } from '../components/FormElements';
+import { doValidation, FormHeader, FormInputText, PasswordPolicy } from '../components/FormElements';
 import Logo from '../assets/images/logo.svg';
 import {getQueryParam} from '../others/utils';
 
@@ -48,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ResetPassword({location, history}) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  // const [open, setOpen] = React.useState(true);
   const defaults = {
     password: '',
     confirm_pass: '',
@@ -76,7 +71,7 @@ export default function ResetPassword({location, history}) {
       messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
-      validators: ['required', function(value) { return formData.password == value}],
+      validators: ['required', function(value) { return formData.password === value}],
       messages: ['This field is required', 'Does not match with the password'],
     },
   }
@@ -86,7 +81,7 @@ export default function ResetPassword({location, history}) {
     setFormData({
       id: id,
     });
-  }, []);
+  }, [location]);
 
   const validateField = (name, value) => {
     let errMsg = '';
@@ -105,7 +100,7 @@ export default function ResetPassword({location, history}) {
     let value = e;
     if(e.target) {
       name = e.target.name;
-      if(name == 'accept') {
+      if(name === 'accept') {
         value = e.target.checked;
       } else {
         value = e.target.value;
@@ -160,7 +155,7 @@ export default function ResetPassword({location, history}) {
       <Paper display="flex" square>
         <Container maxWidth='lg'>
           <Link href={APP_WEBSITE}>
-            <img style={{marginTop: '0.5rem', height: '2.5rem'}} src={Logo} className={classes.logoImg}></img>
+            <img style={{marginTop: '0.5rem', height: '2.5rem'}} alt="" src={Logo} className={classes.logoImg}></img>
           </Link>
         </Container>
       </Paper>

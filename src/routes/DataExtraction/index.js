@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CommonTabs from '../../components/CommonTabs';
-import {getInstance} from '../../others/artificio_api.instance';
+// import {getInstance} from '../../others/artificio_api.instance';
 import UploadFile from './UploadFile';
 import DataList from './DataList';
 import Results from './Results';

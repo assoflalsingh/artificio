@@ -1,4 +1,3 @@
-import Konva from "konva";
 import * as uuid from "uuid";
 import {
   generateRandomColor,
@@ -93,14 +92,14 @@ export function getStageBounds(
 		vertices: {x: number, y: number}[]
  * }[]
  */
-function sortWordsColumnWise(words) {
-  words = words.sort((firstWord, lastWord) => {
-    return firstWord.vertices[0].y - lastWord.vertices[0].y;
-  });
-  words = words.sort((firstWord, lastWord) => {
-    return firstWord.vertices[0].x - lastWord.vertices[0].x;
-  });
-}
+// function sortWordsColumnWise(words) {
+//   words = words.sort((firstWord, lastWord) => {
+//     return firstWord.vertices[0].y - lastWord.vertices[0].y;
+//   });
+//   words = words.sort((firstWord, lastWord) => {
+//     return firstWord.vertices[0].x - lastWord.vertices[0].x;
+//   });
+// }
 
 export function findTextAnnotations(annotation, proposals) {
   let words = [];

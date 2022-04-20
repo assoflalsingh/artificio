@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Divider, Typography } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormInputColor, FormRow, FormRowItem, doValidation, FormHeader, FormInputPhoneNo, PasswordPolicy } from '../../components/FormElements';
+import { Form, FormInputText, FormRow, FormRowItem, doValidation, FormHeader, FormInputPhoneNo, PasswordPolicy } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
-import {getEpochNow, titleCase} from '../../others/utils';
 import { connect } from 'react-redux';
 import { setUser } from '../../store/reducers/user';
 
@@ -51,7 +50,7 @@ function Basic({user, setUser, api}) {
         phone_number: user.phone_number
       });
     }
-  }, [user.user_set])
+  }, [user.user_set, user])
 
   const validateField = (name, value) => {
     let errMsg = '';
@@ -119,9 +118,9 @@ function Basic({user, setUser, api}) {
           }
         } else if (err.request) {
           // client never received a response, or request never left
-          setFormError('Not able to send the request' + '. Contact administrator.');
+          setFormError('Not able to send the request. Contact administrator.');
         } else {
-          setFormError('Some error occurred' + '. Contact administrator.');
+          setFormError('Some error occurred. Contact administrator.');
         }
       }).then(()=>{
         setSaving(false);
@@ -201,7 +200,7 @@ function Auth({api}) {
       messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
-      validators: ['required', function(value) { return formData.password == value}],
+      validators: ['required', function(value) { return formData.password === value}],
       messages: ['This field is required', 'Does not match with the password'],
     },
   }
@@ -262,9 +261,9 @@ function Auth({api}) {
           }
         } else if (err.request) {
           // client never received a response, or request never left
-          setFormError('Not able to send the request' + '. Contact administrator.');
+          setFormError('Not able to send the request. Contact administrator.');
         } else {
-          setFormError('Some error occurred' + '. Contact administrator.');
+          setFormError('Some error occurred. Contact administrator.');
         }
       }).then(()=>{
         setSaving(false);

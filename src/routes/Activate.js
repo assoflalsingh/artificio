@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Container, Grid, Link, Typography } from '@material-ui/core';
+import { Box, Container, Link, Typography } from '@material-ui/core';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import {getQueryParam} from '../others/utils';
 import {getInstance, URL_MAP} from '../others/artificio_api.instance';
@@ -52,7 +52,7 @@ export default function Activate({location, history}) {
     }).then(()=>{
       setActivating(false);
     });
-  }, []);
+  },[location]);
 
   const onLoginClick = (e)=>{
     e.preventDefault();

@@ -1,15 +1,11 @@
 import React from 'react';
-import { makeStyles, Box, InputAdornment, Badge, Avatar, Typography, IconButton, Menu, MenuItem, Popover, CircularProgress, Tooltip } from '@material-ui/core';
-import TextFieldRounded from './TextFieldRounded';
-import SearchIcon from '@material-ui/icons/Search';
+import { makeStyles, Box, Badge, Typography, IconButton, CircularProgress, Tooltip } from '@material-ui/core';
 import MailOutline from '@material-ui/icons/MailOutline';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
-import SettingsIcon from '@material-ui/icons/Settings';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import { withRouter } from 'react-router-dom';
 import { connect } from "react-redux";
-import { titleCase } from '../others/utils';
 
 const useStylesUserBar = makeStyles((theme)=>({
   root: {

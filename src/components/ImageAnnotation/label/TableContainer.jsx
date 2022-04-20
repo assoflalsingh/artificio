@@ -97,6 +97,7 @@ export default class TableDetailsContainer extends CanvasEventAttacher {
           {tableAnnotations &&
             tableAnnotations.map((table, i) => (
               <Box
+              key={i}
                 style={{
                   border: "solid 1px #CDCDCD",
                   padding: "10px",
@@ -117,7 +118,7 @@ export default class TableDetailsContainer extends CanvasEventAttacher {
                     style={{
                       margin: "0px 5px",
                       padding: "0px",
-                      "min-width": "51px",
+                      minWidth: "51px",
                       height: "30px",
                     }}
                     variant="outlined"
@@ -140,7 +141,7 @@ export default class TableDetailsContainer extends CanvasEventAttacher {
                     style={{
                       margin: "0px 5px",
                       padding: "0px",
-                      "min-width": "51px",
+                      minWidth: "51px",
                       height: "30px",
                     }}
                     variant="outlined"
@@ -162,7 +163,7 @@ export default class TableDetailsContainer extends CanvasEventAttacher {
                     style={{
                       margin: "0px 5px",
                       padding: "0px",
-                      "min-width": "51px",
+                      minWidth: "51px",
                       height: "30px",
                     }}
                     variant="outlined"

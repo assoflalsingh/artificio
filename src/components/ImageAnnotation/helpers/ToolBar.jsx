@@ -49,7 +49,7 @@ const ToolBarButton = withStyles({
   const classes = useClasses();
   return (
     <Button
-      className={[active ? classes.active : undefined, classes.button]}
+      className={`${active ? classes.active : ''} ${classes.button}`}
       disabled={disabled}
       {...props}
     >

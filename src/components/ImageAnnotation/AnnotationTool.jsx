@@ -652,7 +652,7 @@ export default class AnnotationTool extends React.Component {
               getAllTableAnnProposals={
                 this.canvasManager.getAllTableAnnProposals
               }
-              downloadCsv={(csvType) => this.downloadCsv(csvType)}
+              downloadCsv={this.downloadCsv.bind(this)}
               highlightTableToggle={this.canvasManager.highlightTableToggle}
               resetTableAnnotations={this.canvasManager.resetTableAnnotations}
               getAllTablesAnnotations={

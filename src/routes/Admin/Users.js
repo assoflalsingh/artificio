@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
+import { Backdrop, Box, Chip, CircularProgress, Snackbar, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
-import SyncIcon from '@material-ui/icons/Sync';
-import RefreshIcon from '@material-ui/icons/Refresh';
-import {CompactAddButton, CompactButton, RefreshIconButton} from '../../components/CustomButtons';
+import {CompactAddButton, RefreshIconButton} from '../../components/CustomButtons';
 
 import {Stacked, StackItem} from '../../components/Stacked';
 import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
-import { FormInputSelect } from '../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import CreateUser from './CreateUser';
 import {titleCase} from '../../others/utils';
@@ -86,7 +81,6 @@ export default function Users({match}) {
 
   const options = {
     selectableRows: 'multiple',
-    filterType: 'checkbox',
     filterType: 'dropdown',
     elevation: 0,
     filter: false,
@@ -108,13 +102,12 @@ export default function Users({match}) {
     }
   };
 
-  const fetchUsersList = () => {
+  const fetchUsersList = useCallback(() => {
     setUsersMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
     api.get(URL_MAP.USERS_LIST)
       .then((res)=>{
-        let data = res.data.data;
         setDatalist(res.data.data);
       })
       .catch((err)=>{
@@ -123,11 +116,11 @@ export default function Users({match}) {
       .then(()=>{
         setUsersMessage(null);
       });
-  }
+  },[api]);
 
   useEffect(()=>{
     fetchUsersList();
-  },[]);
+  },[fetchUsersList]);
 
   return (
     <Box className={classes.root}>
