@@ -77,14 +77,14 @@ export default function DataGroupForm({initFormData, ...props}) {
         }
       } else if (err.request) {
         // client never received a response, or request never left
-        setFormError('Failed to fetch pre-requisites. Not able to send the request' + '. Contact administrator.');
+        setFormError('Failed to fetch pre-requisites. Not able to send the request. Contact administrator.');
       } else {
-        setFormError('Failed to fetch pre-requisites. Some error occurred' + '. Contact administrator.');
+        setFormError('Failed to fetch pre-requisites. Some error occurred. Contact administrator.');
       }
     }).then(()=>{
       setOpLoading(false);
     });
-  }, []);
+  }, [api]);
 
   const validateField = (name, value) => {
     let errMsg = '';
@@ -146,9 +146,9 @@ export default function DataGroupForm({initFormData, ...props}) {
           }
         } else if (err.request) {
           // client never received a response, or request never left
-          setFormError('Not able to send the request' + '. Contact administrator.');
+          setFormError('Not able to send the request. Contact administrator.');
         } else {
-          setFormError('Some error occurred' + '. Contact administrator.');
+          setFormError('Some error occurred. Contact administrator.');
         }
       }).then(()=>{
         setSaving(false);

@@ -12,9 +12,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function DataSetsManager() {
   const [uploadCounter, setUploadCounter] = React.useState(1);
-  const updateUploadCounter = () => {
-    setUploadCounter(uploadCounter+1);
-  }
+  // const updateUploadCounter = () => {
+  //   setUploadCounter(uploadCounter+1);
+  // }
   const classes = useStyles();
   return (
     <CommonTabs tabs={

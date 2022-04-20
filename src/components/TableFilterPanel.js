@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {RefreshIconButton} from './CustomButtons';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, MenuItem, Popover, Snackbar, Typography } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, MenuItem, Typography } from '@material-ui/core';
 import TextField from "@material-ui/core/TextField";
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from "@material-ui/core/IconButton";
@@ -85,7 +85,7 @@ export default function TableFilterPanel(props) {
         return -(Object.keys(selectedFilters).indexOf(a.name) - Object.keys(selectedFilters).indexOf(b.name));
       });
       setSortedColumns(coloumnDetails)
-      }, [props.coloumnDetails]);
+      }, []);
     useEffect( () => {
       updateSelectedFiltersCount(0);
       updateSelectedFilters({});

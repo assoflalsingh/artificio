@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Link, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
+import { Backdrop, Box, Chip, CircularProgress, Link, Snackbar, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
 import {RefreshIconButton} from '../../components/CustomButtons';
 
@@ -27,12 +27,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Downloads() {
   const classes = useStyles();
   const [stackPath, setStackPath] = useState('home');
-  const [annotateOpen, setAnnotateOpen] = useState(false);
-	const [annotateOpenV2, setAnnotateOpenV2] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
-  const [massAnchorEl, setMassAnchorEl] = useState();
   const [rowsSelected, setRowsSelected] = useState([]);
-  const [showAssignDG, setShowAssignDG] = useState(false);
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
   const [datalist, setDatalist] = useState([]);
@@ -122,7 +118,6 @@ export default function Downloads() {
 
   const options = {
     selectableRows: "none",
-    filterType: 'checkbox',
     filterType: 'dropdown',
     elevation: 0,
     filter: false,
@@ -141,9 +136,9 @@ export default function Downloads() {
     },
   };
 
-  const fetchDataList = () => {
+  const fetchDataList = useCallback(() => {
     setDatalistMessage('Loading data...');
-    setDatalist([]);
+    // setDatalist([]);
     setRowsSelected([]);
     api.get(URL_MAP.GET_DOWNLOADS_LIST)
       .then((res)=>{
@@ -156,11 +151,11 @@ export default function Downloads() {
       .then(()=>{
         setDatalistMessage(null);
       });
-  }
+  },[]);
 
   useEffect(()=>{
     fetchDataList();
-  },[]);
+  },[fetchDataList]);
 
   return (
     <>

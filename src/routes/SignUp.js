@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid, IconButton, Input, InputAdornment, Link, Checkbox, Paper, TextField, Typography } from '@material-ui/core';
-import HomeIcon from '@material-ui/icons/Home';
+import { Box, Button, Container, FormControlLabel, Grid, Link, Checkbox, Paper, Typography } from '@material-ui/core';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import BusinessIcon from '@material-ui/icons/Business';
@@ -48,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp({match, history}) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  // const [open, setOpen] = React.useState(true);
   const defaults = {
     first_name: '',
     last_name: '',
@@ -74,7 +73,7 @@ export default function SignUp({match, history}) {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
-  const reqFields = ['first_name', 'last_name', 'email', 'password', 'confirm_pass'];
+  // const reqFields = ['first_name', 'last_name', 'email', 'password', 'confirm_pass'];
 
   useEffect(() => {
     // Initialize Recaptcha here..
@@ -122,7 +121,7 @@ export default function SignUp({match, history}) {
       messages: ['This field is required', 'Does not meet password policy'],
     },
     confirm_pass: {
-      validators: ['required', function(value) { return formData.password == value}],
+      validators: ['required', function(value) { return formData.password === value}],
       messages: ['This field is required', 'Does not match with the password'],
     },
   }
@@ -144,7 +143,7 @@ export default function SignUp({match, history}) {
     let value = e;
     if(e.target) {
       name = e.target.name;
-      if(name == 'accept') {
+      if(name === 'accept') {
         value = e.target.checked;
       } else {
         value = e.target.value;
@@ -211,16 +210,16 @@ export default function SignUp({match, history}) {
       <Paper display="flex" square>
         <Container maxWidth='lg'>
           <Link href={APP_WEBSITE}>
-            <img style={{marginTop: '0.5rem', height: '2.5rem'}} src={Logo} className={classes.logoImg}></img>
+            <img style={{marginTop: '0.5rem', height: '2.5rem'}} alt="" src={Logo} className={classes.logoImg}></img>
           </Link>
         </Container>
       </Paper>
       <Container maxWidth='lg' style={{flexGrow: 1, display:'flex', alignItems: 'stretch'}}>
         <Grid container>
           <Grid item lg={7} md={6} sm={12} xs={12} style={{display:'flex'}}>
-            <img src={SignUpImg} className={classes.img} style={{alignSelf: 'center'}}/>
+            <img src={SignUpImg} className={classes.img} alt="" style={{alignSelf: 'center'}}/>
           </Grid>
-          <Grid item item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
+          <Grid item lg={5} md={6} sm={12} xs={12} style={{display: 'flex'}}>
             <Paper className={classes.formRoot} style={{margin: 'auto'}} elevation={3}>
               <Typography variant="h6">Sign up</Typography>
               <form className={classes.root} noValidate autoComplete="off">

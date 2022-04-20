@@ -1,12 +1,13 @@
 import React from 'react';
 import { makeStyles, Box, Typography } from '@material-ui/core';
 import { Route } from 'react-router-dom';
-import CreateModel from '../routes/CreateModel';
+// import CreateModel from '../routes/CreateModel';
 import Annotation from '../routes/Annotation';
 import clsx from 'clsx';
 import CopyrightIcon from '@material-ui/icons/Copyright';
 import AppBreadCrumbs from './AppBreadCrumbs';
 import Admin from '../routes/Admin';
+import DataFlow from '../routes/DataFlow';
 
 const useStylesContent = makeStyles((theme)=>({
   root: {
@@ -34,7 +35,8 @@ export default function MainContent({children, className, baseurl, ...props}) {
     <Box className={clsx(classes.root, className)}>
       <AppBreadCrumbs />
       <Box className={classes.content}>
-        <Route path={`${baseurl}/createModel`} component={CreateModel} />
+        {/* <Route path={`${baseurl}/createModel`} component={CreateModel} /> */}
+        <Route path={`${baseurl}/dataFlow`} component={DataFlow} />
         <Route path={`${baseurl}/annotation`} component={Annotation} />
         <Route path={`${baseurl}/admin`} component={Admin} />
       </Box>

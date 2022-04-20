@@ -2,10 +2,10 @@
  * Redux store setup.
  */
 
-import { createStore, applyMiddleware } from "redux";
+import { createStore } from "redux";
 
 // Logger with default options
-import logger from "redux-logger";
+// import logger from "redux-logger";
 import userReducer from "./reducers/user";
 
 export default function configureStore(initialState) {

@@ -2,11 +2,9 @@ import React from "react";
 import SaveIcon from "@material-ui/icons/Save";
 import {
   Box,
-  Button,
   IconButton,
   makeStyles,
   Tooltip,
-  withStyles,
 } from "@material-ui/core";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
@@ -125,20 +123,3 @@ export function LeftToolBar({
     </Box>
   );
 }
-
-const ToolBarButton = withStyles({
-  label: {
-    flexDirection: "column",
-  },
-})(({ label, icon, classes, active, ...props }) => {
-  return (
-    <Button
-      classes={{ label: classes.label }}
-      {...props}
-      color={active ? "primary" : ""}
-    >
-      {icon}
-      {label}
-    </Button>
-  );
-});

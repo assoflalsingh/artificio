@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import {
   DataGrid,
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
   },
   wrapper: {
-    width: 100 + theme.spacing.unit * 2,
+    width: 100 + theme.spacing(2),
   },
   elementsContainer: {
     display: "flex",
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     zIndex: 1,
     position: "relative",
-    margin: theme.spacing.unit,
+    margin: theme.spacing(),
   },
   tableWrapper: {
     position: "absolute",
@@ -54,6 +54,9 @@ const useStyles = makeStyles((theme) => ({
   tableActions: {
     borderRadius: 0,
     margin: "0px 10px",
+    "&:hover": {
+      "background-color": "rgba(224, 224, 224, 1)",
+    },
   },
   cellAnnotated: {
     "background-color": "#ffb600",
@@ -72,8 +75,7 @@ function CustomToolbar() {
   return (
     <GridToolbarContainer className={classes["export"]}>
       <span className={classes.tableInfo}>
-        *Verify the data by single click and for edit use doucble click on a
-        cell
+        Use double click to edit the cell.
       </span>
       <GridToolbarExport />
     </GridToolbarContainer>
@@ -149,7 +151,7 @@ function SlideTable(props) {
         rowsData[rowData["row_index"] - 1] = rowsData[
           rowData["row_index"] - 1
         ] || { id: currentRowIndex };
-        rowsData[rowData["row_index"] - 1] =
+        rowsData[rowData["row_index"] - 1][`col_${rowData["column_index"]}`] =
           rowData.word_details &&
           rowData.word_details
             .reduce((acc, current) => `${acc}${current.word_description} `, "")
@@ -163,6 +165,7 @@ function SlideTable(props) {
             0
           );
       }
+      return rowData;
     });
     columns.map((col) => {
       col.renderCell = (cellValues) => {
@@ -178,6 +181,7 @@ function SlideTable(props) {
           </div>
         );
       };
+      return col;
     });
     return {
       columns,
@@ -194,10 +198,12 @@ function SlideTable(props) {
     selectedTableAnnotations.cell_details
   );
   const [selectedCellDetails, setSelectedCellDetails] = useState({});
-  const totalColumnsPerRow = jsonTableData.columns.length;
+  const totalColumnsPerRow = jsonTableData.columns.length; // added one more for handling the addition of checkboxes.
   const handleCellSingleClick = (cellMeta, event) => {
-    const cellIndex =
-      cellMeta.rowIndex * totalColumnsPerRow + cellMeta.colIndex;
+    const colIndex = cellMeta.api.getColumnIndex(cellMeta.field);
+    const rowIndex = cellMeta.api.getRowIndex(cellMeta.row.id);
+
+    const cellIndex = rowIndex * totalColumnsPerRow + (colIndex - 1);
     if (cellIndex !== selectedCellDetails.selectedCellIndex) {
       const cellAnnotation = toggleHighlightCell(
         `TBL_CELL_${cellIndex}`,
@@ -212,8 +218,8 @@ function SlideTable(props) {
       setSelectedCellDetails({
         ...selectedCellDetails,
         selectedCellIndex: cellIndex,
-        row: cellMeta.rowIndex + 1,
-        column: cellMeta.colIndex + 1,
+        row: rowIndex + 1,
+        column: colIndex + 1,
         annotationId: cellAnnotation[0].id,
         coordinates: cellAnnotation[0].coordinates,
         valueChanged: false,
@@ -222,22 +228,25 @@ function SlideTable(props) {
     }
   };
   const handleCellDoubleClick = (cellMeta, event) => {
+    const colIndex = cellMeta.api.getColumnIndex(cellMeta.field);
+    const rowIndex = cellMeta.api.getRowIndex(cellMeta.row.id);
     setSelectedCellDetails({
       ...selectedCellDetails,
-      row: cellMeta.rowIndex + 1,
-      column: cellMeta.colIndex + 1,
+      row: rowIndex + 1,
+      column: colIndex + 1,
       valueAtSelection: cellMeta.value,
     });
   };
-  const handleCellFocus = (cellMeta, event) => {
-    if (cellMeta.props.value !== selectedCellDetails?.valueAtSelection) {
+  const handleCellFocus = (cellParams, event) => {
+    // debugger;
+    if (cellParams.props.value !== selectedCellDetails?.valueAtSelection) {
       setSelectedCellDetails({
         ...selectedCellDetails,
         valueChanged: true,
       });
       updateTableAnnotationAndSelectedValue(
         selectedCellDetails.annotationId,
-        cellMeta.props.value,
+        cellParams.props.value,
         selectedCellDetails.selectedCellIndex,
         selectedTableIndex
       );
@@ -280,6 +289,7 @@ function SlideTable(props) {
                   handleCellFocus(a, b);
                 }}
                 disableColumnFilter
+                checkboxSelection
                 rows={jsonTableData.rowsData}
                 columns={jsonTableData.columns}
                 hideFooter={true}
@@ -289,7 +299,7 @@ function SlideTable(props) {
                   Toolbar: CustomToolbar,
                 }}
               />
-              <div class={classes.buttonWrapper}>
+              <div className={classes.buttonWrapper}>
                 <Button
                   className={classes.tableActions}
                   autoFocus

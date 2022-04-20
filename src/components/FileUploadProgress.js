@@ -82,7 +82,7 @@ export default function FileUploadProgress({fileUploadInfo=[], ...props}) {
         {fileUploadInfo.length > 0 && fileUploadInfo.map((fileInfo, i)=>{
           return <SingleFile key={i} name={fileInfo.name} progress={fileInfo.progress} done={fileInfo.done} error={fileInfo.error}/>
         })}
-        {fileUploadInfo.length == 0 &&
+        {fileUploadInfo.length === 0 &&
           <Typography>No files uploaded !!</Typography>
         }
       </DialogContent>

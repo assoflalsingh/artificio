@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Admin({match, user}) {
   const classes = useStyles();
-  const baseUrl = match.url;
+  // const baseUrl = match.url;
 
   const tabs = {
     "Account settings": <Account />,

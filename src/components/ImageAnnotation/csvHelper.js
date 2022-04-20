@@ -1,4 +1,7 @@
-// CSV helper provides the download to CSV functionality.
+import * as cloneDeep from "lodash.clonedeep";
+
+// CSV helper provides the download to CSV functionality for text and table annotations.
+
 function downloadCSV(csv, filename) {
   var csvFile;
   var downloadLink;
@@ -58,6 +61,7 @@ function convertJSONtoTable(tableData = []) {
           .reduce((acc, current) => `${acc}${current.word_description} `, "")
           .trim();
     }
+    return rowData;
   });
   return {
     columns,
@@ -69,31 +73,41 @@ export default function exportToCSV(
   filename,
   annotatedData,
   tableAnnotations,
-  csvType
+  csvType,
+  selectedTableIndex
 ) {
+  if (tableAnnotations && csvType === "onlyTable") {
+    tableAnnotations = cloneDeep(tableAnnotations).splice(
+      selectedTableIndex,
+      1
+    );
+  }
   var csv = [];
   // var rows = document.querySelectorAll("table tr");
   let textAnnotationHeader = "";
   let textAnnotationdata = "";
-  annotatedData["labels"].forEach((label) => {
-    if (textAnnotationHeader !== "") {
-      textAnnotationHeader += ",";
-      textAnnotationdata += ",";
-    }
-    textAnnotationHeader += label["label_name"];
-    textAnnotationdata += `"${label["label_value"].replace(/"/g, '""')}"`;
-  });
-  textAnnotationdata = `Text Annotations:\n${textAnnotationHeader}'\r\n'${textAnnotationdata}`;
-  csv.push(textAnnotationdata);
+  if (csvType !== "onlyTable") {
+    annotatedData["labels"].forEach((label) => {
+      if (textAnnotationHeader !== "") {
+        textAnnotationHeader += ",";
+        textAnnotationdata += ",";
+      }
+      textAnnotationHeader += label["label_name"];
+      textAnnotationdata += `"${label["label_value"].replace(/"/g, '""')}"`;
+    });
+    csv.push(textAnnotationHeader + "\n" + textAnnotationdata);
+  }
   if (csvType !== "onlyText") {
     tableAnnotations?.length &&
       tableAnnotations.map((tableDetails, index) => {
         const { rowsData } = convertJSONtoTable(tableDetails.cell_details);
-        let rowDataForCSV = ["", `Table Annotation - ${index + 1}:`, ""];
+        let rowDataForCSV = ["", `Table Annotation - ${index + 1}:`];
         rowsData.map((row, index) => {
           rowDataForCSV.push(Object.values(row).join(","));
+          return row;
         });
         csv.push(rowDataForCSV.join("\n"));
+        return tableDetails;
       });
   }
   downloadCSV(csv.join("\n"), filename);

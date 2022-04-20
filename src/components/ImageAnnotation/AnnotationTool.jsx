@@ -300,7 +300,7 @@ export default class AnnotationTool extends React.Component {
     }
   }
 
-  downloadCsv(csvType) {
+  downloadCsv(csvType, selectedTableIndex = 0) {
     this.setLoader(true);
     const selectedImage = this.props.images[this.state.activeImageIndex];
     const tableAnnotations = this.canvasManager.getAllTablesAnnotations();
@@ -314,7 +314,13 @@ export default class AnnotationTool extends React.Component {
         },
       });
     } else {
-      exportToCSV(csvName, annotatedData, tableAnnotations, csvType);
+      exportToCSV(
+        csvName,
+        annotatedData,
+        tableAnnotations,
+        csvType,
+        selectedTableIndex
+      );
     }
     this.setLoader(false);
   }
@@ -646,7 +652,7 @@ export default class AnnotationTool extends React.Component {
               getAllTableAnnProposals={
                 this.canvasManager.getAllTableAnnProposals
               }
-              downloadCsv={(csvType) => this.downloadCsv(csvType)}
+              downloadCsv={this.downloadCsv.bind(this)}
               highlightTableToggle={this.canvasManager.highlightTableToggle}
               resetTableAnnotations={this.canvasManager.resetTableAnnotations}
               getAllTablesAnnotations={

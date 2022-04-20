@@ -18,6 +18,8 @@ import TableContainer from "./TableContainer";
 import TableChartOutlinedIcon from "@material-ui/icons/TableChartOutlined";
 import TextFieldsOutlinedIcon from "@material-ui/icons/TextFieldsOutlined";
 import ConfirmDialog from "../../ConfirmDialog";
+import IconButton from "@material-ui/core/IconButton";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
@@ -35,6 +37,12 @@ const styles = {
   tabsContainer: {
     height: "80%",
     padding: "0 0.5rem 0 0.8rem",
+  },
+  downLoadAction: {
+    "&:hover": {
+      color: "#0575ce",
+      backgroundColor: "transparent",
+    },
   },
   scrollableLabelsContainer: {
     padding: "0.5rem",
@@ -72,6 +80,21 @@ const styles = {
 };
 
 const useStyles = makeStyles(styles);
+
+const ButtonContainer = (props) => {
+  const classes = useStyles();
+  return (
+    <Tooltip title={props.title} aria-label={props.title}>
+      <IconButton
+        className={classes.downLoadAction}
+        component="span"
+        aria-label={props.title}
+      >
+        {props.children}
+      </IconButton>
+    </Tooltip>
+  );
+};
 
 /**
  * imageLabels: {
@@ -154,7 +177,7 @@ export const LabelsContainer = ({
       <Box className={classes.tabsContainer}>
         <CommonTabs
           tabs={{
-            "Custom OCR": {
+            "Data Entities": {
               icon: <TextFieldsOutlinedIcon />,
               disabled: isTableEditingInProgress,
               componentDetails: (
@@ -182,7 +205,7 @@ export const LabelsContainer = ({
                 </Box>
               ),
             },
-            "Tables Data": {
+            "Data Tables": {
               icon: <TableChartOutlinedIcon />,
               componentDetails: (
                 <Box className={classes.scrollableLabelsContainer}>
@@ -192,6 +215,7 @@ export const LabelsContainer = ({
                     updateTableAnnotationAndSelectedValue={
                       updateTableAnnotationAndSelectedValue
                     }
+                    downloadCsv={downloadCsv}
                     tableAnnotations={tableAnnotations}
                     highlightTableToggle={updateTableEdittingAndToggleHighlight.bind(
                       this
@@ -258,7 +282,9 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
           const annotations = getAnnotations() || [];
           const labels = [];
           annotations.forEach((ann, index) => {
-            const isTableInterSection = checkIFAnnotationIntersectingWithTables();
+            const isTableInterSection = checkIFAnnotationIntersectingWithTables(
+              ann
+            );
             const source = isTableInterSection
               ? getAllTableAnnProposals()
               : getProposals();
@@ -351,16 +377,25 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
           <h4
             style={{
               color: "#0575ce",
-              margin: "0.5rem 0 0.5rem 0",
+              margin: "1.0rem 0 0.5rem 0",
               borderBottom: "dotted 1px",
+              display: "inline-block",
+              width: "100%",
             }}
           >
             <b>DATA INFORMATION</b>
             <Button
-              style={{ float: "right", padding: "0", color: "#0575ce" }}
+              style={{
+                float: "right",
+                padding: "0",
+                color: "#0575ce",
+                marginTop: "-10px",
+              }}
               onClick={() => this.props.downloadCsv("onlyText")}
             >
-              <b>DOWNLOAD CSV</b>
+              <ButtonContainer title="Download CSV">
+                <CloudDownloadIcon fontSize="small" />
+              </ButtonContainer>
             </Button>
           </h4>
           {this.state.labels}

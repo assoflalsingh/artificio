@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Link, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
+import { Box, CircularProgress, Link, Snackbar, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
-import {CompactAddButton, CompactButton, RefreshIconButton} from '../../../components/CustomButtons';
+import {CompactAddButton, RefreshIconButton} from '../../../components/CustomButtons';
 import { getInstance, URL_MAP } from '../../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 
@@ -24,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function DataGroupList({setFormData, ...props}) {
   const classes = useStyles();
-  const [stackPath, setStackPath] = useState('home');
   const api = getInstance(localStorage.getItem('token'));
   const [dglistMessage, setDglistMessage] = useState(null);
   const [labelsDict, setLabelsDict] = useState([]);
@@ -83,7 +82,6 @@ export default function DataGroupList({setFormData, ...props}) {
 
   const options = {
     selectableRows: "none",
-    filterType: 'checkbox',
     filterType: 'dropdown',
     elevation: 0,
     filter: false,

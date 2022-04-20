@@ -1,5 +1,5 @@
 import React, { forwardRef, useMemo } from 'react';
-import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { ListItem, ListItemText } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
 export default function ListItemLink({icon, primary, to, onClick}) {

@@ -310,12 +310,13 @@ export class CanvasManager extends CanvasScene {
     }
   }
 
-  deleteAllAnnotations() {
+  deleteAllAnnotations = () => {
     this.annotations.map((ann) => {
       const index = this.annotations.findIndex((anns) => anns.id === ann.id);
       const annotation = this.annotations[index];
       this.selectedAnnotation && this.deSelectActiveAnnotation();
       annotation.getShape().destroy();
+      return ann;
     });
     this.annotations.splice(0, this.annotations.length);
     this.annotationLayer.batchDraw();
@@ -528,6 +529,7 @@ export class CanvasManager extends CanvasScene {
           if (annotation.getLabel().indexOf("TABLE_ANN_") > -1) {
             return this.deleteAnnotation(annotation.id);
           }
+          return annotation;
         });
       }
       return setTimeout(() => {

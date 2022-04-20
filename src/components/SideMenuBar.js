@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItemLink from './ListItemLink';
-import { Divider, ListItem } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import StorageIcon from '../assets/images/create-model.svg';
 import FormatShapesIcon from '../assets/images/annotation.svg';
 import SettingsIcon from '../assets/images/admin.svg';
@@ -28,18 +28,14 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SideMenuBar({baseurl}) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
+  // const [open, setOpen] = React.useState(true);
 
   return (
     <>
       <List component="nav" className={classes.root}>
-        <ListItemLink icon={StorageIcon} primary='Create Model' to={`${baseurl}/createModel`}/>
+        <ListItemLink icon={FormatShapesIcon} primary='Data Flow' to={`${baseurl}/dataFlow`}/>
         <Divider />
-        <ListItemLink icon={FormatShapesIcon} primary='Annotation' to={`${baseurl}/annotation`}/>
+        <ListItemLink icon={StorageIcon} primary='Annotation' to={`${baseurl}/annotation`}/>
         {/* <MenuItem button onClick={handleClick}>
           <ListItemIcon>
             <InboxIcon />

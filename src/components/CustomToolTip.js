@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
@@ -21,10 +21,6 @@ export default function CustomToolTip(props) {
 
   const handleTooltipClose = () => {
     setOpen(false);
-  };
-
-  const handleTooltipOpen = () => {
-    setOpen(true);
   };
 
   return (

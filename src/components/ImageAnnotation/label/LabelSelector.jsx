@@ -14,7 +14,6 @@ import CheckIcon from "@material-ui/icons/Check";
 import Box from "@material-ui/core/Box";
 import { CreateModalDialog } from "../helpers/CreateModalDialog";
 import MenuItem from "@material-ui/core/MenuItem";
-import ConfirmDialog from "../../ConfirmDialog";
 
 export const DefaultLabel = {
   label_name: "Label",

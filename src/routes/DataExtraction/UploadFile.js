@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, ButtonGroup, Chip, Typography } from '@material-ui/core';
+import { Box, Button, Typography } from '@material-ui/core';
 import FileDropZone from '../../components/FileDropZone';
 import FileUploadProgress from '../../components/FileUploadProgress';
 import seedrandom from 'seedrandom';
@@ -105,7 +105,7 @@ export default function UploadFile(props) {
       <Typography color="primary" variant="h5" gutterBottom>Add files to start annotation.</Typography>
       <Typography>To start annotations for your project, import your files in single or multi-page formats. You can upload {MAX_FILES} files at a time.</Typography>
       <FileDropZone filesLimit={MAX_FILES} onChange={(files) => setFiles(files)} key={fileuploaderKey} />
-      <Button variant="contained" color="secondary" onClick={onSubmitClick} disabled={files.length == 0 || !allProcessed}>{allProcessed ? 'Submit' : 'Uploading...'}</Button>
+      <Button variant="contained" color="secondary" onClick={onSubmitClick} disabled={files.length === 0 || !allProcessed}>{allProcessed ? 'Submit' : 'Uploading...'}</Button>
       <Button className={classes.ml1} variant="outlined" onClick={()=>{setProgressOpen(true)}}>Check progress</Button>
       <FileUploadProgress fileUploadInfo={progressFileInfo} open={progressOpen} onClose={()=>{setProgressOpen(false)}} />
     </Box>

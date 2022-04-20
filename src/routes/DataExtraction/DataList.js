@@ -234,7 +234,7 @@ function DataList(props) {
     new_model_name: "",
     new_model_desc: "",
   };
-  const { history, uploadCounter, annotationSuccessCB } = props;
+  const { history, uploadCounter } = props;
   const classes = useStyles();
   const [annotateOpen, setAnnotateOpen] = useState(false);
   const api = getInstance(localStorage.getItem("token"));
@@ -472,6 +472,7 @@ function DataList(props) {
           });
         }
       }
+      return row;
     });
     if (massExtractionPayload.data_lists.length > 0 && !errorMessage) {
       console.log(massExtractionPayload);
@@ -515,6 +516,7 @@ function DataList(props) {
       let row = datalist[i];
       data_lists[row._id] = data_lists[row._id] || [];
       data_lists[row._id].push(row.page_no);
+      return i;
     });
 
     api
@@ -571,7 +573,7 @@ function DataList(props) {
         }
       })
     );
-    let newDatalist = datalist.filter((v, i) => allResp.indexOf(i) == -1);
+    let newDatalist = datalist.filter((v, i) => allResp.indexOf(i) === -1);
 
     for (let i = 0; i < allResp.length; i++) {
       if (typeof allResp[i] != "number") {
@@ -692,6 +694,7 @@ function DataList(props) {
           });
         }
       }
+      return row;
     });
     console.log("createModelPayload", createModelPayload);
     if (createModelPayload.data_lists.length > 0 && !errorMessage) {
@@ -888,7 +891,7 @@ function DataList(props) {
         </Typography>
         <RefreshIconButton
           className={classes.ml1}
-          title="Refresh data list"
+          label="Refresh"
           onClick={() => {
             fetchDataList();
           }}
@@ -921,7 +924,28 @@ function DataList(props) {
             <PlayCircleFilledIcon color="primary" />
             &nbsp; Annotation
           </Button>
-          <CompactButtonWithArrow
+          <CompactButton
+            className={classes.ml1}
+            label="Train"
+            variant="contained"
+            color="primary"
+            disabled={rowsSelected.length === 0}
+            onClick={() => {
+              setCreateModelDialogStatus(true);
+            }}
+          />
+          <CompactButton
+            className={classes.ml1}
+            label="Re-Train"
+            variant="contained"
+            color="primary"
+            disabled={rowsSelected.length === 0}
+            onClick={() => {
+              setMassAnchorEl(null);
+              setShowModelListDialog("retrain");
+            }}
+          />
+          {/* <CompactButtonWithArrow
             className={classes.arrowbutton}
             name="predictmodel"
             arrowBtnClass={classes.arrowBtnClass}
@@ -933,12 +957,6 @@ function DataList(props) {
               setCreateModelDialogStatus(true);
             }}
           >
-            {/* <img
-              src={CreateModelIcon}
-              alt={"Train/Create New Model"}
-              width={40}
-              height={30}
-            ></img> */}
             Train
           </CompactButtonWithArrow>
           <Popover
@@ -962,8 +980,19 @@ function DataList(props) {
             >
               Re-Train
             </MenuItem>
-          </Popover>
-          <CompactButtonWithArrow
+          </Popover> */}
+          <CompactButton
+            className={classes.ml1}
+            label="Predict"
+            variant="contained"
+            color="primary"
+            disabled={rowsSelected.length === 0}
+            onClick={() => {
+              setMassAnchorEl(null);
+              setShowModelListDialog("predict");
+            }}
+          />
+          {/* <CompactButtonWithArrow
             className={classes.arrowbutton}
             name="trainmodel"
             arrowBtnClass={classes.arrowBtnClass}
@@ -998,7 +1027,7 @@ function DataList(props) {
             >
               Predict with Model
             </MenuItem>
-          </Popover>
+          </Popover> */}
           {isTrainingReqInProcess && <Loader />}
           {/* Dialog for Selecting Existing Model */}
           <SelectModelDialog

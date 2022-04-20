@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Container, Box, Paper, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { BrowserRouter as Router } from 'react-router-dom';
+// import { BrowserRouter as Router } from 'react-router-dom';
 import { connect } from "react-redux";
 import {setUser, setUserLoading} from "../store/reducers/user";
 
@@ -67,7 +67,7 @@ const Dashboard = ({match, ...props}) => {
       .catch((err)=>{
         console.error(err);
       });
-  }, []);
+  }, [props]);
 
   return (
       <Box className={classes.root}>
@@ -76,7 +76,7 @@ const Dashboard = ({match, ...props}) => {
             <Box display="flex">
                 <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
                   <Box style={{padding: '0.25rem 0.5rem'}}>
-                    <img src={Logo} className={classes.logoImg}></img>
+                    <img src={Logo} alt="" className={classes.logoImg}></img>
                   </Box>
                 </Paper>
                 <UserBar className={classes.rightSide}/>

@@ -1,12 +1,37 @@
-import isEqual from "lodash.isequal";
 import * as React from "react";
 import { Box, Typography, Button } from "@material-ui/core";
 import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 import { CustomEventType } from "../../../canvas/core/constants";
-import OpenInNewOutlinedIcon from "@material-ui/icons/OpenInNewOutlined";
+import TableChartIcon from "@material-ui/icons/TableChart";
+import AspectRatioIcon from "@material-ui/icons/AspectRatio";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import SlideTable from "./slideTable.jsx";
-import * as cloneDeep from "lodash.clonedeep";
+import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "@material-ui/core/Tooltip";
+import { makeStyles } from "@material-ui/core/styles";
 
+const styles = {
+  tableAction: {
+    "&:hover": {
+      color: "#0575ce",
+    },
+  },
+};
+const useStyles = makeStyles(styles);
+const ButtonContainer = (props) => {
+  const classes = useStyles();
+  return (
+    <Tooltip title={props.title} aria-label={props.title}>
+      <IconButton
+        className={classes.tableAction}
+        component="span"
+        aria-label={props.title}
+      >
+        {props.children}
+      </IconButton>
+    </Tooltip>
+  );
+};
 export default class TableDetailsContainer extends CanvasEventAttacher {
   state = {
     labels: [],
@@ -72,35 +97,32 @@ export default class TableDetailsContainer extends CanvasEventAttacher {
           {tableAnnotations &&
             tableAnnotations.map((table, i) => (
               <Box
+              key={i}
                 style={{
                   border: "solid 1px #CDCDCD",
                   padding: "10px",
                   marginTop: "10px",
                 }}
               >
-                <Typography color="primary" variant="h6" display="inline">
+                <Typography
+                  color="primary"
+                  variant="h6"
+                  display="inline"
+                  style={{ fontsize: "18px", fontWeight: "bold" }}
+                >
                   {`Table-${i + 1}`}
                 </Typography>
                 <Box style={{ float: "right" }}>
                   <Button
-                    style={{ padding: "3px 16px", margin: "0px 10px" }}
+                    className="actionButton"
+                    style={{
+                      margin: "0px 5px",
+                      padding: "0px",
+                      minWidth: "51px",
+                      height: "30px",
+                    }}
                     variant="outlined"
                     size="small"
-                    color="primary"
-                    onClick={() =>
-                      highlightTableToggle(
-                        `TBL_HL-${i}`,
-                        "DISPLAY",
-                        table.bounding_box
-                      )
-                    }
-                  >
-                    <span>Highlight</span>
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    color="primary"
                     onClick={() => {
                       highlightTableToggle(
                         `TBL_HL-${i}`,
@@ -110,8 +132,47 @@ export default class TableDetailsContainer extends CanvasEventAttacher {
                       this.openTable(i);
                     }}
                   >
-                    <span>Edit</span>{" "}
-                    <OpenInNewOutlinedIcon color="primary" fontSize="small" />
+                    <ButtonContainer title="Edit Table Data">
+                      <TableChartIcon fontSize="small" />
+                    </ButtonContainer>
+                  </Button>
+                  <Button
+                    className="actionButton"
+                    style={{
+                      margin: "0px 5px",
+                      padding: "0px",
+                      minWidth: "51px",
+                      height: "30px",
+                    }}
+                    variant="outlined"
+                    size="small"
+                    onClick={() =>
+                      highlightTableToggle(
+                        `TBL_HL-${i}`,
+                        "DISPLAY",
+                        table.bounding_box
+                      )
+                    }
+                  >
+                    <ButtonContainer title="Display Table Data">
+                      <AspectRatioIcon fontSize="small" />
+                    </ButtonContainer>
+                  </Button>
+                  <Button
+                    className="actionButton"
+                    style={{
+                      margin: "0px 5px",
+                      padding: "0px",
+                      minWidth: "51px",
+                      height: "30px",
+                    }}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => this.props.downloadCsv("onlyTable", i)}
+                  >
+                    <ButtonContainer title="Download CSV">
+                      <CloudDownloadIcon fontSize="small" />
+                    </ButtonContainer>
                   </Button>
                 </Box>
               </Box>

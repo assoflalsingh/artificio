@@ -1,39 +1,17 @@
-import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import React, { useEffect, useState } from "react";
 import {
-  doValidation,
-  Form,
-  FormInputColor,
-  FormInputText,
   FormRow,
   FormRowItem,
 } from "../../FormElements";
 import Alert from "@material-ui/lab/Alert";
 import { getStructuresList } from "../apiMethods";
-import { Box, CircularProgress, makeStyles, Paper, Typography, Link } from "@material-ui/core";
-import { CompactButton } from "../../CustomButtons";
+import { Box, CircularProgress, Typography, Link } from "@material-ui/core";
 import MUIDataTable from "mui-datatables";
 import ConfirmDialog from "../../ConfirmDialog";
-
-
-const useStyles = makeStyles(()=>({
-  fileroot: {
-    display: 'flex',
-    padding: '1rem',
-    minWidth: '400px',
-    marginBottom: '0.5rem',
-  },
-  filedetails: {
-    flexGrow: 1,
-  },
-  rightAlign: {
-    marginLeft: 'auto',
-  }
-}));
 
 export const ChooseStructureDialog = ({ api, modalOpen, onClose, chooseStructure }) => {
   const [formError, setFormError] = useState("");
@@ -92,7 +70,6 @@ export const ChooseStructureDialog = ({ api, modalOpen, onClose, chooseStructure
 
   const options = {
     selectableRows: 'none',
-    filterType: 'checkbox',
     filterType: 'dropdown',
     elevation: 0,
     filter: false,

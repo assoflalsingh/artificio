@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, ButtonGroup, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Link, Menu, MenuItem, Popover, Snackbar, Tooltip, Typography } from '@material-ui/core';
+import { Box, CircularProgress, Link, Snackbar, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
-import {CompactAddButton, CompactButton, RefreshIconButton} from '../../../components/CustomButtons';
+import {CompactAddButton, RefreshIconButton} from '../../../components/CustomButtons';
 import { getInstance, URL_MAP } from '../../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
-import { ColorPalette, ColorButton } from 'material-ui-color';
+import { ColorButton } from 'material-ui-color';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LabelList({setFormData, ...props}) {
   const classes = useStyles();
-  const [stackPath, setStackPath] = useState('home');
+  // const [stackPath, setStackPath] = useState('home');
   const api = getInstance(localStorage.getItem('token'));
   const [listMessage, setListMessage] = useState(null);
   const [labelList, setLabelList] = useState([]);
@@ -98,7 +98,6 @@ export default function LabelList({setFormData, ...props}) {
 
   const options = {
     selectableRows: "none",
-    filterType: 'checkbox',
     filterType: 'dropdown',
     elevation: 0,
     filter: false,

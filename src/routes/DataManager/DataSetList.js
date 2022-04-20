@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   makeStyles,
   MuiThemeProvider,
-  createMuiTheme,
 } from "@material-ui/core/styles";
 import {
   Backdrop,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Snackbar,
   Typography,
@@ -25,7 +23,6 @@ import {
   Link,
 } from "react-router-dom";
 import {
-  CompactButton,
   CompactAddButton,
 } from "../../components/CustomButtons";
 import DataSets from "./DataSets";
@@ -325,7 +322,7 @@ function DataSetList({ history }) {
         });
     });
   };
-  const fetchDataList = () => {
+  const fetchDataList = useCallback(() => {
     setDataSetlistMessage("Loading data...");
     setDataSetlist([]);
     setRowsSelected([]);
@@ -345,10 +342,11 @@ function DataSetList({ history }) {
       .then(() => {
         setDataSetlistMessage(null);
       });
-  };
+  },[]);
+
   useEffect(() => {
     fetchDataList();
-  }, []);
+  }, [fetchDataList]);
 
   return (
     <>
