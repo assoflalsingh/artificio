@@ -6,6 +6,12 @@ deploy-dev:
    before_script:
     - apk add --update openssh-client bash
     - apk add git
+    - apk add --update nodejs npm
+    - node -v
+    - git clone https://gitlab.com/artificio2020/front-end-react
+    - cd front-end-react
+    - npm install 
+    - npm build
     - eval $(ssh-agent -s)
     - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
     - mkdir ~/.ssh
