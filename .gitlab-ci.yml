@@ -1,0 +1,16 @@
+image: alpine:latest
+stages:
+    - deploy-dev
+deploy-dev:
+   stage: deploy-dev
+   before_script:
+    - apk add --update openssh-client bash
+    - apk add git
+    - eval $(ssh-agent -s)
+    - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
+    - mkdir ~/.ssh
+    - ssh-keyscan -t rsa artificio.ai >> ~/.ssh/known_hosts
+   script: 
+    - sh deploy-dev.sh
+   only:
+    - master
