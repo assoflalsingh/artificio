@@ -116,7 +116,7 @@ export default function Users({match}) {
       .then(()=>{
         setUsersMessage(null);
       });
-  },[api]);
+  },[]);
 
   useEffect(()=>{
     fetchUsersList();
