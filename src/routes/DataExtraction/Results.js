@@ -4,7 +4,7 @@ import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snack
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
-import {RefreshIconButton, CompactButtonWithArrow} from '../../components/CustomButtons';
+import {RefreshIconButton, CompactButton} from '../../components/CustomButtons';
 import TableFilterPanel from "../../components/TableFilterPanel";
 import {Stacked, StackItem} from '../../components/Stacked';
 import {ImageAnnotationDialog} from "../../components/ImageAnnotation/ImageAnnotationDialog";
@@ -17,6 +17,9 @@ import { Form, FormInputText, FormRow, FormRowItem, doValidation } from "../../c
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
     marginLeft: 'auto'
+  },
+  playBtn: {
+    border: "solid 1px #0575CF",
   },
   ml1: {
     marginLeft: '1rem',
@@ -70,6 +73,7 @@ export default function Results(props) {
   const createModelDefault = {
     new_model_name: "",
     new_model_desc: "",
+    new_model_type: "nope",
   };
   const [createModelFormData, setCreateModelFormData] = useState(createModelDefault);
   const [modelsList, setModelsList] = useState([]);
@@ -344,10 +348,6 @@ export default function Results(props) {
     setAnnotateOpen(false)
   }
 
-  const onCreateModelArrowBtn = (event) => {
-    setMassAnchorEl(event.currentTarget);
-  };
-
   const onTrainRetrainModel = async (
     model_name,
     model_desc,
@@ -560,7 +560,7 @@ export default function Results(props) {
     onTrainRetrainModel(
       createModelFormData.new_model_name,
       createModelFormData.new_model_desc,
-      "classifier",
+      createModelFormData.new_model_type,
       "train"
     );
   };
@@ -589,85 +589,28 @@ export default function Results(props) {
             <RefreshIconButton className={classes.ml1} onClick={()=>{fetchDataList()}}/>
             <Box className={classes.rightAlign}>
               {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
-							<Button disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
-              <CompactButtonWithArrow
-                className={classes.arrowbutton}
-                name="predictmodel"
-                arrowBtnClass={classes.arrowBtnClass}
-                arrowBtnOnClick={onCreateModelArrowBtn}
+							<Button style={{height: '2rem'}} className={classes.playBtn} disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
+              <CompactButton
+                className={classes.ml1}
+                label="Train"
                 variant="contained"
                 color="primary"
                 disabled={rowsSelected.length === 0}
                 onClick={() => {
                   setCreateModelDialogStatus(true);
                 }}
-              >
-                {/* <img
-                  src={CreateModelIcon}
-                  alt={"Train/Create New Model"}
-                  width={40}
-                  height={30}
-                ></img> */}
-                Train
-              </CompactButtonWithArrow>
-              <Popover
-                open={Boolean(massAnchorEl) && massAnchorEl.name === "predictmodel"}
-                onClose={handleClose}
-                anchorEl={massAnchorEl}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-              >
-                <MenuItem
-                  onClick={() => {
-                    setMassAnchorEl(null);
-                    setShowModelListDialog("retrain");
-                  }}
-                >
-                  Re-Train
-                </MenuItem>
-              </Popover>
-              <CompactButtonWithArrow
-                className={classes.arrowbutton}
-                name="trainmodel"
-                arrowBtnClass={classes.arrowBtnClass}
-                arrowBtnOnClick={onCreateModelArrowBtn}
+              />
+              <CompactButton
+                className={classes.ml1}
+                label="Re-Train"
                 variant="contained"
                 color="primary"
                 disabled={rowsSelected.length === 0}
                 onClick={() => {
-                  onTrainRetrainModel(null, null, null, "predict", null);
+                  setMassAnchorEl(null);
+                  setShowModelListDialog("retrain");
                 }}
-              >
-                Predict
-              </CompactButtonWithArrow>
-              <Popover
-                open={Boolean(massAnchorEl) && massAnchorEl.name === "trainmodel"}
-                onClose={handleClose}
-                anchorEl={massAnchorEl}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-              >
-                <MenuItem
-                  onClick={() => {
-                    setMassAnchorEl(null);
-                    setShowModelListDialog("predict");
-                  }}
-                >
-                  Predict with Model
-                </MenuItem>
-              </Popover>
+              />
               {isTrainingReqInProcess && <Loader />}
               {/* Dialog for Selecting Existing Model */}
               <SelectModelDialog
@@ -678,7 +621,7 @@ export default function Results(props) {
                   onTrainRetrainModel(
                     name,
                     desc,
-                    null,
+                    createModelFormData.new_model_type,
                     showModelListDialog,
                     version,
                     modelID

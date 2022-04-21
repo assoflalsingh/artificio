@@ -20,7 +20,6 @@ import MUIDataTable from "mui-datatables";
 import {
   CompactButton,
   RefreshIconButton,
-  CompactButtonWithArrow,
 } from "../../components/CustomButtons";
 import TableFilterPanel from "../../components/TableFilterPanel";
 import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
@@ -50,6 +49,9 @@ import SelectModelDialog from "../../components/SelectModelDialog";
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
     marginLeft: "auto",
+  },
+  playBtn: {
+    border: "solid 1px #0575CF",
   },
   ml1: {
     marginLeft: "1rem",
@@ -233,6 +235,7 @@ function DataList(props) {
   const createModelDefault = {
     new_model_name: "",
     new_model_desc: "",
+    new_model_type: "classifier",
   };
   const { history, uploadCounter } = props;
   const classes = useStyles();
@@ -396,9 +399,6 @@ function DataList(props) {
   };
 
   const onMassMenuClick = (event) => {
-    setMassAnchorEl(event.currentTarget);
-  };
-  const onCreateModelArrowBtn = (event) => {
     setMassAnchorEl(event.currentTarget);
   };
 
@@ -596,7 +596,7 @@ function DataList(props) {
     onTrainRetrainModel(
       createModelFormData.new_model_name,
       createModelFormData.new_model_desc,
-      "classifier",
+      createModelFormData.new_model_type,
       "train"
     );
   };
@@ -916,6 +916,10 @@ function DataList(props) {
         />
         <Box className={classes.rightAlign}>
           <Button
+            style={{
+              height: '2rem'
+            }}
+            className={classes.playBtn}
             disabled={rowsSelected.length === 0}
             onClick={() => {
               setAnnotateOpen(true);
@@ -945,42 +949,6 @@ function DataList(props) {
               setShowModelListDialog("retrain");
             }}
           />
-          {/* <CompactButtonWithArrow
-            className={classes.arrowbutton}
-            name="predictmodel"
-            arrowBtnClass={classes.arrowBtnClass}
-            arrowBtnOnClick={onCreateModelArrowBtn}
-            variant="contained"
-            color="primary"
-            disabled={rowsSelected.length === 0}
-            onClick={() => {
-              setCreateModelDialogStatus(true);
-            }}
-          >
-            Train
-          </CompactButtonWithArrow>
-          <Popover
-            open={Boolean(massAnchorEl) && massAnchorEl.name === "predictmodel"}
-            onClose={handleClose}
-            anchorEl={massAnchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                setMassAnchorEl(null);
-                setShowModelListDialog("retrain");
-              }}
-            >
-              Re-Train
-            </MenuItem>
-          </Popover> */}
           <CompactButton
             className={classes.ml1}
             label="Predict"
@@ -992,42 +960,6 @@ function DataList(props) {
               setShowModelListDialog("predict");
             }}
           />
-          {/* <CompactButtonWithArrow
-            className={classes.arrowbutton}
-            name="trainmodel"
-            arrowBtnClass={classes.arrowBtnClass}
-            arrowBtnOnClick={onCreateModelArrowBtn}
-            variant="contained"
-            color="primary"
-            disabled={rowsSelected.length === 0}
-            onClick={() => {
-              onTrainRetrainModel(null, null, null, "predict", null);
-            }}
-          >
-            Predict
-          </CompactButtonWithArrow>
-          <Popover
-            open={Boolean(massAnchorEl) && massAnchorEl.name === "trainmodel"}
-            onClose={handleClose}
-            anchorEl={massAnchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                setMassAnchorEl(null);
-                setShowModelListDialog("predict");
-              }}
-            >
-              Predict with Model
-            </MenuItem>
-          </Popover> */}
           {isTrainingReqInProcess && <Loader />}
           {/* Dialog for Selecting Existing Model */}
           <SelectModelDialog
@@ -1038,7 +970,7 @@ function DataList(props) {
               onTrainRetrainModel(
                 name,
                 desc,
-                null,
+                createModelFormData.new_model_type,
                 showModelListDialog,
                 version,
                 modelID
