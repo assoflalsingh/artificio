@@ -73,7 +73,7 @@ export default function Results(props) {
   const createModelDefault = {
     new_model_name: "",
     new_model_desc: "",
-    new_model_type: "nope",
+    new_model_type: "ner",
   };
   const [createModelFormData, setCreateModelFormData] = useState(createModelDefault);
   const [modelsList, setModelsList] = useState([]);
