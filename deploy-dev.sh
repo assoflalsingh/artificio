@@ -8,4 +8,4 @@ echo "${string}"
 # Iterate servers for deploy and pull last commit
 # Careful with the ; https://stackoverflow.com/a/20666248/1057052
 echo "Deploy project on server ${string}"
-ssh ${string} "pwd && git clone git@gitlab.com:artificio2020/front-end-react.git && cd front-end-react && npm install && npm build && cd build"
+ssh ${string} "pwd"
