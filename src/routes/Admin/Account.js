@@ -50,7 +50,7 @@ function Basic({user, setUser, api}) {
         phone_number: user.phone_number
       });
     }
-  }, [user.user_set, user])
+  }, [user.user_set])
 
   const validateField = (name, value) => {
     let errMsg = '';

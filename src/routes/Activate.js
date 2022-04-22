@@ -52,7 +52,7 @@ export default function Activate({location, history}) {
     }).then(()=>{
       setActivating(false);
     });
-  },[location]);
+  },[]);
 
   const onLoginClick = (e)=>{
     e.preventDefault();

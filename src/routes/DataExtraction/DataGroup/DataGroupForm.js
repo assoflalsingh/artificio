@@ -84,7 +84,7 @@ export default function DataGroupForm({initFormData, ...props}) {
     }).then(()=>{
       setOpLoading(false);
     });
-  }, [api]);
+  }, []);
 
   const validateField = (name, value) => {
     let errMsg = '';
