@@ -85,7 +85,7 @@ export default function TableFilterPanel(props) {
         return -(Object.keys(selectedFilters).indexOf(a.name) - Object.keys(selectedFilters).indexOf(b.name));
       });
       setSortedColumns(coloumnDetails)
-      }, []);
+      }, [props.coloumnDetails]);
     useEffect( () => {
       updateSelectedFiltersCount(0);
       updateSelectedFilters({});

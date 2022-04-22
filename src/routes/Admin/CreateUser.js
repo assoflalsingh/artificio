@@ -81,7 +81,7 @@ export default function CreateUser({onCancel, ...props}) {
     }).then(()=>{
       setOpLoading(false);
     });
-  }, [api]);
+  }, []);
 
   const validateField = (name, value) => {
     let errMsg = '';

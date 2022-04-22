@@ -61,7 +61,7 @@ export default function LabelForm({initFormData, ...props}) {
     }).then(()=>{
       setOpLoading(false);
     });
-  }, [api, editMode, initFormData]);
+  }, []);
 
   const validateField = (name, value) => {
     let errMsg = '';

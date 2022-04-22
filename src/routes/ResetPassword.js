@@ -81,7 +81,7 @@ export default function ResetPassword({location, history}) {
     setFormData({
       id: id,
     });
-  }, [location]);
+  }, []);
 
   const validateField = (name, value) => {
     let errMsg = '';
