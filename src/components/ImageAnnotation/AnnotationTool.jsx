@@ -21,6 +21,7 @@ import exportToCSV from "./csvHelper";
 import { LeftToolBar } from "./helpers/LeftToolBar";
 import { CreateStructureDialog } from "./helpers/CreateStructureDialog";
 import { ChooseStructureDialog } from "./helpers/ChooseStructureDialog";
+import { getLabelValueFromProposals } from "./utilities";
 
 export const appId = "canvas-annotation-tool";
 export const DefaultLabel = {
@@ -538,6 +539,14 @@ export default class AnnotationTool extends React.Component {
     }
   };
 
+  getAnnotatedValue = (ann) => {
+    const isTableInterSection = this.canvasManager.checkIFAnnotationIntersectingWithTables(ann);
+    const source = isTableInterSection
+      ? this.canvasManager.getAllTableAnnProposals()
+      : this.canvasManager.getProposals();
+    return getLabelValueFromProposals(ann, source);
+  }
+
   componentWillUnmount() {
     window.removeEventListener("keydown", this.preventZoom);
   }
@@ -703,6 +712,7 @@ export default class AnnotationTool extends React.Component {
             getSelectedAnnotation={this.canvasManager.getSelectedAnnotation}
             setAnnotationLabel={this.canvasManager.setAnnotationLabel}
             getProposalTool={this.canvasManager.getProposalTool}
+            getAnnotatedValue={this.getAnnotatedValue}
             // isIntersectingWithTable={
             //   this.canvasManager.checkIFAnnotationIntersectingWithTables
             // }

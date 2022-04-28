@@ -40,7 +40,7 @@
   "scripts": {
     "start": "react-scripts start --no-cache",
     "build": "npm run copy-logo && react-scripts build",
-    "copy-logo": "ncp './src/assets/images/logo.svg' './public/logo.svg'",
+    "copy-logo": "ncp 'src/assets/images/logo.svg' 'public/logo.svg'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

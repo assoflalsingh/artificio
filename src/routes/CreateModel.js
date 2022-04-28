@@ -3,8 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 import MenuTile from '../components/MenuTile';
 import DataMangerIcon from '../assets/images/data-manager.svg';
-import DataExtractionIcon from '../assets/images/data-extraction.svg';
-import Classifier from '../assets/images/classifier.svg';
 import {Switch as RouterSwitch, Route} from 'react-router-dom';
 import DataManger from './DataManager/DataManager';
 import DataExtraction from './DataExtraction';

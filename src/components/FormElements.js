@@ -44,15 +44,11 @@ export function FormRow({children}) {
   const classes = useStyles();
   let sizingProps = {xs: 12};
   let items = React.Children.count(children);
-  if(items === 1) {
-    sizingProps['md'] = 12;
-    sizingProps['sm'] = 12;
-    sizingProps['lg'] = 12;
-  } else {
-    sizingProps['md'] = 6;
-    sizingProps['sm'] = 6;
-    sizingProps['lg'] = 6;
-  }
+  let size = parseInt(12 / items);
+  size = (size < 2)? 2 : size;
+  sizingProps['md'] = size;
+  sizingProps['sm'] = size;
+  sizingProps['lg'] = size;
 
   return(
     <Grid container spacing={5} className={classes.formRow}>
@@ -233,7 +229,6 @@ export function FormInputSelect({
           loading={loading}
           filterSelectedOptions
           onChange={onChange}
-          helperText={errorMsg}
           className={classes.formInput}
           getOptionLabel={(option) => typeof(option) === 'string' ? option : option[labelKey]}
           renderInput={(params) => (
@@ -263,7 +258,6 @@ export function FormInputSelect({
             variant="outlined"
             className={classes.formInput}
             fullWidth
-            helperText={errorMsg}
             {...props}
           >
             {noOptions && <MenuItem value=''><em>{loading ? 'Loading...' : 'None'}</em></MenuItem>}
