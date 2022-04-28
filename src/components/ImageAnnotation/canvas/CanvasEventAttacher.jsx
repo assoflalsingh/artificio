@@ -17,9 +17,9 @@ const addKeyboardEventListenersToApp = (listeners) => {
 export class CanvasEventAttacher extends React.Component {
   containerId = appId;
 
-  // constructor(props) {
-  //   super(props);
-  // }
+  constructor(props) {
+    super(props);
+  }
 
   // Variable will be overriden by child classes
   eventListeners = [];

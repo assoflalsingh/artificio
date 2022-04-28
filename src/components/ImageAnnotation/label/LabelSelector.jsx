@@ -11,9 +11,11 @@ import { CanvasEventAttacher } from "../canvas/CanvasEventAttacher";
 import { CustomEventType } from "../../../canvas/core/constants";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
+import Add from "@material-ui/icons/Add";
 import Box from "@material-ui/core/Box";
 import { CreateModalDialog } from "../helpers/CreateModalDialog";
 import MenuItem from "@material-ui/core/MenuItem";
+import { CreateRuleDialog } from "../helpers/CreateRuleDialog";
 
 export const DefaultLabel = {
   label_name: "Label",
@@ -198,6 +200,7 @@ export class LabelSelector extends CanvasEventAttacher {
               }
               proposalMode={this.state.proposalMode}
               resetProposalMode={this.resetProposalMode}
+              getAnnotatedValue={this.props.getAnnotatedValue}
             />
           </div>
         )}
@@ -277,6 +280,7 @@ const Label = ({
   setAnnotationLabel,
   proposalMode,
   resetProposalMode,
+  getAnnotatedValue,
 }) => {
   const classes = useStyles();
   const annotation = getSelectedAnnotation();
@@ -290,13 +294,14 @@ const Label = ({
       : DefaultLabel.label_name,
   });
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [ruleModalOpen, setRuleModalOpen] = React.useState(false);
   const [creatableLabel, setCreatableLabel] = React.useState(undefined);
   return (
     <Paper className={classnames(classes.regionInfo)}>
       <Box style={{ width: 185 }}>
         <Box>
           <Box style={{ display: "flex", flexDirection: "row" }}>
-            {!proposalMode && (
+            {/* {!proposalMode && (
               <div
                 style={{
                   display: "flex",
@@ -312,7 +317,15 @@ const Label = ({
               >
                 {annotation.type}
               </div>
-            )}
+            )} */}
+
+            <Button
+              onClick={() => setRuleModalOpen(true)}
+              size="small"
+              variant="contained"
+              color="primary"
+            ><Add style={{ marginTop: -2, width: 16, height: 16 }} /> Rule
+            </Button>
 
             <div style={{ flexGrow: 1 }} />
             {!proposalMode && (
@@ -352,8 +365,7 @@ const Label = ({
               size="small"
               variant="contained"
               color="primary"
-            >
-              Create Label
+            ><Add style={{ marginTop: -2, width: 16, height: 16 }} /> Label
             </Button>
             <Box style={{ flexGrow: 1 }} />
             <Button
@@ -392,6 +404,18 @@ const Label = ({
           setLabelValue(label);
           setModalOpen(false);
         }}
+      />
+      <CreateRuleDialog
+        modalOpen={ruleModalOpen}
+        typedText={creatableLabel}
+        onClose={() => setRuleModalOpen(false)}
+        createLabel={(label) => {
+          setAnnotationLabel(label);
+          setLabelValue(label);
+          setRuleModalOpen(false);
+        }}
+        annotation={annotation}
+        getAnnotatedValue={getAnnotatedValue}
       />
     </Paper>
   );
