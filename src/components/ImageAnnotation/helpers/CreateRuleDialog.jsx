@@ -30,7 +30,6 @@ const defaultRuleForm = {
 
 export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAnnotation, getAnnotatedValue }) => {
   const annotation = getSelectedAnnotation();
-  const annotationDimentions = annotation.annotationData.dimensions;
   const [newAnnotatedValue, setNewAnnotatedValue] = useState(getAnnotatedValue(annotation).value);
   const ruleType = [{label: "Tokenization", value:"tokenize"},{label:"Pattern", value: "pattern"}];
   const tokenType = [{label: "Region", value:"region"},{label: "Whole Doc", value:"whole_doc"}];
