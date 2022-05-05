@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CreatableSelect from "react-select/creatable";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
@@ -263,6 +263,17 @@ export class LabelSelector extends CanvasEventAttacher {
 }
 
 const iconStyle = { marginTop: -2, width: 20, height: 16 };
+const getUpdatedLabel = (annotation,proposalMode) => {
+  return {
+    value: !proposalMode ? annotation.getLabel() : DefaultLabel.label_value,
+    label: !proposalMode
+      ? annotation.getLabel() === DefaultLabel.label_value
+        ? DefaultLabel.label_name
+        : annotation.getLabel()
+      : DefaultLabel.label_name,
+      color: annotation.color
+  }
+}
 
 /**
  *
@@ -288,20 +299,19 @@ const Label = ({
   const classes = useStyles();
   const annotation = getSelectedAnnotation();
   const labels = Object.assign([], imageLabels);
-  const [labelValue, setLabelValue] = React.useState({
-    value: !proposalMode ? annotation.getLabel() : DefaultLabel.label_value,
-    label: !proposalMode
-      ? annotation.getLabel() === DefaultLabel.label_value
-        ? DefaultLabel.label_name
-        : annotation.getLabel()
-      : DefaultLabel.label_name,
-      color: annotation.color
-  });
+  const [labelValue, setLabelValue] = React.useState(getUpdatedLabel(annotation,proposalMode));
   const [modalOpen, setModalOpen] = React.useState(false);
   const [ruleModalOpen, setRuleModalOpen] = React.useState(false);
   const [creatableLabel, setCreatableLabel] = React.useState(undefined);
   const isReady = !labelValue?.value || labelValue.value === DefaultLabel.label_value ? true : false;
   const hasRule = annotation.getRule();
+
+  useEffect(() => {
+    if(annotation.getLabel() !== labelValue.value){
+      setLabelValue(getUpdatedLabel(annotation,proposalMode));
+    }
+  },[annotation, labelValue]);
+
   return (
     <Paper className={classnames(classes.regionInfo)} style={{ border: "1px solid #ccc", boxShadow: "0 4px 18px 0px rgb(0 0 0 / 12%), 0 7px 10px -5px rgb(0 0 0 / 15%)"}}>
       <Box style={{ width: 185 }}>
