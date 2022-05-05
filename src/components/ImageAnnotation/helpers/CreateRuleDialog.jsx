@@ -28,12 +28,13 @@ const defaultRuleForm = {
   extracted_text: '',
 };
 
+const ruleType = [{label: "Tokenization", value:"tokenize"},{label:"Pattern", value: "pattern"}];
+const tokenType = [{label: "Region", value:"region"},{label: "Whole Doc", value:"whole_doc"}];
+const preSucc = [{label: "Preceding", value:"prec"},{label: "Succeeding", value:"succ"}];
+
 export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAnnotation, getAnnotatedValue }) => {
   const annotation = getSelectedAnnotation();
   const [newAnnotatedValue, setNewAnnotatedValue] = useState(getAnnotatedValue(annotation).value);
-  const ruleType = [{label: "Tokenization", value:"tokenize"},{label:"Pattern", value: "pattern"}];
-  const tokenType = [{label: "Region", value:"region"},{label: "Whole Doc", value:"whole_doc"}];
-  const preSucc = [{label: "Preceding", value:"prec"},{label: "Succeeding", value:"succ"}];
   const [formData, setFormData] = useState(defaultRuleForm);
 
   const onTextChange = (e) => {
@@ -122,7 +123,7 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
       setNewAnnotatedValue(getAnnotatedValue(annotation).value);
     }
     setFormData(ruleData);
-  },[annotation, ruleType, tokenType, getAnnotatedValue]);
+  },[annotation, getAnnotatedValue]);
 
   return (
     <Dialog
