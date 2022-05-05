@@ -122,7 +122,7 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
       setNewAnnotatedValue(getAnnotatedValue(annotation).value);
     }
     setFormData(ruleData);
-  },[annotation]);
+  },[annotation, ruleType, tokenType, getAnnotatedValue]);
 
   return (
     <Dialog
