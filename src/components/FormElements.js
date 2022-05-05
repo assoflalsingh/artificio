@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, CircularProgress, Divider, FormControl, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField, Typography } from '@material-ui/core';
+import { Box, CircularProgress, Divider, FormControl, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField, Typography, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import MuiPhoneNumber from 'material-ui-phone-number';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { ColorPalette, ColorButton } from 'material-ui-color';
@@ -207,6 +207,44 @@ export function FormInputPhoneNo({InputIcon, errorMsg, required, onChange, label
         onBlur={onChange}
         {...props}
       />
+    </FormInput>
+  );
+}
+
+export function FormInputRadio({errorMsg, required, onChange, label, options, readOnly, labelKey='label', valueKey='value', ...props}) {
+  const classes = useStyles();
+  options = options || [];
+
+  return (
+    <FormInput required={required} label={label}>
+      <FormControl error={Boolean(errorMsg)} fullWidth>
+      <RadioGroup row
+        aria-label={label}
+        name={label}
+        onChange={onChange}
+        onBlur={onChange}
+        variant="outlined"
+        className={classes.formInput}
+        {...props}>
+          {options.map((opt, index)=>{
+            let label = '', value = '';
+
+            if(typeof(opt) === 'string') {
+              label = value = opt;
+            } else {
+              label = opt[labelKey];
+              value = opt[valueKey];
+            }
+            return <FormControlLabel key={index} value={value} control={<Radio color="primary" 
+            inputProps={{
+              'data-label': label,
+              'data-required': required,
+              readOnly: Boolean(readOnly)
+            }} />} label={label} />
+          })}
+        </RadioGroup>
+      <FormHelperText>{errorMsg}</FormHelperText>
+      </FormControl>
     </FormInput>
   );
 }

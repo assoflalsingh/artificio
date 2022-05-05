@@ -131,7 +131,7 @@ export default function SignIn({history, location}) {
         if(location.state && location.state.from === 'signin') {
           history.push(location.state.from);
         } else {
-          history.push('/dashboard/createModel');
+          history.push('/dashboard/annotation');
         }
       }).catch((err)=>{
         if (err.response) {

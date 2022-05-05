@@ -122,6 +122,14 @@ export default class Annotation {
     this.reCreateLabel();
   }
 
+  setRule(rule) {
+    this.annotationData.rule = rule;
+  }
+
+  getRule() {
+    return this.annotationData.rule || undefined;
+  }
+
   setLabelValue = (labelValue) => {
     if (this.getLabel() !== DefaultLabel.label_value) {
       this.labelValue = labelValue;

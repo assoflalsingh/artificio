@@ -652,6 +652,7 @@ export class CanvasManager extends CanvasScene {
   setAnnotationLabel = (label) => {
     this.selectedAnnotation.setLabel(label.value);
     this.selectedAnnotation.setColor(label.color);
+    this.selectedAnnotation.setRule(label.rule);
     this.selectedAnnotation.draw();
     this.removeConnectingLine();
     this.notifyLabelCreation();
