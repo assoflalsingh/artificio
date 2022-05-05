@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CreatableSelect from "react-select/creatable";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
@@ -16,6 +16,7 @@ import Box from "@material-ui/core/Box";
 import { CreateModalDialog } from "../helpers/CreateModalDialog";
 import MenuItem from "@material-ui/core/MenuItem";
 import { CreateRuleDialog } from "../helpers/CreateRuleDialog";
+import { Edit } from "@material-ui/icons";
 
 export const DefaultLabel = {
   label_name: "Label",
@@ -261,6 +262,19 @@ export class LabelSelector extends CanvasEventAttacher {
   }
 }
 
+const iconStyle = { marginTop: -2, width: 20, height: 16 };
+const getUpdatedLabel = (annotation,proposalMode) => {
+  return {
+    value: !proposalMode ? annotation.getLabel() : DefaultLabel.label_value,
+    label: !proposalMode
+      ? annotation.getLabel() === DefaultLabel.label_value
+        ? DefaultLabel.label_name
+        : annotation.getLabel()
+      : DefaultLabel.label_name,
+      color: annotation.color
+  }
+}
+
 /**
  *
  * imageLabels: {
@@ -285,19 +299,21 @@ const Label = ({
   const classes = useStyles();
   const annotation = getSelectedAnnotation();
   const labels = Object.assign([], imageLabels);
-  const [labelValue, setLabelValue] = React.useState({
-    value: !proposalMode ? annotation.getLabel() : DefaultLabel.label_value,
-    label: !proposalMode
-      ? annotation.getLabel() === DefaultLabel.label_value
-        ? DefaultLabel.label_name
-        : annotation.getLabel()
-      : DefaultLabel.label_name,
-  });
+  const [labelValue, setLabelValue] = React.useState(getUpdatedLabel(annotation,proposalMode));
   const [modalOpen, setModalOpen] = React.useState(false);
   const [ruleModalOpen, setRuleModalOpen] = React.useState(false);
   const [creatableLabel, setCreatableLabel] = React.useState(undefined);
+  const isReady = !labelValue?.value || labelValue.value === DefaultLabel.label_value ? true : false;
+  const hasRule = annotation.getRule();
+
+  useEffect(() => {
+    if(annotation.getLabel() !== labelValue.value){
+      setLabelValue(getUpdatedLabel(annotation,proposalMode));
+    }
+  },[annotation, labelValue]);
+
   return (
-    <Paper className={classnames(classes.regionInfo)}>
+    <Paper className={classnames(classes.regionInfo)} style={{ border: "1px solid #ccc", boxShadow: "0 4px 18px 0px rgb(0 0 0 / 12%), 0 7px 10px -5px rgb(0 0 0 / 15%)"}}>
       <Box style={{ width: 185 }}>
         <Box>
           <Box style={{ display: "flex", flexDirection: "row" }}>
@@ -320,11 +336,13 @@ const Label = ({
             )} */}
 
             <Button
+              disabled={isReady}
               onClick={() => setRuleModalOpen(true)}
               size="small"
               variant="contained"
               color="primary"
-            ><Add style={{ marginTop: -2, width: 16, height: 16 }} /> Rule
+            >{hasRule && <Edit style={iconStyle} />}
+            {!hasRule && <Add style={iconStyle} />} Rule
             </Button>
 
             <div style={{ flexGrow: 1 }} />
@@ -336,12 +354,17 @@ const Label = ({
                 size="small"
                 variant="outlined"
               >
-                <TrashIcon style={{ marginTop: -8, width: 16, height: 16 }} />
+                <TrashIcon style={iconStyle} />
               </IconButton>
             )}
           </Box>
-          <br />
           <CreatableSelect
+            styles={{
+              control: base => ({
+                ...base,
+                margin: "10px 0",
+              })
+            }}
             placeholder="Tags"
             value={labelValue}
             onChange={(label) => {
@@ -359,22 +382,17 @@ const Label = ({
               color: label.label_color,
             }))}
           />
-          <Box style={{ marginTop: 4, display: "flex" }}>
+          <Box style={{ display: "flex" }}>
             <Button
               onClick={() => setModalOpen(true)}
               size="small"
               variant="contained"
               color="primary"
-            ><Add style={{ marginTop: -2, width: 16, height: 16 }} /> Label
+            ><Add style={iconStyle} /> Label
             </Button>
             <Box style={{ flexGrow: 1 }} />
             <Button
-              disabled={
-                !labelValue?.value ||
-                labelValue.value === DefaultLabel.label_value
-                  ? true
-                  : false
-              }
+              disabled={isReady}
               onClick={() => {
                 if (proposalMode) {
                   // point to active too assign label
@@ -407,14 +425,14 @@ const Label = ({
       />
       <CreateRuleDialog
         modalOpen={ruleModalOpen}
-        typedText={creatableLabel}
         onClose={() => setRuleModalOpen(false)}
-        createLabel={(label) => {
-          setAnnotationLabel(label);
-          setLabelValue(label);
+        createRule={(ruleData) => {
+          labelValue.rule = {...ruleData};
+          console.log(labelValue);
+          setAnnotationLabel(labelValue);
           setRuleModalOpen(false);
         }}
-        annotation={annotation}
+        getSelectedAnnotation={getSelectedAnnotation}
         getAnnotatedValue={getAnnotatedValue}
       />
     </Paper>

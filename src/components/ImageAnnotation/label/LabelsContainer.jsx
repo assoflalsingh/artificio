@@ -20,6 +20,7 @@ import TextFieldsOutlinedIcon from "@material-ui/icons/TextFieldsOutlined";
 import ConfirmDialog from "../../ConfirmDialog";
 import IconButton from "@material-ui/core/IconButton";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+import { LabelImportant } from "@material-ui/icons";
 
 export const LabelId = "label-text-container";
 export const LabelContainerId = "labels-container";
@@ -301,6 +302,7 @@ class ScrollableLabelsContainer extends CanvasEventAttacher {
                   words={labelValue.words}
                   key={uuid.v4()}
                   labelName={ann.getLabel()}
+                  isRuled={ann.getRule()}
                   color={ann.color}
                   annotationId={ann.id}
                   selectAnnotationById={selectAnnotationById}
@@ -429,6 +431,7 @@ const Label = ({
   annotationId,
   selectAnnotationById,
   confidence,
+  isRuled,
   words,
   setAnnotationAccuracy,
   getAnnotationAccuracy,
@@ -462,6 +465,7 @@ const Label = ({
         ) : (
           <Checkbox checked={true} onClick={() => tick("green")} />
         )}
+        {isRuled? <LabelImportant title="Rule Applied" style={{position: 'relative', top: '8px'}} />: '' }
       </Box>
       <Box
         className={classes.label}

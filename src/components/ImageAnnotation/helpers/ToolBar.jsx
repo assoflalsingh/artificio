@@ -123,7 +123,7 @@ export class ToolBar extends CanvasEventAttacher {
 
   renderComponent() {
     return (
-      <Box>
+      <Box style={{boxShadow: "0 4px 18px 0px rgb(0 0 0 / 12%), 0 7px 10px -5px rgb(0 0 0 / 15%)", position: "relative", zIndex: 9}}>
         <ToolBarButton
           label="Select"
           active={this.state.selectMode}
