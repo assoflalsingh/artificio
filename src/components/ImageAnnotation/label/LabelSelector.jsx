@@ -202,6 +202,9 @@ export class LabelSelector extends CanvasEventAttacher {
               proposalMode={this.state.proposalMode}
               resetProposalMode={this.resetProposalMode}
               getAnnotatedValue={this.props.getAnnotatedValue}
+              getImageModelData={this.props.getImageModelData}
+              api={this.props.api}
+              rulePatterns={this.props.rulePatterns}
             />
           </div>
         )}
@@ -295,6 +298,9 @@ const Label = ({
   proposalMode,
   resetProposalMode,
   getAnnotatedValue,
+  getImageModelData,
+  api,
+  rulePatterns,
 }) => {
   const classes = useStyles();
   const annotation = getSelectedAnnotation();
@@ -303,6 +309,7 @@ const Label = ({
   const [modalOpen, setModalOpen] = React.useState(false);
   const [ruleModalOpen, setRuleModalOpen] = React.useState(false);
   const [creatableLabel, setCreatableLabel] = React.useState(undefined);
+  const [ruleData, setRuleData] = React.useState(undefined);
   const isReady = !labelValue?.value || labelValue.value === DefaultLabel.label_value ? true : false;
   const hasRule = annotation.getRule();
 
@@ -310,7 +317,7 @@ const Label = ({
     if(annotation.getLabel() !== labelValue.value){
       setLabelValue(getUpdatedLabel(annotation,proposalMode));
     }
-  },[annotation, labelValue]);
+  },[annotation, labelValue, proposalMode]);
 
   return (
     <Paper className={classnames(classes.regionInfo)} style={{ border: "1px solid #ccc", boxShadow: "0 4px 18px 0px rgb(0 0 0 / 12%), 0 7px 10px -5px rgb(0 0 0 / 15%)"}}>
@@ -418,6 +425,7 @@ const Label = ({
         typedText={creatableLabel}
         onClose={() => setModalOpen(false)}
         createLabel={(label) => {
+          label.rule = ruleData;
           setAnnotationLabel(label);
           setLabelValue(label);
           setModalOpen(false);
@@ -430,10 +438,14 @@ const Label = ({
           labelValue.rule = {...ruleData};
           console.log(labelValue);
           setAnnotationLabel(labelValue);
+          setRuleData(ruleData);
           setRuleModalOpen(false);
         }}
         getSelectedAnnotation={getSelectedAnnotation}
         getAnnotatedValue={getAnnotatedValue}
+        getImageModelData={getImageModelData}
+        api={api}
+        rulePatterns={rulePatterns}
       />
     </Paper>
   );

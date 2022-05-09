@@ -51,6 +51,14 @@ export async function saveStructure(api, payload) {
   return api.post(URL_MAP.CREATE_STRUCTURE, payload);
 }
 
+export async function rulePatterns(api) {
+  return api.get(URL_MAP.RULE_PATTERNS);
+}
+
+export async function ruleVerification(api, payload) {
+  return api.post(URL_MAP.VERIFY_RULE, payload);
+}
+
 export async function assignData(api, payload) {
   return api.post(URL_MAP.ASSIGN_DATA, payload);
 }
