@@ -14,6 +14,7 @@ import {
   saveAnnotationData,
   saveStructure,
   assignData,
+  rulePatterns,
 } from "./apiMethods";
 import Alert from "@material-ui/lab/Alert";
 import { findTextAnnotations, generateAnnotationsFromData } from "./utilities";
@@ -61,6 +62,7 @@ export default class AnnotationTool extends React.Component {
     chooseStructOpen: false,
     deleteAllAnnotation: false,
     isSaved: false,
+    rulePatterns: {},
   };
 
   deleteProposalInModelData = (proposal) => {
@@ -273,6 +275,10 @@ export default class AnnotationTool extends React.Component {
         selectedImage.page_no,
         this.props.inReview
       );
+      this.metaData = this.imageData?.image_json
+        ? this.imageData?.image_json?.metadata ||
+          this.imageData?.image_json?.initial_model_data?.metadata
+        : [];
       this.textAnnotations = this.imageData?.image_json
         ? this.imageData?.image_json?.text_annotations ||
           this.imageData?.image_json?.initial_model_data?.text_annotations
@@ -516,6 +522,7 @@ export default class AnnotationTool extends React.Component {
       image.src = imageData.img_thumb_src;
       image.onload = () => {
         this.fetchImageData(0);
+        this.fetchRulePatterns();
       };
       image.onerror = () => {
         this.setLoader(false);
@@ -560,6 +567,29 @@ export default class AnnotationTool extends React.Component {
       this.deleteProposalInModelData
     );
     window.addEventListener("keydown", this.preventZoom);
+  }
+
+  fetchRulePatterns = () => {
+    rulePatterns(this.props.api).then((response) => {
+      if(response.data.success){
+        let formattedRulePatterns = response.data.data.map((pattern) => {
+          return {
+            label: pattern.name,
+            value: pattern.value,
+            user_input: pattern.user_input,
+          }
+        });
+        this.setState({ rulePatterns: formattedRulePatterns});
+      }else{
+        console.warning('Rule Patterns Server Error');
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
+  getImageModelData = () => {
+    return { metadata: this.state.imageMetadata, text_annotations: this.textAnnotations, table_annotations: this.tableAnnotations};
   }
 
   render() {
@@ -713,6 +743,9 @@ export default class AnnotationTool extends React.Component {
             setAnnotationLabel={this.canvasManager.setAnnotationLabel}
             getProposalTool={this.canvasManager.getProposalTool}
             getAnnotatedValue={this.getAnnotatedValue}
+            getImageModelData={this.getImageModelData}
+            api={this.props.api}
+            rulePatterns={this.state.rulePatterns}
             // isIntersectingWithTable={
             //   this.canvasManager.checkIFAnnotationIntersectingWithTables
             // }

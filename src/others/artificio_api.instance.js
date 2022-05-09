@@ -89,6 +89,9 @@ export const URL_MAP = {
   GET_DOWNLOADS_LIST: 'downloads/list/',
   SCHEDULE_DOWNLOAD_REQUEST: 'downloads/schedule/',
 
+  VERIFY_RULE: 'rules/verify-rule/',
+  RULE_PATTERNS: 'rules/patterns/',
+
   /* ReCaptcha */
 
   RECAPTCHA_API: `https://www.google.com/recaptcha/api.js?render=${APP_CONFIGS.CAPTCHA_SITE_KEY}`,

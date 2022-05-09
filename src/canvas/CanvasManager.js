@@ -1189,6 +1189,7 @@ export class CanvasManager extends CanvasScene {
     return {
       label_name: annotationData.label,
       label_value: annotationData.labelValue,
+      label_rule: annotation.getRule(),
       label_shape: annotation.type.toLowerCase(),
       label_points: [
         [coordinates[0], coordinates[1]],

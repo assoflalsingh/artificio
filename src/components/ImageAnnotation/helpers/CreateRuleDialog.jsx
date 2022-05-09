@@ -13,6 +13,9 @@ import {
   FormRowItem,
   FormInputRadio,
 } from "../../FormElements";
+import { ruleVerification } from "../apiMethods";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
 
 const defaultRuleForm = {
   rule_type: '',
@@ -26,16 +29,29 @@ const defaultRuleForm = {
   preSucc: '',
   no_of_tokens: '1',
   extracted_text: '',
+  pattern_type: '',
+  pattern_value: '',
 };
 
 const ruleType = [{label: "Tokenization", value:"tokenize"},{label:"Pattern", value: "pattern"}];
 const tokenType = [{label: "Region", value:"region"},{label: "Whole Doc", value:"whole_doc"}];
 const preSucc = [{label: "Preceding", value:"prec"},{label: "Succeeding", value:"succ"}];
 
-export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAnnotation, getAnnotatedValue }) => {
+export const CreateRuleDialog = ({
+  modalOpen,
+  onClose,
+  createRule,
+  getSelectedAnnotation,
+  getAnnotatedValue,
+  getImageModelData,
+  api,
+  rulePatterns,
+}) => {
   const annotation = getSelectedAnnotation();
   const [newAnnotatedValue, setNewAnnotatedValue] = useState(getAnnotatedValue(annotation).value);
   const [formData, setFormData] = useState(defaultRuleForm);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({show: false, error: false, message: ''});
 
   const onTextChange = (e) => {
     let name = e.target.name;
@@ -83,6 +99,8 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
         occurence: formData.occurence,
         preSucc: formData.preSucc,
         no_of_tokens: formData.no_of_tokens,
+        pattern_type: formData.pattern_type,
+        pattern_value: formData.pattern_value,
       };
       if(formData.preSucc.length > 0){
         createRuleData[formData.preSucc] = formData.no_of_tokens;
@@ -91,9 +109,61 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
     // }
   };
 
+  const notify = (errorFlag = false, message = '') => {
+    setAlert({
+        show: message.length > 0,
+        error: errorFlag,
+        message: message,
+    });
+  }
+
+  const getFormattedRuleData = () => {
+    let ruleData = {};
+    let ruleDataType = formData.rule_type === 'tokenize' ? "tokens" : "pattern";
+    ruleData[ruleDataType] = {
+      coor: [[+formData.x1,+formData.y1],[+formData.x2,+formData.y2]],
+      occ: +formData.occurence || 0,
+    };
+    if(formData.rule_type === 'tokenize'){
+      ruleData[ruleDataType] = {...ruleData[ruleDataType], token_word: formData.keyword};
+      if(formData.preSucc.length > 0 && +formData.no_of_tokens > 0){
+        ruleData[ruleDataType] = {...ruleData[ruleDataType], [formData.preSucc]: +formData.no_of_tokens};
+      }
+    }else{
+      ruleData[ruleDataType] = {...ruleData[ruleDataType], pattern: formData.pattern_type, user_input: formData.pattern_value};
+    }
+    return ruleData;
+  }
+
+  const verify = () => {
+    let verifyData = {rule: getFormattedRuleData(), ...getImageModelData()};
+    console.log(verifyData);
+
+    setLoading(true);
+
+    ruleVerification(api, verifyData).then((response) => {
+      setLoading(false);
+      if (response.status === 200) {
+        notify(false, 'Rule Verified Successfully!');
+      }else{
+        notify(true, 'Server Response Error!');
+      }
+
+    }).catch((error) => {
+      setLoading(false);
+
+      if(error.hasOwnProperty("response") && error.response !== undefined){
+        notify(true, error.response.data.message);
+      } else {
+        notify(true, 'Something Went Wrong!!');
+      }
+    });
+  }
+
   useEffect(()=>{
     let ruleData = {};
     const savedRule = annotation.getRule();
+
     if(savedRule){
       let savedRuleDimentions = savedRule.dimentions;
       ruleData = {...savedRule,
@@ -124,6 +194,8 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
     }
     setFormData(ruleData);
   },[annotation, getAnnotatedValue]);
+
+  let currentRuleType = rulePatterns.filter((pattern) => pattern.value === formData.pattern_type);
 
   return (
     <Dialog
@@ -164,7 +236,20 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
               <FormInputText label="Display Text" name="display_text" value={newAnnotatedValue} readOnly/>
             </FormRowItem>
           </FormRow></>}
-          <FormRow>
+          {formData.rule_type === ruleType[1].value && <><FormRow>
+            <FormRowItem>
+              <FormInputSelect required label="Patter Type" name="pattern_type" value={formData.pattern_type} onChange={onTextChange} options={rulePatterns} />
+            </FormRowItem>
+            <FormRowItem>
+              <FormInputText required label="Occurence" name="occurence" value={formData.occurence} onChange={onTextChange}/>
+            </FormRowItem>
+          </FormRow>
+          {currentRuleType[0]?.user_input && <FormRow>
+            <FormRowItem>
+              <FormInputText label="Pattern Value" name="pattern_value" value={formData.pattern_value} onChange={onTextChange} />
+            </FormRowItem>
+          </FormRow>}</>}
+          {formData.rule_type === ruleType[0].value && <><FormRow>
             <FormRowItem>
               <FormInputText label="Keyword" name="keyword" value={formData.keyword} onChange={onTextChange}/>
             </FormRowItem>
@@ -177,20 +262,33 @@ export const CreateRuleDialog = ({ modalOpen, onClose, createRule, getSelectedAn
               <FormInputRadio label="Preceding / Succeeding" name="preSucc" value={formData.preSucc} onChange={onTextChange} options={preSucc} />
             </FormRowItem>
             <FormRowItem>
-              <FormInputText label="No. of Tokens" disabled={formData.preSucc === ''} name="no_of_tokens" value={formData.no_of_tokens} onChange={onTextChange}/>
+              <FormInputText required label="No. of Tokens" disabled={formData.preSucc === ''} name="no_of_tokens" value={formData.no_of_tokens} onChange={onTextChange}/>
             </FormRowItem>
-          </FormRow>
-          <FormRow>
+          </FormRow></>}
+          {/* <FormRow>
             <FormRowItem>
               <FormInputText label="Extracted Text" name="extracted_text" value={formData.extracted_text} onChange={onTextChange}/>
             </FormRowItem>
-          </FormRow>
+          </FormRow> */}
         </Form>
       </DialogContent>
       <DialogActions style={{paddingTop: 12, paddingBottom: 12}}>
-        <Button autoFocus onClick={create} color="primary" variant="contained">Create Rule</Button>
+        <Button autoFocus onClick={verify} disabled={loading || (formData.rule_type === ruleType[1].value && (formData.pattern_value === '' || +formData.occurence < 1))} color="secondary" variant="contained">{loading ? 'Verifing' : 'Verify'}</Button>
+        <Button autoFocus onClick={create} color="primary" variant="contained">Save Rule</Button>
         <Button autoFocus onClick={onClose} color="primary" variant="contained">Cancel</Button>
       </DialogActions>
+      <Snackbar
+          open={alert.show}
+          autoHideDuration={6000}
+          onClose={() => notify()}
+        >
+          <Alert
+            // onClose={() => notify()}
+            severity={alert.error ? "error" : "success"}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
     </Dialog>
   );
 };
