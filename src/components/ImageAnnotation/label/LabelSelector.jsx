@@ -205,6 +205,7 @@ export class LabelSelector extends CanvasEventAttacher {
               getImageModelData={this.props.getImageModelData}
               api={this.props.api}
               rulePatterns={this.props.rulePatterns}
+              convertCoorToPoints={this.props.convertCoorToPoints}
             />
           </div>
         )}
@@ -301,6 +302,7 @@ const Label = ({
   getImageModelData,
   api,
   rulePatterns,
+  convertCoorToPoints,
 }) => {
   const classes = useStyles();
   const annotation = getSelectedAnnotation();
@@ -446,6 +448,7 @@ const Label = ({
         getImageModelData={getImageModelData}
         api={api}
         rulePatterns={rulePatterns}
+        convertCoorToPoints={convertCoorToPoints}
       />
     </Paper>
   );

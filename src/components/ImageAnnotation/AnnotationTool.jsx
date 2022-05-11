@@ -746,6 +746,7 @@ export default class AnnotationTool extends React.Component {
             getImageModelData={this.getImageModelData}
             api={this.props.api}
             rulePatterns={this.state.rulePatterns}
+            convertCoorToPoints={this.canvasManager.convertCoorToPoints}
             // isIntersectingWithTable={
             //   this.canvasManager.checkIFAnnotationIntersectingWithTables
             // }

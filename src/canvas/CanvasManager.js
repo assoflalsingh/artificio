@@ -1140,6 +1140,53 @@ export class CanvasManager extends CanvasScene {
     this.proposalLayer.batchDraw();
   }
 
+  convertCoorToPoints = (coordinates, realXY = true, scaled = false) => {
+    const imagePosition = this.konvaImage.position();
+    coordinates = Object.assign([], coordinates);
+
+    // x1
+    coordinates[0] = coordinates[0] - imagePosition.x;
+    // y1
+    coordinates[1] = coordinates[1] - imagePosition.y;
+    // x2
+    coordinates[2] = coordinates[2] - imagePosition.x;
+    // y2
+    coordinates[3] = coordinates[3] - imagePosition.y;
+
+    if (scaled) {
+      // x1
+      coordinates[0] = coordinates[0] / this.konvaImage.width();
+      // y1
+      coordinates[1] = coordinates[1] / this.konvaImage.height();
+      // x2
+      coordinates[2] = coordinates[2] / this.konvaImage.width();
+      // y2
+      coordinates[3] = coordinates[3] / this.konvaImage.height();
+    } else {
+      // x1
+      coordinates[0] = (coordinates[0] / this.konvaImage.width()) * this.imageDimensions.width;
+      // y1
+      coordinates[1] = (coordinates[1] / this.konvaImage.height()) * this.imageDimensions.height;
+      // x2
+      coordinates[2] = (coordinates[2] / this.konvaImage.width()) * this.imageDimensions.width;
+      // y2
+      coordinates[3] = (coordinates[3] / this.konvaImage.height()) * this.imageDimensions.height;
+    }
+
+    if(realXY){
+      return [[coordinates[0], coordinates[1]], [coordinates[2], coordinates[3]]];
+    }
+
+    const width = coordinates[2] - coordinates[0];
+    const height = coordinates[3] - coordinates[1];
+    return [
+        [coordinates[0], coordinates[1]],
+        [coordinates[0] + width, coordinates[1]],
+        [coordinates[2], coordinates[3]],
+        [coordinates[0], coordinates[1] + height],
+      ];
+  }
+
   getAnnotationData = (annotation, scaled) => {
     const imagePosition = this.konvaImage.position();
     const annotationData = annotation.getData();
