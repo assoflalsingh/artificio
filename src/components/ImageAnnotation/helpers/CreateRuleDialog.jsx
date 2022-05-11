@@ -46,10 +46,12 @@ export const CreateRuleDialog = ({
   getImageModelData,
   api,
   rulePatterns,
+  convertCoorToPoints,
 }) => {
   const annotation = getSelectedAnnotation();
   const [newAnnotatedValue, setNewAnnotatedValue] = useState(getAnnotatedValue(annotation).value);
   const [formData, setFormData] = useState(defaultRuleForm);
+  const [ extractedText, setExtractedText] = useState("");
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({show: false, error: false, message: ''});
 
@@ -81,9 +83,6 @@ export const CreateRuleDialog = ({
 
   const create = () => {
     console.log(formData);
-    // if (!formData.name) {
-      // setFormError("Label ID is empty");
-    // } else {
       let createRuleData = {
         rule_type: formData.rule_type,
         token_type: formData.token_type,
@@ -105,8 +104,8 @@ export const CreateRuleDialog = ({
       if(formData.preSucc.length > 0){
         createRuleData[formData.preSucc] = formData.no_of_tokens;
       }
+      // console.log(createRuleData);
       createRule(createRuleData);
-    // }
   };
 
   const notify = (errorFlag = false, message = '') => {
@@ -120,10 +119,11 @@ export const CreateRuleDialog = ({
   const getFormattedRuleData = () => {
     let ruleData = {};
     let ruleDataType = formData.rule_type === 'tokenize' ? "tokens" : "pattern";
-    ruleData[ruleDataType] = {
-      coor: [[+formData.x1,+formData.y1],[+formData.x2,+formData.y2]],
-      occ: +formData.occurence || 0,
-    };
+    ruleData[ruleDataType] = { occ: +formData.occurence || 0};
+
+    if(formData.token_type === tokenType[0].value ){
+      ruleData[ruleDataType] = {...ruleData[ruleDataType], coor: convertCoorToPoints([formData.x1, formData.y1, formData.x2, formData.y2])};
+    }
     if(formData.rule_type === 'tokenize'){
       ruleData[ruleDataType] = {...ruleData[ruleDataType], token_word: formData.keyword};
       if(formData.preSucc.length > 0 && +formData.no_of_tokens > 0){
@@ -144,6 +144,7 @@ export const CreateRuleDialog = ({
     ruleVerification(api, verifyData).then((response) => {
       setLoading(false);
       if (response.status === 200) {
+        setExtractedText(response.data.data);
         notify(false, 'Rule Verified Successfully!');
       }else{
         notify(true, 'Server Response Error!');
@@ -196,6 +197,8 @@ export const CreateRuleDialog = ({
   },[annotation, getAnnotatedValue]);
 
   let currentRuleType = rulePatterns.filter((pattern) => pattern.value === formData.pattern_type);
+  let isDisabled = loading || (formData.rule_type === ruleType[1].value && ((formData.pattern_value === '' && currentRuleType[0]?.user_input) || +formData.occurence < 1))
+  || (formData.token_type === tokenType[0].value && (formData.keyword.length < 1 || formData.preSucc.length === 0 || formData.no_of_tokens === 0));
 
   return (
     <Dialog
@@ -236,6 +239,11 @@ export const CreateRuleDialog = ({
               <FormInputText label="Display Text" name="display_text" value={newAnnotatedValue} readOnly/>
             </FormRowItem>
           </FormRow></>}
+          {formData.token_type === tokenType[1].value && <FormRow>
+            <FormRowItem>
+              <FormInputText label="Annotated Value" name="annotated_value" value={getAnnotatedValue(annotation).value} readOnly/>
+            </FormRowItem>
+            </FormRow>}
           {formData.rule_type === ruleType[1].value && <><FormRow>
             <FormRowItem>
               <FormInputSelect required label="Patter Type" name="pattern_type" value={formData.pattern_type} onChange={onTextChange} options={rulePatterns} />
@@ -251,7 +259,7 @@ export const CreateRuleDialog = ({
           </FormRow>}</>}
           {formData.rule_type === ruleType[0].value && <><FormRow>
             <FormRowItem>
-              <FormInputText label="Keyword" name="keyword" value={formData.keyword} onChange={onTextChange}/>
+              <FormInputText required label="Keyword" name="keyword" value={formData.keyword} onChange={onTextChange}/>
             </FormRowItem>
             <FormRowItem>
               <FormInputText label="Occurence" name="occurence" value={formData.occurence} onChange={onTextChange}/>
@@ -259,22 +267,22 @@ export const CreateRuleDialog = ({
           </FormRow>
           <FormRow>
             <FormRowItem>
-              <FormInputRadio label="Preceding / Succeeding" name="preSucc" value={formData.preSucc} onChange={onTextChange} options={preSucc} />
+              <FormInputRadio required label="Preceding / Succeeding" name="preSucc" value={formData.preSucc} onChange={onTextChange} options={preSucc} />
             </FormRowItem>
             <FormRowItem>
               <FormInputText required label="No. of Tokens" disabled={formData.preSucc === ''} name="no_of_tokens" value={formData.no_of_tokens} onChange={onTextChange}/>
             </FormRowItem>
           </FormRow></>}
-          {/* <FormRow>
+          <FormRow>
             <FormRowItem>
-              <FormInputText label="Extracted Text" name="extracted_text" value={formData.extracted_text} onChange={onTextChange}/>
+              <FormInputText label="Extracted Text" name="extracted_text" value={extractedText} readOnly/>
             </FormRowItem>
-          </FormRow> */}
+          </FormRow>
         </Form>
       </DialogContent>
       <DialogActions style={{paddingTop: 12, paddingBottom: 12}}>
-        <Button autoFocus onClick={verify} disabled={loading || (formData.rule_type === ruleType[1].value && (formData.pattern_value === '' || +formData.occurence < 1))} color="secondary" variant="contained">{loading ? 'Verifing' : 'Verify'}</Button>
-        <Button autoFocus onClick={create} color="primary" variant="contained">Save Rule</Button>
+        <Button autoFocus onClick={verify} disabled={isDisabled} color="secondary" variant="contained">{loading ? 'Verifing' : 'Verify'}</Button>
+        <Button autoFocus onClick={create} disabled={isDisabled} color="primary" variant="contained">Save Rule</Button>
         <Button autoFocus onClick={onClose} color="primary" variant="contained">Cancel</Button>
       </DialogActions>
       <Snackbar
