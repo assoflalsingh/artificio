@@ -5,6 +5,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import Rectangle from "../../../canvas/annotations/Rectangle";
+import Draggable from "react-draggable";
+import Paper from '@material-ui/core/Paper';
 import {
   Form,
   FormInputText,
@@ -16,6 +18,17 @@ import {
 import { ruleVerification } from "../apiMethods";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
+
+const PaperComponent = (props) => {
+  return (
+    <Draggable
+      handle="#customized-dialog-title"
+      cancel={'[class*="MuiDialogContent-root"]'}
+    >
+      <Paper {...props} />
+    </Draggable>
+  );
+}
 
 const defaultRuleForm = {
   rule_type: '',
@@ -31,6 +44,7 @@ const defaultRuleForm = {
   extracted_text: '',
   pattern_type: '',
   pattern_value: '',
+  annotated_value: '',
 };
 
 const ruleType = [{label: "Tokenization", value:"tokenize"},{label:"Pattern", value: "pattern"}];
@@ -64,6 +78,8 @@ export const CreateRuleDialog = ({
       [name]: value,
     }));
 
+    setExtractedText("");
+
     const updatedData = {
       ...formData,
       [name]: value,
@@ -82,29 +98,20 @@ export const CreateRuleDialog = ({
   };
 
   const create = () => {
-    console.log(formData);
       let createRuleData = {
-        rule_type: formData.rule_type,
-        token_type: formData.token_type,
+        ...formData,
         dimentions: {
           x: +formData.x1,
           y: +formData.y1,
           w: +(formData.x2 - formData.x1).toFixed(),
           h: +(formData.y2 - formData.y1).toFixed(),
         },
-        annotated_value: getAnnotatedValue(annotation).value,
+        annotated_value: formData.annotated_value.trim(),
         new_annotated_value: newAnnotatedValue,
-        keyword: formData.keyword,
-        occurence: formData.occurence,
-        preSucc: formData.preSucc,
-        no_of_tokens: formData.no_of_tokens,
-        pattern_type: formData.pattern_type,
-        pattern_value: formData.pattern_value,
       };
       if(formData.preSucc.length > 0){
         createRuleData[formData.preSucc] = formData.no_of_tokens;
       }
-      // console.log(createRuleData);
       createRule(createRuleData);
   };
 
@@ -137,15 +144,19 @@ export const CreateRuleDialog = ({
 
   const verify = () => {
     let verifyData = {rule: getFormattedRuleData(), ...getImageModelData()};
-    console.log(verifyData);
 
+    setExtractedText("");
     setLoading(true);
 
     ruleVerification(api, verifyData).then((response) => {
       setLoading(false);
       if (response.status === 200) {
-        setExtractedText(response.data.data);
-        notify(false, 'Rule Verified Successfully!');
+        setExtractedText(response.data.data.trim());
+        if(formData.annotated_value.trim() === response.data.data.trim()){
+          notify(false, 'Rule Verified Successfully!');
+        }else{
+          notify(true, 'Rule Not Verified!');
+        }
       }else{
         notify(true, 'Server Response Error!');
       }
@@ -186,6 +197,7 @@ export const CreateRuleDialog = ({
         ...defaultRuleForm,
         rule_type: ruleType[0].value,
         token_type: tokenType[0].value,
+        annotated_value: getAnnotatedValue(annotation).value.trim(),
         x1: (annDim.x).toFixed(),
         x2: (annDim.x + annDim.w).toFixed(),
         y1: (annDim.y).toFixed(),
@@ -197,16 +209,17 @@ export const CreateRuleDialog = ({
   },[annotation, getAnnotatedValue]);
 
   let currentRuleType = rulePatterns.filter((pattern) => pattern.value === formData.pattern_type);
-  let isDisabled = loading || (formData.rule_type === ruleType[1].value && ((formData.pattern_value === '' && currentRuleType[0]?.user_input) || +formData.occurence < 1))
-  || (formData.token_type === tokenType[0].value && (formData.keyword.length < 1 || formData.preSucc.length === 0 || formData.no_of_tokens === 0));
+  let isDisabled = loading || (formData.rule_type === ruleType[1].value && ((currentRuleType[0]?.user_input && formData.pattern_value.length === 0) || +formData.occurence < 1))
+  || (formData.rule_type === ruleType[0].value && formData.token_type === tokenType[0].value && (formData.keyword.length < 1 || formData.preSucc.length === 0 || formData.no_of_tokens === 0));
 
   return (
     <Dialog
       onClose={onClose}
+      PaperComponent={PaperComponent}
       aria-labelledby="customized-dialog-title"
       open={modalOpen}
     >
-      <DialogTitle id="customized-dialog-title" onClose={onClose}>Create Rule</DialogTitle>
+      <DialogTitle id="customized-dialog-title" onClose={onClose} style={{cursor: "move"}}>Create Rule</DialogTitle>
       <DialogContent dividers>
         <Form>
           <FormRow>
@@ -233,7 +246,7 @@ export const CreateRuleDialog = ({
           </FormRow>
           <FormRow>
             <FormRowItem>
-              <FormInputText label="Annotated Value" name="annotated_value" value={getAnnotatedValue(annotation).value} readOnly/>
+              <FormInputText label="Annotated Value" name="annotated_value" value={formData.annotated_value} readOnly/>
             </FormRowItem>
             <FormRowItem>
               <FormInputText label="Display Text" name="display_text" value={newAnnotatedValue} readOnly/>
@@ -241,7 +254,7 @@ export const CreateRuleDialog = ({
           </FormRow></>}
           {formData.token_type === tokenType[1].value && <FormRow>
             <FormRowItem>
-              <FormInputText label="Annotated Value" name="annotated_value" value={getAnnotatedValue(annotation).value} readOnly/>
+              <FormInputText label="Annotated Value" name="annotated_value" value={formData.annotated_value} readOnly/>
             </FormRowItem>
             </FormRow>}
           {formData.rule_type === ruleType[1].value && <><FormRow>
@@ -267,7 +280,7 @@ export const CreateRuleDialog = ({
           </FormRow>
           <FormRow>
             <FormRowItem>
-              <FormInputRadio required label="Preceding / Succeeding" name="preSucc" value={formData.preSucc} onChange={onTextChange} options={preSucc} />
+              <FormInputRadio required label="Preceding / Succeeding" disabled={formData.keyword.length < 1} name="preSucc" value={formData.preSucc} onChange={onTextChange} options={preSucc} />
             </FormRowItem>
             <FormRowItem>
               <FormInputText required label="No. of Tokens" disabled={formData.preSucc === ''} name="no_of_tokens" value={formData.no_of_tokens} onChange={onTextChange}/>
@@ -282,7 +295,7 @@ export const CreateRuleDialog = ({
       </DialogContent>
       <DialogActions style={{paddingTop: 12, paddingBottom: 12}}>
         <Button autoFocus onClick={verify} disabled={isDisabled} color="secondary" variant="contained">{loading ? 'Verifing' : 'Verify'}</Button>
-        <Button autoFocus onClick={create} disabled={isDisabled} color="primary" variant="contained">Save Rule</Button>
+        <Button autoFocus onClick={create} disabled={isDisabled || extractedText.trim() !== formData.annotated_value.trim()} color="primary" variant="contained">Save Rule</Button>
         <Button autoFocus onClick={onClose} color="primary" variant="contained">Cancel</Button>
       </DialogActions>
       <Snackbar

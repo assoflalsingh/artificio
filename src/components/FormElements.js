@@ -10,6 +10,9 @@ const useStyles = makeStyles((theme) => ({
   formRoot: {
     padding: '1rem'
   },
+  disabled:{
+    opacity: '0.5'
+  },
   formRow: {
     paddingTop: '1rem',
   },
@@ -211,7 +214,7 @@ export function FormInputPhoneNo({InputIcon, errorMsg, required, onChange, label
   );
 }
 
-export function FormInputRadio({errorMsg, required, onChange, label, options, readOnly, labelKey='label', valueKey='value', ...props}) {
+export function FormInputRadio({errorMsg, required, onChange, label, options, readOnly, disabled, labelKey='label', valueKey='value', ...props}) {
   const classes = useStyles();
   options = options || [];
 
@@ -224,7 +227,7 @@ export function FormInputRadio({errorMsg, required, onChange, label, options, re
         onChange={onChange}
         onBlur={onChange}
         variant="outlined"
-        className={classes.formInput}
+        className={`${classes.formInput} ${Boolean(disabled) ? classes.disabled : ''}`}
         {...props}>
           {options.map((opt, index)=>{
             let label = '', value = '';
@@ -239,6 +242,7 @@ export function FormInputRadio({errorMsg, required, onChange, label, options, re
             inputProps={{
               'data-label': label,
               'data-required': required,
+              disabled: Boolean(disabled),
               readOnly: Boolean(readOnly)
             }} />} label={label} />
           })}

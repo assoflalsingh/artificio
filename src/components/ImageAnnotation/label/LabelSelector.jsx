@@ -438,7 +438,6 @@ const Label = ({
         onClose={() => setRuleModalOpen(false)}
         createRule={(ruleData) => {
           labelValue.rule = {...ruleData};
-          console.log(labelValue);
           setAnnotationLabel(labelValue);
           setRuleData(ruleData);
           setRuleModalOpen(false);
