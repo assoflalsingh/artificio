@@ -73,19 +73,32 @@ export const CreateRuleDialog = ({
     let name = e.target.name;
     let value = e.target.value;
 
+    setExtractedText("");
+
+    if(name === 'x1' && value >= formData.x2){
+      value = formData.x1;
+    }
+    if(name === 'x2' && value <= formData.x1){
+      value = formData.x2;
+    }
+    if(name === 'y1' && value >= formData.y2){
+      value = formData.y1;
+    }
+    if(name === 'y2' && value <= formData.y1){
+      value = formData.y2;
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
 
-    setExtractedText("");
-
-    const updatedData = {
-      ...formData,
-      [name]: value,
-    }
-
     if(['x1', 'x2', 'y1', 'y2'].indexOf(name) >= 0){
+      const updatedData = {
+        ...formData,
+        [name]: value,
+      }
+
       let newDimensions = {x: +updatedData.x1, y: +updatedData.y1, w: +(updatedData.x2 - updatedData.x1).toFixed(), h: +(updatedData.y2 - updatedData.y1).toFixed()};
       const annotationData = {...annotation.annotationData, dimensions: newDimensions};
       const rectangle = new Rectangle(
@@ -192,16 +205,16 @@ export const CreateRuleDialog = ({
       );
       setNewAnnotatedValue(getAnnotatedValue(rectangle).value);
     }else{
-      const annDim = annotation.annotationData.dimensions;
+      const annDim = annotation.getData().coordinates;
       ruleData = {
         ...defaultRuleForm,
         rule_type: ruleType[0].value,
         token_type: tokenType[0].value,
         annotated_value: getAnnotatedValue(annotation).value.trim(),
-        x1: (annDim.x).toFixed(),
-        x2: (annDim.x + annDim.w).toFixed(),
-        y1: (annDim.y).toFixed(),
-        y2: (annDim.y + annDim.h).toFixed(),
+        x1: annDim[0].toFixed(),
+        y1: annDim[1].toFixed(),
+        x2: annDim[2].toFixed(),
+        y2: annDim[3].toFixed(),
       };
       setNewAnnotatedValue(getAnnotatedValue(annotation).value);
     }
@@ -235,10 +248,10 @@ export const CreateRuleDialog = ({
               <FormInputText label="X1" name="x1" value={formData.x1} onChange={onTextChange}/>
             </FormRowItem>
             <FormRowItem>
-              <FormInputText label="X2" name="x2" value={formData.x2} onChange={onTextChange}/>
+              <FormInputText label="Y1" name="y1" value={formData.y1} onChange={onTextChange}/>
             </FormRowItem>
             <FormRowItem>
-              <FormInputText label="Y1" name="y1" value={formData.y1} onChange={onTextChange}/>
+              <FormInputText label="X2" name="x2" value={formData.x2} onChange={onTextChange}/>
             </FormRowItem>
             <FormRowItem>
               <FormInputText label="Y2" name="y2" value={formData.y2} onChange={onTextChange}/>
