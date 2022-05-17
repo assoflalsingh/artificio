@@ -15,10 +15,11 @@ const useStyles = makeStyles((theme) => ({
   root: {
     // backgroundColor: theme.palette.background.paper,
     // marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(5),
+    marginBottom: theme.spacing(4),
     borderBottomLeftRadius: '5px',
     borderBottomRightRadius: '5px',
     borderTopRightRadius: '5px',
+    boxShadow: '0px 2px 1px -1px rgb(57 63 77 / 20%), 0px 1px 1px 0px rgb(57 63 77 / 14%), 0px 1px 3px 0px rgb(57 63 77 / 12%)',
   },
   main_selected: {
     color: theme.palette.primary.main,
@@ -56,8 +57,8 @@ const Navbar = ({baseurl}) => {
       <Toolbar>
         {/* <Typography variant="h4" className={classes.logo}>Navbar</Typography> */}
           <div className={classes.navlinks} >
-            <ListItemLink icon={FormatShapesIcon} primary='Data Flow' to={`${baseurl}/dataFlow`}/>
             <ListItemLink icon={StorageIcon} primary='Data Model' to={`${baseurl}/data_model`}/>
+            <ListItemLink icon={FormatShapesIcon} primary='Data Flow' to={`${baseurl}/dataFlow`}/>
           </div>
           <div className={classes.navlinks} style={{marginLeft: 'auto'}} >
             <ListItemLink icon={SettingsIcon} primary='Admin' to={`${baseurl}/admin`} />
