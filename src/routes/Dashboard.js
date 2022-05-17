@@ -9,7 +9,6 @@ import { getInstance, URL_MAP } from '../others/artificio_api.instance';
 import Logo from '../assets/images/logo.svg';
 import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
-import SideMenuBar from '../components/SideMenuBar';
 import { titleCase } from '../others/utils';
 import Navbar from '../components/Navbar';
 
@@ -30,8 +29,6 @@ const useStyles = makeStyles((theme)=>({
   },
   rightSide: {
     width: '100%',
-    paddingLeft: '0.5rem',
-    paddingRight: '0.5rem',
     minWidth: 0,
   },
   bottomSide: {
@@ -75,7 +72,7 @@ const Dashboard = ({match, ...props}) => {
         <Container maxWidth="lg" className={classes.container}>
           <Box display="flex" flexDirection="column" className={classes.container}>
             <Box display="flex">
-                <Paper item className={clsx(classes.leftSide, classes.logoContainer)}>
+                <Paper item className={clsx(classes.leftSide, classes.logoContainer)} style={{marginRight: '0.5rem'}}>
                   <Box style={{padding: '0.25rem 0.5rem'}}>
                     <img src={Logo} alt="" className={classes.logoImg}></img>
                   </Box>
