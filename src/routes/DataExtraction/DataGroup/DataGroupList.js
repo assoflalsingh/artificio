@@ -139,9 +139,9 @@ export default function DataGroupList({setFormData, ...props}) {
         </Alert>}
       </Snackbar>
       <Box style={{display: 'flex', flexWrap: 'wrap'}}>
-        <Typography color="primary" variant="h6">Data groups</Typography>
-        <RefreshIconButton className={classes.ml1} title="Refresh data list" onClick={()=>{fetchDgList()}}/>
-        <CompactAddButton className={classes.ml1} color="secondary" label="Create data group" onClick={onCreateDGClick} />
+        <Typography color="primary" variant="h6">Data Groups</Typography>
+        <RefreshIconButton className={classes.ml1} title="Refresh List" onClick={()=>{fetchDgList()}}/>
+        <CompactAddButton className={classes.ml1} color="secondary" label="Create Data Group" onClick={onCreateDGClick} />
       </Box>
       <MUIDataTable
         title={<>

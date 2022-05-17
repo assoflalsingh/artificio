@@ -99,7 +99,7 @@ function DataSetList({ history }) {
   const columns = [
     {
       name: "data_set_id",
-      label: "Data set",
+      label: "Data Flow",
       options: {
         filter: true,
         sort: true,
@@ -373,12 +373,12 @@ function DataSetList({ history }) {
       </Snackbar>
       <Box style={{ display: "flex", flexWrap: "wrap", margin: "15px 0px" }}>
         <Typography color="primary" variant="h6">
-          Data sets
+          Data Flow
         </Typography>
         <CompactAddButton
           color="secondary"
           className={classes.ml1}
-          label="Create Data set"
+          label="Create Data Flow"
           variant="contained"
           onClick={() => {
             history.push("create-dataset");
@@ -465,7 +465,7 @@ function DataSetList({ history }) {
         title={
           <>
             <Typography color="primary" variant="h8">
-              Please select the data set for uploading files.
+              Please select the data flow for uploading files.
             </Typography>
           </>
         }

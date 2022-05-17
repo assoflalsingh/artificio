@@ -142,7 +142,7 @@ function AsssignDataGroup({ open, onClose, onOK, api }) {
       <DialogContent>
         <FormInputSelect
           hasSearch
-          label="Assign data group"
+          label="Assign Data gGroup"
           onChange={(e, value) => {
             setDatagroup(value);
           }}
@@ -304,7 +304,7 @@ function DataList(props) {
     },
     {
       name: "datagroup_name",
-      label: "Data group",
+      label: "Data Group",
       options: {
         filter: true,
         sort: true,
@@ -907,7 +907,7 @@ function DataList(props) {
         />
         <CompactButton
           className={classes.ml1}
-          label="Data groups"
+          label="Data Groups"
           variant="contained"
           color="primary"
           onClick={() => {
@@ -1123,7 +1123,7 @@ function DataList(props) {
               setShowAssignDG(true);
             }}
           >
-            Assign data group
+            Assign Data Group
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -1131,7 +1131,7 @@ function DataList(props) {
               setShowAssignStruct(true);
             }}
           >
-            Assign data structure
+            Assign Data Structure
           </MenuItem>
           <MenuItem
             onClick={() => {

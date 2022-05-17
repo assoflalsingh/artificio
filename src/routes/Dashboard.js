@@ -11,6 +11,7 @@ import UserBar from '../components/UserBar';
 import MainContent from '../components/MainContent';
 import SideMenuBar from '../components/SideMenuBar';
 import { titleCase } from '../others/utils';
+import Navbar from '../components/Navbar';
 
 const useStyles = makeStyles((theme)=>({
   root: {
@@ -81,8 +82,8 @@ const Dashboard = ({match, ...props}) => {
                 </Paper>
                 <UserBar className={classes.rightSide}/>
             </Box>
+            <Box display="flex"><Navbar baseurl={match.url} /></Box>
             <Box display="flex" className={classes.bottomSide}>
-                <Paper item className={classes.leftSide}><SideMenuBar baseurl={match.url}/></Paper>
                 <MainContent className={classes.rightSide} baseurl={match.url} />
             </Box>
           </Box>

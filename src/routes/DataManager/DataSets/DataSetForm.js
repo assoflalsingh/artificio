@@ -266,7 +266,7 @@ export default function LabelForm({initFormData, ...props}) {
     <Form>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Data set ID" required name='data_set_id' placeholder="Data set ID here.."
+          <FormInputText label="Data Flow ID" required name='data_set_id' placeholder="Data Flow ID here.."
             value={formData.data_set_id} errorMsg={formDataErr.data_set_id} onChange={onTextChange} disabled={editMode}/>
         </FormRowItem>
         <FormRowItem>

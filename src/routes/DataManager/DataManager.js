@@ -20,7 +20,7 @@ export default function DataSetsManager() {
     <CommonTabs tabs={
       {
         "Upload File(s)": <DataSetsList />,
-        "Dataset Result": <DataSetsResults uploadCounter={uploadCounter}/>,
+        "Data Flow Result": <DataSetsResults uploadCounter={uploadCounter}/>,
       }
     } panelClasses={classes.panelClasses}/>
   );
