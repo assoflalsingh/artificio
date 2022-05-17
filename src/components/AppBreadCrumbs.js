@@ -30,7 +30,9 @@ const useStylesContent = makeStyles((theme)=>({
 
 const breadcrumbNameMap = {
   'dataFlow': 'Data Flow',
-  'createModel': 'Create Model',
+  'data_model': 'Data Model',
+  'data_group': 'Data Group',
+  'data_validation': 'Data Validation',
   'dataManager': 'Data Manager',
   'annotation': 'Annotation',
   'dataExtraction': 'Data Extraction',

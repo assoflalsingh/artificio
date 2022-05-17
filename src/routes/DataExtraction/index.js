@@ -22,10 +22,10 @@ export default function DataExtraction() {
   return (
     <CommonTabs tabs={
       {
-        "Upload file": <UploadFile successCB={updateUploadCounter}/>,
-        "Data list": <DataList uploadCounter={uploadCounter}/>,
+        "Upload File": <UploadFile successCB={updateUploadCounter}/>,
+        "Data List": <DataList uploadCounter={uploadCounter}/>,
         "Results": <Results uploadCounter={uploadCounter} />,
-        "Download reports": <Downloads />,
+        "Download Reports": <Downloads />,
       }
     } panelClasses={classes.panelClasses}/>
   );
