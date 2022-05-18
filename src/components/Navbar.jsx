@@ -2,8 +2,6 @@ import React from "react";
 import {
   AppBar,
   Toolbar,
-  CssBaseline,
-  Typography,
   makeStyles,
 } from "@material-ui/core";
 import ListItemLink from './ListItemLink';
@@ -57,8 +55,8 @@ const Navbar = ({baseurl}) => {
       <Toolbar>
         {/* <Typography variant="h4" className={classes.logo}>Navbar</Typography> */}
           <div className={classes.navlinks} >
-            <ListItemLink icon={StorageIcon} primary='Data Model' to={`${baseurl}/data_model`}/>
-            <ListItemLink icon={FormatShapesIcon} primary='Data Flow' to={`${baseurl}/dataFlow`}/>
+            <ListItemLink icon={StorageIcon} primary='Data Modelling' to={`${baseurl}/data_model`}/>
+            <ListItemLink icon={FormatShapesIcon} primary='Automation' to={`${baseurl}/automation`}/>
           </div>
           <div className={classes.navlinks} style={{marginLeft: 'auto'}} >
             <ListItemLink icon={SettingsIcon} primary='Admin' to={`${baseurl}/admin`} />

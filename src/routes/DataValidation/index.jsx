@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CommonTabs from '../../components/CommonTabs';
-import DataGroupList from '../DataExtraction/DataGroup/DataGroupList';
+import DataView from './DataView';
 
 const useStyles = makeStyles((theme) => ({
   panelClasses: {
@@ -12,11 +12,10 @@ const useStyles = makeStyles((theme) => ({
 export default function DataValidation() {
   const classes = useStyles();
   return (
-  // <DataGroupList/>
     <CommonTabs tabs={
       {
         // "Upload File(s)": <DataSetsList />,
-        "Data Group": <DataGroupList/>,
+        "Data View": <DataView/>,
       }
     } panelClasses={classes.panelClasses}/>
   );

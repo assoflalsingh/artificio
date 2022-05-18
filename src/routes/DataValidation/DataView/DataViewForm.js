@@ -3,16 +3,19 @@ import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
 import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
+import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
 
-export default function DataGroupForm({initFormData, ...props}) {
-  const defaults = {
-    name: '',
-    desc: '',
-    assign_user: '',
-    ptm: '',
-    assign_label: [],
-    data_struct: '',
-  }
+const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
+const lineItemsTableData = [{label: "No", value:"no"},{label: "Yes", value:"yes"}];
+const defaults = {
+  name: '',
+  desc: '',
+  data_group: [],
+  view_type: viewType[0].value,
+  include_items_table: lineItemsTableData[0].value,
+}
+
+export default function DataViewForm({initFormData, ...props}) {
   const editMode = (initFormData != null);
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
@@ -21,10 +24,7 @@ export default function DataGroupForm({initFormData, ...props}) {
   const [saving, setSaving] = useState(false);
 
   const [opLoading, setOpLoading] = useState(false);
-  const [userOpts, setUserOpts] = useState([]);
-  const [ptmOpts, setPtmOpts] = useState([]);
-  const [labelOpts, setLabelOpts] = useState([]);
-  const [dataStructOpts, setDataStructOpts] = useState([]);
+  const [dgList, setDGList] = useState([]);
 
   const api = getInstance(localStorage.getItem('token'));
 
@@ -37,26 +37,9 @@ export default function DataGroupForm({initFormData, ...props}) {
 
   useEffect(()=>{
     setOpLoading(true);
-
-    // {
-    //   users: [
-    //     {id: 1, name: ‘the name’},
-    //     {id: 2, name: ‘another name’}
-    //     …
-    //   ],
-    //   ptms : [‘pertained mode 1’, ‘some other model’]
-    //   labels: [
-    //     {id: ‘label_12345_LABEL1’, name: ‘LABEL1’},
-    //     {id: ‘label_12345_LABEL2’, name: ‘LABEL2’}
-    //   ],
-    //   data_structs: [‘001’, ‘002’]
-    // }
-    api.get(URL_MAP.GET_DATAGROUP_PREQUISITES).then((resp)=>{
+    api.get(URL_MAP.GET_DATAGROUPS).then((resp)=>{
       let data = resp.data.data;
-      setUserOpts(data.users);
-      setPtmOpts(data.ptms);
-      setLabelOpts(data.labels);
-      setDataStructOpts(data.data_structs);
+      setDGList(data.datagroups);
 
       if(editMode) {
         let formLabels = data.labels.filter((label)=>{
@@ -125,16 +108,19 @@ export default function DataGroupForm({initFormData, ...props}) {
         isFormValid = false;
       }
     });
+    console.log("formData: ",formData);
 
     if(isFormValid) {
-      setSaving(true);
       let newFormData = {
         ...formData,
-        assign_label: formData.assign_label.map((label)=>label._id),
+        data_group: formData.data_group.map((label)=>label._id),
       }
+      console.log("newFormData: ",newFormData);
+      return;
+      setSaving(true);
       let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
       api.post(url, newFormData).then((resp)=>{
-        setFormSuccess('Data group created sucessfully.');
+        setFormSuccess('Data View created sucessfully.');
         if(!editMode) setFormData(defaults);
       }).catch((err)=>{
         if (err.response) {
@@ -155,44 +141,42 @@ export default function DataGroupForm({initFormData, ...props}) {
       });
     }
   }
-  console.log("form data->",formData);
+  // console.log("formData: ",formData);
   return (
     <>
     <Box display="flex">
-      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data Group</Typography>
+      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data View</Typography>
       {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
+    </Box>
+    <Box display="flex">
+      <Button
+        startIcon={<ChevronLeftOutlinedIcon />}
+        onClick={() => {
+          props.loadDataViewForm(false);
+        }}
+      >
+        Back
+      </Button>
     </Box>
     <Form>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Data Group Name" required name='name'
+          <FormInputText label="Name" required name='name'
             value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange} disabled={editMode}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="Description" name='desc'
-            value={formData.desc} onChange={onTextChange}/>
+          <FormInputText label="Description" name='desc' value={formData.desc} onChange={onTextChange}/>
+        </FormRowItem>
+        <FormRowItem>
+          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={opLoading} />
         </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect label="Assign user" name='assign_user' onChange={onTextChange}
-            firstEmpty={true} loading={opLoading} value={formData.assign_user} options={userOpts}
-            labelKey='name' valueKey='id' />
+          <FormInputSelect required label="Data View Type" name="view_type" value={formData.view_type} onChange={onTextChange} options={viewType} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect label="Pre-trained model" name='ptm' onChange={onTextChange}
-            firstEmpty={true} loading={opLoading} value={formData.ptm} options={ptmOpts} />
-        </FormRowItem>
-      </FormRow>
-      <FormRow>
-        <FormRowItem>
-          <FormInputSelect hasSearch multiple label="Assign label" name='assign_label' onChange={(e, value)=>{onTextChange(value, 'assign_label')}}
-            loading={opLoading} value={formData.assign_label} options={labelOpts}
-            labelKey='name' valueKey='id' />
-        </FormRowItem>
-        <FormRowItem>
-          <FormInputSelect label="Default structure ID" name='data_struct' onChange={onTextChange}
-            loading={opLoading} value={formData.data_struct} options={dataStructOpts} />
+          <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={opLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
       </FormRow>
       {(formError || formSuccess) &&
