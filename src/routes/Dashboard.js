@@ -72,7 +72,7 @@ const Dashboard = ({match, ...props}) => {
         <Container maxWidth="lg" className={classes.container}>
           <Box display="flex" flexDirection="column" className={classes.container}>
             <Box display="flex">
-                <Paper item className={clsx(classes.leftSide, classes.logoContainer)} style={{marginRight: '0.5rem'}}>
+                <Paper item className={clsx(classes.leftSide, classes.logoContainer)} style={{marginRight: '0.8rem'}}>
                   <Box style={{padding: '0.25rem 0.5rem'}}>
                     <img src={Logo} alt="" className={classes.logoImg}></img>
                   </Box>

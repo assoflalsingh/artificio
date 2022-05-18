@@ -235,7 +235,7 @@ export default function TableFilterPanel(props) {
                     onChange={(event)=>updateFilters(event,element.name, element.type)}
                   > 
                     {
-                      comparisonOptions.map((comparison, index)=> (element.possibleComparisons.indexOf(comparison.value) > -1) && <MenuItem value={comparison.value}>{comparison.name}</MenuItem>)
+                      comparisonOptions.map((comparison, index)=> (element.possibleComparisons.indexOf(comparison.value) > -1) && <MenuItem key={index} value={comparison.value}>{comparison.name}</MenuItem>)
                     }
                   </Select>
                 </FormControl>

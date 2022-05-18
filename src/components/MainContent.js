@@ -35,7 +35,7 @@ export default function MainContent({children, className, baseurl, ...props}) {
       <AppBreadCrumbs />
       <Box className={classes.content}>
         <Route path={`${baseurl}/data_model`} component={DataModel} />
-        <Route path={`${baseurl}/dataFlow`} component={DataFlow} />
+        <Route path={`${baseurl}/automation`} component={DataFlow} />
         <Route path={`${baseurl}/admin`} component={Admin} />
       </Box>
       <Box className={classes.copyrights}>

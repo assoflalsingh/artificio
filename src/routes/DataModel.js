@@ -32,7 +32,7 @@ export default function DataModel({match}) {
       <Route path={match.url+'/data_validation'} component={DataValidation} />
       <Route>
         <Box className={classes.self}>
-          <MenuTile to={match.url+'/dataExtraction'} icon={StorageIcon} label="Train Model" buttonLabel="Start Train Model" className={classes.menucard} toolTipDesc={<><em>Start Annotation and extract text for all types of PDFs and Images</em></>} toolTipLabel={"How it works"}/>
+          <MenuTile to={match.url+'/dataExtraction'} icon={StorageIcon} label="Train Model" buttonLabel="Start Training" className={classes.menucard} toolTipDesc={<><em>Start Annotation and extract text for all types of PDFs and Images</em></>} toolTipLabel={"How it works"}/>
           <MenuTile to={match.url+'/data_validation'} icon={DataExtractionIcon} label="Data Validation" buttonLabel="Open Data Validation" className={classes.menucard}/>
         </Box>
       </Route>
