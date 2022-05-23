@@ -1,5 +1,5 @@
 import React from 'react';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import NunitoRegular from '../assets/fonts/Nunito-Regular.ttf';
 
 const nunito = {
@@ -15,10 +15,10 @@ const nunito = {
 };
 
 
-const defaultTheme = createMuiTheme();
+const defaultTheme = createTheme();
 defaultTheme.shadows[1] = '0px 2px 1px -1px rgba(57, 63, 77,0.2),0px 1px 1px 0px rgba(57, 63, 77,0.14),0px 1px 3px 0px rgba(57, 63, 77,0.12)';
 
-const globalTheme = createMuiTheme({
+const globalTheme = createTheme({
     palette: {
         primary: {
             main: '#0575ce',
@@ -70,7 +70,7 @@ const globalTheme = createMuiTheme({
     }
 });
 
-const theme = createMuiTheme({
+const theme = createTheme({
     typography: {
       ...globalTheme.typography,
     },
@@ -264,7 +264,7 @@ const theme = createMuiTheme({
     }
 }, globalTheme);
 
-export const DMUploaderCustomTheme = createMuiTheme({
+export const DMUploaderCustomTheme = createTheme({
   typography: {
     ...globalTheme.typography,
   },
