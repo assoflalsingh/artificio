@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
-import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
+import {URL_MAP} from '../../../others/artificio_api.instance';
 import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
+import useApi from '../../../hooks/use-api';
+import DataGroupJoins from './DataGroupJoins';
 
 const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
 const lineItemsTableData = [{label: "No", value:"no"},{label: "Yes", value:"yes"}];
@@ -19,14 +21,11 @@ export default function DataViewForm({initFormData, ...props}) {
   const editMode = (initFormData != null);
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
-  const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [saving, setSaving] = useState(false);
-
-  const [opLoading, setOpLoading] = useState(false);
   const [dgList, setDGList] = useState([]);
-
-  const api = getInstance(localStorage.getItem('token'));
+  const [labelsList, setLabesList] = useState([]);
+  const {isLoading, apiRequest, error} = useApi();
 
   const formValidators = {
     name: {
@@ -36,38 +35,23 @@ export default function DataViewForm({initFormData, ...props}) {
   }
 
   useEffect(()=>{
-    setOpLoading(true);
-    api.get(URL_MAP.GET_DATAGROUPS).then((resp)=>{
-      let data = resp.data.data;
-      setDGList(data.datagroups);
-
+    apiRequest({url: URL_MAP.GET_DATAGROUPS}, (response) => {
+      setDGList(response.datagroups);
+    });
+    apiRequest({url: URL_MAP.GET_DATAGROUP_PREQUISITES}, (response) =>{
+      setLabesList(response.labels);
       if(editMode) {
-        let formLabels = data.labels.filter((label)=>{
+        let formLabels = response.labels.filter((label)=>{
           return initFormData.assign_label.indexOf(label._id) > -1;
         });
         setFormData({
+          ...defaults,
           ...initFormData,
           assign_label: formLabels,
         });
       }
-    }).catch((err)=>{
-      if (err.response) {
-        // client received an error response (5xx, 4xx)
-        if(err.response.data.message) {
-          setFormError(err.response.data.message);
-        } else {
-          setFormError(err.response.statusText + '. Contact administrator.');
-        }
-      } else if (err.request) {
-        // client never received a response, or request never left
-        setFormError('Failed to fetch pre-requisites. Not able to send the request. Contact administrator.');
-      } else {
-        setFormError('Failed to fetch pre-requisites. Some error occurred. Contact administrator.');
-      }
-    }).then(()=>{
-      setOpLoading(false);
     });
-  }, []);
+  }, [apiRequest, editMode, initFormData]);
 
   const validateField = (name, value) => {
     let errMsg = '';
@@ -98,8 +82,6 @@ export default function DataViewForm({initFormData, ...props}) {
 
   const onSave = () =>{
     let isFormValid = true;
-
-    setFormError('');
     setFormSuccess('');
 
     /* Validate */
@@ -116,37 +98,21 @@ export default function DataViewForm({initFormData, ...props}) {
         data_group: formData.data_group.map((label)=>label._id),
       }
       console.log("newFormData: ",newFormData);
-      return;
-      setSaving(true);
       let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
-      api.post(url, newFormData).then((resp)=>{
+      setSaving(true);
+      apiRequest({url: url, params: newFormData}, () =>{
         setFormSuccess('Data View created sucessfully.');
         if(!editMode) setFormData(defaults);
-      }).catch((err)=>{
-        if (err.response) {
-          // client received an error response (5xx, 4xx)
-          if(err.response.data.message) {
-            setFormError(err.response.data.message);
-          } else {
-            setFormError(err.response.statusText + '. Contact administrator.');
-          }
-        } else if (err.request) {
-          // client never received a response, or request never left
-          setFormError('Not able to send the request. Contact administrator.');
-        } else {
-          setFormError('Some error occurred. Contact administrator.');
-        }
-      }).then(()=>{
         setSaving(false);
       });
     }
   }
-  // console.log("formData: ",formData);
+
   return (
     <>
-    <Box display="flex">
+    <Box display="flex" style={{marginTop: '1rem'}}>
       <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data View</Typography>
-      {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
+      {isLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
     </Box>
     <Box display="flex">
       <Button
@@ -168,7 +134,7 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputText label="Description" name='desc' value={formData.desc} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={opLoading} />
+          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={isLoading} />
         </FormRowItem>
       </FormRow>
       <FormRow>
@@ -176,20 +142,21 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputSelect required label="Data View Type" name="view_type" value={formData.view_type} onChange={onTextChange} options={viewType} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={opLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
+          <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
       </FormRow>
-      {(formError || formSuccess) &&
+      {console.log(formData.data_group)}
+      {formData.data_group.length > 1 && <DataGroupJoins selectedDataGroups={formData.data_group} labelsList={labelsList} />}
+      {(error || formSuccess) &&
       <FormRow>
         <FormRowItem>
-          {formError && <Alert severity="error">{formError}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
           {formSuccess && <Alert severity="success">{formSuccess}</Alert>}
         </FormRowItem>
       </FormRow>}
       <FormRow>
         <FormRowItem>
           <Button color="secondary" variant="contained" onClick={onSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-          {/* <Button style={{marginLeft: '1rem'}} variant="outlined" onClick={onCancel}>Cancel</Button> */}
         </FormRowItem>
       </FormRow>
     </Form>

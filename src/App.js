@@ -1,6 +1,6 @@
 import React from 'react';
 import { CssBaseline, StylesProvider } from '@material-ui/core';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import { Provider as ReduxProvider } from "react-redux";
 import configureStore from './store/index';
 import './App.css';
@@ -28,12 +28,15 @@ export default function App() {
         <CssBaseline />
         <ReduxProvider store={reduxStore}>
           <Router basename="/app">
+          <Switch>
             <PrivateRoute path='/dashboard' component={Dashboard} />
             <Route path='/signin' component={SignIn} />
             <Route path='/signup' component={SignUp} />
             <Route path='/activate' component={Activate} />
             <Route path='/forgotpassword' component={ForgotPassword} />
             <Route path='/resetpassword' component={ResetPassword} />
+            <Redirect to="/dashboard" />
+          </Switch>
           </Router>
         </ReduxProvider>
       </StylesProvider>

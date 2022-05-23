@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, CircularProgress, Link, Snackbar, Typography } from '@material-ui/core';
 import MUIDataTable from "mui-datatables";
 import {CompactAddButton, RefreshIconButton} from '../../../components/CustomButtons';
-import { getInstance, URL_MAP } from '../../../others/artificio_api.instance';
+import { URL_MAP } from '../../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
+import useApi from '../../../hooks/use-api';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -24,11 +25,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function DataGroupList({setFormData, ...props}) {
   const classes = useStyles();
-  const api = getInstance(localStorage.getItem('token'));
-  const [dglistMessage, setDglistMessage] = useState(null);
   const [labelsDict, setLabelsDict] = useState([]);
   const [dglist, setDgList] = useState([]);
-  const [ajaxMessage, setAjaxMessage] = useState(null);
+  const {isLoading, apiRequest, error} = useApi();
 
   const showDGForm = ()=>{history.push(`${match.url}/createdg`)};
   const onCreateDGClick = ()=>{
@@ -100,53 +99,39 @@ export default function DataGroupList({setFormData, ...props}) {
     },
   };
 
-  const fetchDgList = async () => {
-    setDglistMessage('Loading data...');
+  const fetchDGList = useCallback(() => {
     setDgList([]);
 
-    try {
-      let resp = await api.get(URL_MAP.GET_DATAGROUPS);
+    apiRequest({url: URL_MAP.GET_DATAGROUPS}, (resp) => {
       let labelsDict = {};
-      resp.data.data.labels.forEach((label)=>{
+      resp.labels.forEach((label)=>{
         labelsDict[label._id] = label.name;
       });
       setLabelsDict(labelsDict);
-      setDgList(resp.data.data.datagroups);
-    } catch (error) {
-      if(error.response) {
-        setAjaxMessage({
-          error: true, text: error.response.data.message,
-        });
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setDglistMessage(null);
-    }
-  }
+      setDgList(resp.datagroups);
+    });
+  },[apiRequest]);
 
   useEffect(()=>{
-    fetchDgList();
-  },[]);
+    fetchDGList();
+  },[fetchDGList]);
 
   const {match, history} = props;
 
   return (
     <>
-      <Snackbar open={Boolean(ajaxMessage)} autoHideDuration={6000} >
-        {ajaxMessage && <Alert onClose={()=>{setAjaxMessage(null)}} severity={ajaxMessage.error ? "error" : "success"}>
-          {ajaxMessage.error ? "Error occurred: " : ""}{ajaxMessage.text}
-        </Alert>}
+      <Snackbar open={Boolean(error)} autoHideDuration={6000} >
+        {error && <Alert severity="error">{error}</Alert>}
       </Snackbar>
       <Box style={{display: 'flex', flexWrap: 'wrap'}}>
         <Typography color="primary" variant="h6">Data Groups</Typography>
-        <RefreshIconButton className={classes.ml1} title="Refresh List" onClick={()=>{fetchDgList()}}/>
+        <RefreshIconButton className={classes.ml1} title="Refresh List" onClick={()=>{fetchDGList()}}/>
         <CompactAddButton className={classes.ml1} color="secondary" label="Create Data Group" onClick={onCreateDGClick} />
       </Box>
       <MUIDataTable
         title={<>
           <Box display="flex">
-          {dglistMessage && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;{dglistMessage}</Typography></>}
+          {isLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading data...</Typography></>}
           </Box>
         </>}
         data={dglist}
