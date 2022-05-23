@@ -145,7 +145,6 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
       </FormRow>
-      {console.log(formData.data_group)}
       {formData.data_group.length > 1 && <DataGroupJoins selectedDataGroups={formData.data_group} labelsList={labelsList} />}
       {(error || formSuccess) &&
       <FormRow>

@@ -17,7 +17,7 @@ const DataGroupJoins = (props) => {
 	}
 	
 	const addJoin = () => {
-		setJoinData((prevState) => [...prevState, [{...defaultField}]]);
+		setJoinData((prevState) => [...prevState, {...defaultField}]);
 	}
 
 	const onTextChange = (e, name) => {
