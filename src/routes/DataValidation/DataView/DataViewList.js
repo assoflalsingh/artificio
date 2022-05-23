@@ -113,7 +113,7 @@ export default function DataViewList({setFormData, ...props}) {
   },[apiRequest]);
 
   useEffect(()=>{
-    fetchDGList();
+    // fetchDGList();
   },[fetchDGList]);
 
   return (

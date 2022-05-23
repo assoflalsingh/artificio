@@ -5,6 +5,7 @@ import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidatio
 import Alert from '@material-ui/lab/Alert';
 import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
 import useApi from '../../../hooks/use-api';
+import DataGroupJoins from './DataGroupJoins';
 
 const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
 const lineItemsTableData = [{label: "No", value:"no"},{label: "Yes", value:"yes"}];
@@ -23,6 +24,7 @@ export default function DataViewForm({initFormData, ...props}) {
   const [formSuccess, setFormSuccess] = useState('');
   const [saving, setSaving] = useState(false);
   const [dgList, setDGList] = useState([]);
+  const [labelsList, setLabesList] = useState([]);
   const {isLoading, apiRequest, error} = useApi();
 
   const formValidators = {
@@ -33,9 +35,11 @@ export default function DataViewForm({initFormData, ...props}) {
   }
 
   useEffect(()=>{
-    apiRequest({url: URL_MAP.GET_DATAGROUP_PREQUISITES}, (response) =>{
+    apiRequest({url: URL_MAP.GET_DATAGROUPS}, (response) => {
       setDGList(response.datagroups);
-
+    });
+    apiRequest({url: URL_MAP.GET_DATAGROUP_PREQUISITES}, (response) =>{
+      setLabesList(response.labels);
       if(editMode) {
         let formLabels = response.labels.filter((label)=>{
           return initFormData.assign_label.indexOf(label._id) > -1;
@@ -141,6 +145,8 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
       </FormRow>
+      {console.log(formData.data_group)}
+      {formData.data_group.length > 1 && <DataGroupJoins selectedDataGroups={formData.data_group} labelsList={labelsList} />}
       {(error || formSuccess) &&
       <FormRow>
         <FormRowItem>
