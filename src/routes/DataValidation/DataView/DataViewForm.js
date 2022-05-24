@@ -7,13 +7,13 @@ import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
 import useApi from '../../../hooks/use-api';
 import DataGroupJoins from './DataGroupJoins';
 
-const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
+// const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
 const lineItemsTableData = [{label: "No", value:"no"},{label: "Yes", value:"yes"}];
 const defaults = {
   name: '',
   desc: '',
   data_group: [],
-  view_type: viewType[0].value,
+  // view_type: viewType[0].value,
   include_items_table: lineItemsTableData[0].value,
 }
 
@@ -98,13 +98,13 @@ export default function DataViewForm({initFormData, ...props}) {
         data_group: formData.data_group.map((label)=>label._id),
       }
       console.log("newFormData: ",newFormData);
-      let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
-      setSaving(true);
-      apiRequest({url: url, params: newFormData}, () =>{
-        setFormSuccess('Data View created sucessfully.');
-        if(!editMode) setFormData(defaults);
-        setSaving(false);
-      });
+      // let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
+      // setSaving(true);
+      // apiRequest({url: url, params: newFormData}, () =>{
+      //   setFormSuccess('Data View created sucessfully.');
+      //   if(!editMode) setFormData(defaults);
+      //   setSaving(false);
+      // });
     }
   }
 
@@ -133,19 +133,19 @@ export default function DataViewForm({initFormData, ...props}) {
         <FormRowItem>
           <FormInputText label="Description" name='desc' value={formData.desc} onChange={onTextChange}/>
         </FormRowItem>
-        <FormRowItem>
-          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={isLoading} />
-        </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect required label="Data View Type" name="view_type" value={formData.view_type} onChange={onTextChange} options={viewType} />
+          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={isLoading} />
         </FormRowItem>
+        {/* <FormRowItem>
+          <FormInputSelect required label="Default Layout" name="view_type" value={formData.view_type} onChange={onTextChange} options={viewType} />
+        </FormRowItem> */}
         <FormRowItem>
           <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
       </FormRow>
-      {formData.data_group.length > 1 && <DataGroupJoins selectedDataGroups={formData.data_group} labelsList={labelsList} />}
+      {formData.data_group.length > 1 && <DataGroupJoins selectedDataGroups={formData.data_group} labelsList={labelsList} setFormData={setFormData} />}
       {(error || formSuccess) &&
       <FormRow>
         <FormRowItem>

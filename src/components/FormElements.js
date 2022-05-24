@@ -43,7 +43,7 @@ export function Form({children}) {
   );
 }
 
-export function FormRow({children}) {
+export function FormRow({children, style}) {
   const classes = useStyles();
   let sizingProps = {xs: 12};
   let items = React.Children.count(children);
@@ -54,7 +54,7 @@ export function FormRow({children}) {
   sizingProps['lg'] = size;
 
   return(
-    <Grid container spacing={5} className={classes.formRow}>
+    <Grid container spacing={5} className={classes.formRow} style={style}>
       {React.Children.map(children, (child) => {
         return React.cloneElement(child, sizingProps);
       })}
