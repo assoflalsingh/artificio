@@ -257,7 +257,7 @@ export default function Results(props) {
     setDatalistMessage('Loading data...');
     setDatalist([]);
     setRowsSelected([]);
-    api.post(URL_MAP.GET_DATA_LIST, {status: ['in-process', 'completed']})
+    api.get(URL_MAP.GET_DATA_LIST, {params:{status: ['in-process', 'completed']}})
       .then((res)=>{
         let data = res.data.data;
         let contr = refreshCounter+1;

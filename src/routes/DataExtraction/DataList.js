@@ -808,7 +808,7 @@ function DataList(props) {
     setDatalist([]);
     setRowsSelected([]);
     api
-      .post(URL_MAP.GET_DATA_LIST, { status: ["new", "ready", "classified"] })
+      .get(URL_MAP.GET_DATA_LIST, { params: {status:["new","ready","classified"] }})
       .then((res) => {
         let data = res.data.data;
         let contr = refreshCounter + 1;
