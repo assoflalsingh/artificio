@@ -3,8 +3,8 @@ import APP_CONFIGS from '../app-config.js';
 
 export const getInstance = (token) => {
   const artificioApi = axios.create({
-    // baseURL: 'https://api.artificio.ai',
-    baseURL: 'http://localhost:5000',
+    baseURL: 'https://api.artificio.ai',
+    // baseURL: 'http://localhost:5000',
   });
 
   if (token) {
