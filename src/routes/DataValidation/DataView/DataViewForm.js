@@ -135,9 +135,6 @@ export default function DataViewForm({initFormData, ...props}) {
         <FormRowItem>
           <FormInputText label="Description" name='desc' value={formData.desc} onChange={onTextChange}/>
         </FormRowItem>
-        <FormRowItem>
-          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={isLoading} />
-        </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
@@ -151,6 +148,9 @@ export default function DataViewForm({initFormData, ...props}) {
         </FormRowItem>
       </FormRow>
       <FormRow>
+        <FormRowItem>
+          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={isLoading} />
+        </FormRowItem>
         <FormRowItem>
           <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
