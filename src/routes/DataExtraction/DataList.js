@@ -12,6 +12,7 @@ import {
   MenuItem,
   Popover,
   Snackbar,
+  Tooltip,
   Typography,
 } from "@material-ui/core";
 import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
@@ -928,6 +929,7 @@ function DataList(props) {
             <PlayCircleFilledIcon color="primary" />
             &nbsp; Annotation
           </Button>
+          <Tooltip title="Text Classification" aria-label="Text Classification">
           <CompactButton
             className={classes.ml1}
             label="Train"
@@ -938,6 +940,8 @@ function DataList(props) {
               setCreateModelDialogStatus(true);
             }}
           />
+          </Tooltip>
+          <Tooltip title="Text Classification" aria-label="Text Classification" placement="top">
           <CompactButton
             className={classes.ml1}
             label="Re-Train"
@@ -949,6 +953,7 @@ function DataList(props) {
               setShowModelListDialog("retrain");
             }}
           />
+          </Tooltip>
           <CompactButton
             className={classes.ml1}
             label="Predict"

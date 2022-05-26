@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography, Dialog, DialogActions, DialogContent} from '@material-ui/core';
+import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography, Dialog, DialogActions, DialogContent, Tooltip} from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
@@ -590,6 +590,7 @@ export default function Results(props) {
             <Box className={classes.rightAlign}>
               {/* <Button onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button> */}
 							<Button style={{height: '2rem'}} className={classes.playBtn} disabled={rowsSelected.length === 0} onClick={()=>{setAnnotateOpen(true)}}><PlayCircleFilledIcon color="primary" />&nbsp; Review</Button>
+              <Tooltip title="Entity Extraction" aria-label="Entity Extraction">
               <CompactButton
                 className={classes.ml1}
                 label="Train"
@@ -600,6 +601,8 @@ export default function Results(props) {
                   setCreateModelDialogStatus(true);
                 }}
               />
+              </Tooltip>
+              <Tooltip title="Entity Extraction" aria-label="Entity Extraction">
               <CompactButton
                 className={classes.ml1}
                 label="Re-Train"
@@ -611,6 +614,7 @@ export default function Results(props) {
                   setShowModelListDialog("retrain");
                 }}
               />
+              </Tooltip>
               {isTrainingReqInProcess && <Loader />}
               {/* Dialog for Selecting Existing Model */}
               <SelectModelDialog
