@@ -133,7 +133,15 @@ export default function DataGroupForm({initFormData, ...props}) {
         assign_label: formData.assign_label.map((label)=>label._id),
       }
       let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
-      api.post(url, newFormData).then((resp)=>{
+      let tempResponse=null
+      if (editMode){
+tempResponse=api.patch(url,newFormData)
+
+      }else{
+
+        tempResponse=api.post(url,newFormData)
+      }
+      tempResponse.then((resp)=>{
         setFormSuccess('Data group created sucessfully.');
         if(!editMode) setFormData(defaults);
       }).catch((err)=>{

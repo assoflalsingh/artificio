@@ -73,7 +73,7 @@ export default function LabelForm({initFormData, ...props}) {
         const emailsResponse = await api.get(URL_MAP.GET_DATASET_EMAILS);
 
         // fetch Ocr data
-        const ocrResponse = await api.post(URL_MAP.GET_OCR_DETAILS);
+        const ocrResponse = await api.get(URL_MAP.GET_OCR_DETAILS);
         // fetch classification data
         const classifyResponse = await api.post(URL_MAP.GET_ALL_MODELS,{model_type:"classifier"});
         const classifyData = classifyResponse?.data?.model_list || []; 
