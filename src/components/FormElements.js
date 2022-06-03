@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, CircularProgress, Divider, FormControl, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Popover, Select, TextField, Typography, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
+import { Box, CircularProgress, Divider, FormControl, FormHelperText, FormLabel, FormGroup, Grid, InputAdornment, MenuItem, Popover, Select, TextField, Typography, FormControlLabel, Radio, RadioGroup, Checkbox } from '@material-ui/core';
 import MuiPhoneNumber from 'material-ui-phone-number';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { ColorPalette, ColorButton } from 'material-ui-color';
@@ -84,10 +84,11 @@ export function FormInput({children, info, ...props}) {
 
   const open = Boolean(anchorEl);
   return (
-    <Box>
-      <Box display="flex" style={{alignItems: 'flex-end'}}>
+    <Box style={{display: `${props.sideLabel? 'flex' : ''}`, marginTop: `${props.sideLabel? '0.9rem' : ''}`}}>
+      <Box display="flex" style={{alignItems: `${props.sideLabel? 'center' : 'flex-end'}`, marginRight: `${props.sideLabel? '1.18rem' : ''}`}}>
         <FormLabel component={Box} required={props.required} className={classes.formLabel}>
           {props.label}
+          {/* style={{opacity: `${props.sideLabel? '0' : '1'}`}} */}
         </FormLabel>
           {info &&
             <>
@@ -160,11 +161,11 @@ export function doValidation(value, validators, errorMessages) {
   return errMsg;
 }
 
-export function FormInputText({InputIcon, errorMsg, required, onChange, label, readOnly, info, ...props}) {
+export function FormInputText({InputIcon, errorMsg, required, onChange, label, sideLabel, readOnly, info, ...props}) {
   const classes = useStyles();
 
   return (
-    <FormInput required={required} label={label} info={info}>
+    <FormInput required={required} label={label} sideLabel={sideLabel} info={info}>
       <TextField
         variant="outlined"
         InputProps={{
@@ -248,6 +249,44 @@ export function FormInputRadio({errorMsg, required, onChange, label, options, re
           })}
         </RadioGroup>
       <FormHelperText>{errorMsg}</FormHelperText>
+      </FormControl>
+    </FormInput>
+  );
+}
+
+export function FormInputCheck({errorMsg, formData, required, onChange, label, options, readOnly, disabled, nameKey='name', labelKey='label', valueKey='value', ...props}) {
+  const classes = useStyles();
+  options = options || [];
+
+  return (
+    <FormInput required={required} label={label}>
+      <FormControl error={Boolean(errorMsg)}>
+        <FormGroup aria-label="position" row>
+        {options.map((opt, index)=>{
+          let label = '', value = '', name = '';
+
+          if(typeof(opt) === 'string') {
+            name = label = value = opt;
+          } else {
+            name = opt[nameKey];
+            label = opt[labelKey];
+            value = opt[valueKey];
+          }
+
+          if(index > 0 && label === ''){
+            return;
+          }
+          return <FormControlLabel key={index}
+            control={<Checkbox
+            checked={formData[name] === value}
+            name={name}
+            onChange={onChange}
+            variant="outlined"
+            className={`${classes.formInput} ${Boolean(disabled) ? classes.disabled : ''}`}
+            />} label={label} />
+          })}
+        </FormGroup>
+        <FormHelperText>{errorMsg}</FormHelperText>
       </FormControl>
     </FormInput>
   );

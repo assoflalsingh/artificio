@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../../components/FormElements';
+import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, FormInputCheck } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 
+const dataAnalyticsOptions = [{label: "", name: 'data_analytics', value: true}];
+const defaults = {
+  name: '',
+  desc: '',
+  assign_user: '',
+  ptm: '',
+  assign_label: [],
+  data_struct: '',
+  data_analytics: '',
+}
+
 export default function DataGroupForm({initFormData, ...props}) {
-  const defaults = {
-    name: '',
-    desc: '',
-    assign_user: '',
-    ptm: '',
-    assign_label: [],
-    data_struct: '',
-  }
   const editMode = (initFormData != null);
   const [formData, setFormData] = useState(defaults);
   const [formDataErr, setFormDataErr] = useState({});
@@ -103,7 +106,7 @@ export default function DataGroupForm({initFormData, ...props}) {
     let value = e;
     if(e.target) {
       name = e.target.name;
-      value = e.target.value;
+      value = e.target.type === 'checkbox'? e.target.checked : e.target.value;
     }
     setFormData((prevData)=>({
       ...prevData,
@@ -188,7 +191,7 @@ tempResponse=api.patch(url,newFormData)
             labelKey='name' valueKey='id' />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect label="Pre-trained model" name='ptm' onChange={onTextChange}
+          <FormInputSelect label="Pre-trained model" name='ptm' onChange={onTextChange} disabled={formData.data_struct !== ''}
             firstEmpty={true} loading={opLoading} value={formData.ptm} options={ptmOpts} />
         </FormRowItem>
       </FormRow>
@@ -199,8 +202,13 @@ tempResponse=api.patch(url,newFormData)
             labelKey='name' valueKey='id' />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect label="Default structure ID" name='data_struct' onChange={onTextChange}
-            loading={opLoading} value={formData.data_struct} options={dataStructOpts} />
+          <FormInputSelect label="Default structure ID" name='data_struct' disabled={formData.ptm !== ''} onChange={onTextChange}
+            firstEmpty={true} loading={opLoading} value={formData.data_struct} options={dataStructOpts} />
+        </FormRowItem>
+      </FormRow>
+      <FormRow>
+        <FormRowItem>
+          <FormInputCheck label="Data Analytics" formData={formData} options={dataAnalyticsOptions} onChange={onTextChange} />
         </FormRowItem>
       </FormRow>
       {(formError || formSuccess) &&

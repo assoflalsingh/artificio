@@ -5,7 +5,7 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import ListItemLink from './ListItemLink';
-import FormatShapesIcon from '../assets/images/annotation.svg';
+import automationIcon from '../assets/images/automation.svg';
 import StorageIcon from '../assets/images/create-model.svg';
 import SettingsIcon from '../assets/images/admin.svg';
 
@@ -56,7 +56,7 @@ const Navbar = ({baseurl}) => {
         {/* <Typography variant="h4" className={classes.logo}>Navbar</Typography> */}
           <div className={classes.navlinks} >
             <ListItemLink icon={StorageIcon} primary='Data Modelling' to={`${baseurl}/data_model`}/>
-            <ListItemLink icon={FormatShapesIcon} primary='Automation' to={`${baseurl}/automation`}/>
+            <ListItemLink icon={automationIcon} primary='Automation' to={`${baseurl}/automation`}/>
           </div>
           <div className={classes.navlinks} style={{marginLeft: 'auto'}} >
             <ListItemLink icon={SettingsIcon} primary='Admin' to={`${baseurl}/admin`} />
