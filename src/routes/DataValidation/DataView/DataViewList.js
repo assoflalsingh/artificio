@@ -6,6 +6,9 @@ import {CompactAddButton, RefreshIconButton} from '../../../components/CustomBut
 import { URL_MAP } from '../../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import useApi from '../../../hooks/use-api';
+import TableChartIcon from "@material-ui/icons/TableChart";
+import IconButton from "@material-ui/core/IconButton";
+// import DataViewGrid from './DataViewGrid';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -23,10 +26,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const testData = [{name: 'ADSingh', desc: 'Developer', actions: ''}];
+
 export default function DataViewList({setFormData, ...props}) {
   const classes = useStyles();
-  const [labelsDict, setLabelsDict] = useState([]);
-  const [dglist, setDgList] = useState([]);
+  const [openDataViewGrid, setOpenDataViewGrid] = useState(false);
+  const [dataViewId, setDataViewId] = useState(0);
+  const [dglist, setDgList] = useState(testData);
   const {isLoading, apiRequest, error} = useApi();
 
   const showDGForm = ()=>{props.loadDataViewForm(true);};
@@ -37,6 +43,14 @@ export default function DataViewList({setFormData, ...props}) {
   const onNameClick = (dataIndex)=>{
     setFormData(dglist[dataIndex]);
     showDGForm();
+  };
+  const showDataViewGrid = (dataIndex)=>{
+    setDataViewId(dataIndex);
+    setOpenDataViewGrid(true);
+  };
+  const closeDataViewGrid = ()=>{
+    setDataViewId(0);
+    setOpenDataViewGrid(false);
   };
 
   const columns = [
@@ -64,16 +78,16 @@ export default function DataViewList({setFormData, ...props}) {
       }
     },
     {
-      name: "assign_label",
-      label: "Labels",
+      name: "actions",
+      label: "Actions",
       options: {
-        filter: true,
-        sort: true,
-        draggable: true,
+        filter: false,
+        sort: false,
+        draggable: false,
         customBodyRenderLite: (dataIndex, rowIndex) => {
-          return dglist[dataIndex].assign_label.map((label_id)=>{
-            return labelsDict[label_id];
-          }).join(', ');
+          return <IconButton variant="outlined" onClick={()=>showDataViewGrid(dataIndex)}>
+            <TableChartIcon style={{fontSize: '1.2rem'}} />
+          </IconButton>
         }
       }
     },
@@ -103,11 +117,6 @@ export default function DataViewList({setFormData, ...props}) {
     setDgList([]);
 
     apiRequest({url: URL_MAP.GET_DATAGROUPS}, (resp) => {
-      let labelsDict = {};
-      resp.labels.forEach((label)=>{
-        labelsDict[label._id] = label.name;
-      });
-      setLabelsDict(labelsDict);
       setDgList(resp.datagroups);
     });
   },[apiRequest]);
@@ -131,6 +140,7 @@ export default function DataViewList({setFormData, ...props}) {
         columns={columns}
         options={options}
       />
+      {/* <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewID={dataViewId} /> */}
       <Snackbar open={Boolean(error)} autoHideDuration={6000} >
         {error && <Alert severity="error">{error}</Alert>}
       </Snackbar>

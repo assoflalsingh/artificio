@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import {URL_MAP} from '../../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation } from '../../../components/FormElements';
+import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, FormInputCheck } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
 import useApi from '../../../hooks/use-api';
 import DataGroupJoins from './DataGroupJoins';
 
 // const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
-const lineItemsTableData = [{label: "No", value:"no"},{label: "Yes", value:"yes"}];
+const lineItemsTableData = [{label: "", name: 'include_items_table', value: true}];
 const defaults = {
   name: '',
   desc: '',
   data_group: [],
   records: 1000,
-  past_days: 30,
+  past_days: -30,
   future_days: 30,
   include_items_table: lineItemsTableData[0].value,
 }
@@ -72,7 +72,15 @@ export default function DataViewForm({initFormData, ...props}) {
     let value = e;
     if(e.target) {
       name = e.target.name;
-      value = e.target.value;
+      value = e.target.type === 'checkbox'? e.target.checked : e.target.value;
+    }
+    if(name === 'past_days'){
+      if(value === '-'){
+        value = '';
+      }
+      if(+value > 0){
+        value *= -1;
+      }
     }
     setFormData((prevData)=>({
       ...prevData,
@@ -141,15 +149,15 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputText label="Relative Days Data Selection" name='past_days' value={formData.past_days} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="To" name='future_days' value={formData.future_days} onChange={onTextChange}/>
+          <FormInputText label="To" sideLabel={true} name='future_days' value={formData.future_days} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="Default no of records (rows)" name="Default no of records (rows)" value={formData.records} onChange={onTextChange} />
+          <FormInputCheck label="Include Line Items / Table Data" formData={formData} options={lineItemsTableData} onChange={onTextChange} />
         </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect label="Include Line Items/Table Data" name='include_items_table' value={formData.include_items_table} options={lineItemsTableData} onChange={onTextChange} loading={isLoading} />
+          <FormInputText label="Default no of records (rows)" name="records" value={formData.records} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
           <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
