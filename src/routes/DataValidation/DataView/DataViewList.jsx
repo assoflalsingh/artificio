@@ -8,7 +8,7 @@ import Alert from '@material-ui/lab/Alert';
 import useApi from '../../../hooks/use-api';
 import TableChartIcon from "@material-ui/icons/TableChart";
 import IconButton from "@material-ui/core/IconButton";
-// import DataViewGrid from './DataViewGrid';
+import DataViewGrid from './DataViewGrid';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -139,8 +139,9 @@ export default function DataViewList({setFormData, ...props}) {
         data={dglist}
         columns={columns}
         options={options}
+        onPageChange={() => {}}
       />
-      {/* <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewID={dataViewId} /> */}
+      <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewID={dataViewId} />
       <Snackbar open={Boolean(error)} autoHideDuration={6000} >
         {error && <Alert severity="error">{error}</Alert>}
       </Snackbar>
