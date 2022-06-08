@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import {URL_MAP} from '../../../others/artificio_api.instance';
-import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, FormInputCheck } from '../../../components/FormElements';
+import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, FormInputCheck, FormInput, CustomField } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
 import ChevronLeftOutlinedIcon from "@material-ui/icons/ChevronLeftOutlined";
+import { makeStyles } from '@material-ui/core/styles';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import useApi from '../../../hooks/use-api';
 import DataGroupJoins from './DataGroupJoins';
 
@@ -16,8 +19,17 @@ const defaults = {
   records: 1000,
   past_days: -30,
   future_days: 30,
+  from_date: '',
+  to_date: '',
   include_items_table: lineItemsTableData[0].value,
 }
+const useStyles = makeStyles((theme) => ({
+  dateSelector: {
+    cursor: "pointer",
+    caretColor: 'transparent'
+  }
+}));
+
 
 export default function DataViewForm({initFormData, ...props}) {
   const editMode = (initFormData != null);
@@ -28,6 +40,7 @@ export default function DataViewForm({initFormData, ...props}) {
   const [dgList, setDGList] = useState([]);
   const [labelsList, setLabesList] = useState([]);
   const {isLoading, apiRequest, error} = useApi();
+  const classes = useStyles();
 
   const formValidators = {
     name: {
@@ -152,10 +165,24 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputText label="To" sideLabel={true} name='future_days' value={formData.future_days} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputCheck label="Include Line Items / Table Data" formData={formData} options={lineItemsTableData} onChange={onTextChange} />
+          <FormInput label="Relative Date From">
+            <CustomField>
+              <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={formData.from_date } placeholderText="Select Date" onChange={date => onTextChange(date, "from_date")} />
+            </CustomField>
+          </FormInput>
+        </FormRowItem>
+        <FormRowItem>
+          <FormInput label="To" sideLabel={true}>
+            <CustomField>
+              <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={formData.to_date } placeholderText="Select Date" minDate={formData.from_date} onChange={date => onTextChange(date, "to_date")} />
+            </CustomField>
+          </FormInput>
         </FormRowItem>
       </FormRow>
       <FormRow>
+        <FormRowItem>
+          <FormInputCheck label="Include Line Items / Table Data" formData={formData} options={lineItemsTableData} onChange={onTextChange} />
+        </FormRowItem>
         <FormRowItem>
           <FormInputText label="Default no of records (rows)" name="records" value={formData.records} onChange={onTextChange} />
         </FormRowItem>

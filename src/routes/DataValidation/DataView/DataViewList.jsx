@@ -139,7 +139,6 @@ export default function DataViewList({setFormData, ...props}) {
         data={dglist}
         columns={columns}
         options={options}
-        onPageChange={() => {}}
       />
       <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewID={dataViewId} />
       <Snackbar open={Boolean(error)} autoHideDuration={6000} >

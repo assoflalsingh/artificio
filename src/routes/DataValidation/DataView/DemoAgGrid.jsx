@@ -3,11 +3,8 @@ import { AgGridReact } from 'ag-grid-react'; // the AG Grid React Component
 import 'ag-grid-enterprise'; // To use enterprise features
 import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
-import { LicenseManager } from 'ag-grid-enterprise';
 import { FormInputText } from '../../../components/FormElements';
 // import { Box } from '@material-ui/core';
-
-LicenseManager.setLicenseKey("CompanyName=BizTech2go,LicensedApplication=artificio.ai,LicenseType=SingleApplication,LicensedConcurrentDeveloperCount=1,LicensedProductionInstancesCount=1,AssetReference=AG-029052,SupportServicesEnd=7_June_2023_[v2]_MTY4NjA5MjQwMDAwMA==1f8971d4f50107f0f900f250225b5238");
 
 const defaultRowData = [{
 	"athlete": "Michael Phelps",

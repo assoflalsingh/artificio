@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import {RefreshIconButton} from './CustomButtons';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Dialog, DialogActions, DialogContent, MenuItem, Typography } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, Typography } from '@material-ui/core';
 import TextField from "@material-ui/core/TextField";
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from "@material-ui/core/IconButton";
 import FilterListTwoToneIcon from '@material-ui/icons/FilterListTwoTone';
-import Select from '@material-ui/core/Select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { CustomField, FormInputSelect } from './FormElements';
 
 const useStyles = makeStyles((theme) => ({
     contentColumn: {
       textAlign: "center",
-      border: "solid 1px gray",
-      borderRadius: "10px",
+      borderBottom: "solid 1px #ccc",
       height: "40px",
       padding: "0px",
       fontSize: "18px",
@@ -93,7 +92,12 @@ export default function TableFilterPanel(props) {
 
     const updateFilters = (event,label,type)=> {
     let filtersToUpdate = selectedFilters;
-    let {name, value} = event.target;
+    let value = event;
+    let name = label;
+    if(event.target) {
+      name = event.target.name;
+      value = event.target.type === 'checkbox'? event.target.checked : event.target.value;
+    }
     filtersToUpdate[label] = filtersToUpdate[label] || {};
     filtersToUpdate[label][name] = value;
     if(typeof filtersToUpdate[label]["fieldValue"] === "object") {
@@ -227,24 +231,18 @@ export default function TableFilterPanel(props) {
                 <td className={classes.contentColumn}>{element.label}</td>
                 <td className={`${classes.contentColumn} ${classes.noBorder}`}>
                 <FormControl variant="filled" className={classes.formControl}>
-                  <Select
-                    labelId="demo-simple-select-filled-label"
-                    id="demo-simple-select-filled"
-                    value={selectedFilters[element.name]?.comparison || (element.type==="datetime" ? "gt" : "eq")}
-                    name="comparison"
-                    onChange={(event)=>updateFilters(event,element.name, element.type)}
-                  > 
-                    {
-                      comparisonOptions.map((comparison, index)=> (element.possibleComparisons.indexOf(comparison.value) > -1) && <MenuItem key={index} value={comparison.value}>{comparison.name}</MenuItem>)
-                    }
-                  </Select>
+                  <FormInputSelect name='comparison' onChange={(e, name)=>{updateFilters(e, element.name, element.type)}} value={selectedFilters[element.name]?.comparison || (element.type==="datetime" ? "gt" : "eq")} options={comparisonOptions} labelKey='name' valueKey='value' />
                 </FormControl>
                 </td>
                 <td className={`${classes.contentColumn} ${classes.noBorder}`}>
                 {(element.type==="datetime" && selectedFilters[element.name]?.comparison==="drange") ? 
                 <>
-                  <DatePicker className={`${classes.dateSelector}`} selected={selectedFilters[element.name]?.fieldValue?.fromDate } placeholderText="select date" onChange={date => updateFiltersWithDateRange(date,"timestamp","fromDate")} />
-                  <DatePicker className={`${classes.dateSelector}`} selected={selectedFilters[element.name]?.fieldValue?.toDate } placeholderText="select date" onChange={date => updateFiltersWithDateRange(date,"timestamp", "toDate")} />
+                <CustomField>
+                  <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={selectedFilters[element.name]?.fieldValue?.fromDate } placeholderText="select date" onChange={date => updateFiltersWithDateRange(date,"timestamp","fromDate")} />
+                </CustomField>
+                <CustomField>
+                  <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={selectedFilters[element.name]?.fieldValue?.toDate } placeholderText="select date" onChange={date => updateFiltersWithDateRange(date,"timestamp", "toDate")} />
+                  </CustomField>
                 </>
                 :
                 <TextField
@@ -257,7 +255,7 @@ export default function TableFilterPanel(props) {
                 />}
                 </td>
                 <td className={`${classes.contentColumn} ${classes.noBorder}`}>
-                  <RefreshIconButton className={classes.ml1} title="Reset filter value" label="" onClick={()=>{resetFilter(element.name)}}/>
+                  <RefreshIconButton title="Reset Filter Value" onClick={()=>{resetFilter(element.name)}}/>
                 </td>
               </tr>
               )
