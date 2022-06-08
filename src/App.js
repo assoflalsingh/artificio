@@ -14,6 +14,10 @@ import Activate from './routes/Activate';
 import ForgotPassword from './routes/ForgotPassword';
 import ResetPassword from './routes/ResetPassword';
 
+import { LicenseManager } from 'ag-grid-enterprise';
+import APP_CONFIGS from './app-config';
+LicenseManager.setLicenseKey(APP_CONFIGS.AG_GRID_LICENCE_KEY);
+
 const reduxStore = configureStore({
   user: {
     user_set: false,

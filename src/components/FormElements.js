@@ -70,6 +70,15 @@ export function FormRowItem({children, ...props}) {
   );
 }
 
+export function CustomField({children}) {
+  return (
+  <div style={{marginTop: '0.25rem'}} className='MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth'>
+    <div class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-fullWidth MuiInputBase-formControl">{children}
+      <fieldset aria-hidden="true" className="PrivateNotchedOutline-root-174 MuiOutlinedInput-notchedOutline" style={{paddingLeft: '8px', top: 0}}><legend className="PrivateNotchedOutline-legend-175" style={{width: '0.01px'}}><span></span></legend></fieldset>
+    </div>
+  </div>);
+}
+
 export function FormInput({children, info, ...props}) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
