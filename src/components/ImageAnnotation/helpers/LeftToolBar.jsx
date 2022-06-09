@@ -110,7 +110,7 @@ export function LeftToolBar({
         </IconButton>
       </Tooltip>
       {inReview && (
-        <Tooltip title="Push to done">
+        <Tooltip title="Push to Reviewed">
           <IconButton
             data-name="done-save"
             onClick={() => save(true)}

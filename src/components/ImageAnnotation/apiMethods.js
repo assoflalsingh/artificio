@@ -43,7 +43,7 @@ export async function saveAnnotationData(
       },
       user_annotate_data: userAnnotatedData,
     },
-    status: reviewMode ? "completed" : "in-process",
+    status: reviewMode ? "reviewed" : "in-process",
   });
 }
 
