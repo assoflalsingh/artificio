@@ -121,8 +121,8 @@ export default function DataViewForm({initFormData, ...props}) {
         data_group: formData.data_group.map((label)=>label._id),
       }
       console.log("newFormData: ",newFormData);
-      // let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
       // setSaving(true);
+      // let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
       // apiRequest({url: url, params: newFormData}, () =>{
       //   setFormSuccess('Data View created sucessfully.');
       //   if(!editMode) setFormData(defaults);
@@ -181,7 +181,7 @@ export default function DataViewForm({initFormData, ...props}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputCheck label="Include Line Items / Table Data" formData={formData} options={lineItemsTableData} onChange={onTextChange} />
+          <FormInputCheck color="primary" label="Include Line Items / Table Data" formData={formData} options={lineItemsTableData} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
           <FormInputText label="Default no of records (rows)" name="records" value={formData.records} onChange={onTextChange} />

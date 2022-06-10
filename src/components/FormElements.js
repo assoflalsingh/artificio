@@ -263,7 +263,7 @@ export function FormInputRadio({errorMsg, required, onChange, label, options, re
   );
 }
 
-export function FormInputCheck({errorMsg, formData, required, onChange, label, options, readOnly, disabled, nameKey='name', labelKey='label', valueKey='value', ...props}) {
+export function FormInputCheck({errorMsg, formData, required, onChange, label, options, readOnly, disabled, nameKey='name', labelKey='label', valueKey='value', checked = false, ...props}) {
   const classes = useStyles();
   options = options || [];
 
@@ -292,8 +292,18 @@ export function FormInputCheck({errorMsg, formData, required, onChange, label, o
             onChange={onChange}
             variant="outlined"
             className={`${classes.formInput} ${Boolean(disabled) ? classes.disabled : ''}`}
+            {...props}
             />} label={label} />
           })}
+          {options.length === 0 && <FormControlLabel
+            control={<Checkbox
+            checked={checked}
+            onChange={onChange}
+            variant="outlined"
+            readOnly={Boolean(readOnly)}
+            {...props}
+            className={`${classes.formInput} ${Boolean(disabled) ? classes.disabled : ''}`}
+            />} label={''} /> }
         </FormGroup>
         <FormHelperText>{errorMsg}</FormHelperText>
       </FormControl>
