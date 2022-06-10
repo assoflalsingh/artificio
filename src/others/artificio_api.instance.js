@@ -69,6 +69,7 @@ export const URL_MAP = {
   GET_ALL_MODELS:'classification/get-model-details/',
 
   TRAIN_RETRAIN_MODEL:'classification/prediction-model/',
+  TRAIN_MODEL:'ner-model/train/',
 
   GET_APP_USAGE: 'appusage/',
   GET_DATA_SETS: 'dataset/',

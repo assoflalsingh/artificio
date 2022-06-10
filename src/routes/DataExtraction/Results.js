@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography, Dialog, DialogActions, DialogContent, Tooltip} from '@material-ui/core';
+import { Backdrop, Box, Button, Chip, CircularProgress, MenuItem, Popover, Snackbar, Typography, Dialog, DialogActions, DialogContent, Tooltip, IconButton} from '@material-ui/core';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import MUIDataTable from "mui-datatables";
@@ -12,7 +12,9 @@ import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import Loader from "../../components/ImageAnnotation/helpers/Loader";
 import SelectModelDialog from "../../components/SelectModelDialog";
-import { Form, FormInputText, FormRow, FormRowItem, doValidation } from "../../components/FormElements";
+import { Form, FormInputText, FormRow, FormRowItem, doValidation, FormInputCheck } from "../../components/FormElements";
+import SettingsIcon from '@material-ui/icons/Settings';
+import DeleteIcon from "@material-ui/icons/Clear";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -73,8 +75,16 @@ export default function Results(props) {
   const createModelDefault = {
     new_model_name: "",
     new_model_desc: "",
-    new_model_type: "ner",
+    new_model_type: "", // ner
+    epochs: '2',
+    lr: '0.000000001',
+    batch_size: '2',
   };
+  const [trainSettings, setTrainSettings] = useState(false);
+  const [epochsAuto, setEpochsAuto] = useState(true);
+  const [lrAuto, setLRAuto] = useState(true);
+  const [batchSizeAuto, setBatchSizeAuto] = useState(true);
+
   const [createModelFormData, setCreateModelFormData] = useState(createModelDefault);
   const [modelsList, setModelsList] = useState([]);
   const [createModelErr, setCreateModelErr] = useState({});
@@ -371,7 +381,14 @@ export default function Results(props) {
       createModelPayload["model_id"] = modelID || "";
       createModelPayload["version"] = version || "";
     }
+
+    createModelPayload.files = [];
+    createModelPayload.settings = {epochs: +createModelFormData.epochs, lr: +createModelFormData.lr, batch_size: +createModelFormData.batch_size};
+
     rowsSelected.map((row) => {
+      createModelPayload.files.push(datalist[row].image_name);
+      createModelPayload.datagroup_id = datalist[row].datagroup_id;
+
       if (model_action === "predict")
         datalist[row].struct_id = "temp_strucutre_to_remove_for_predict";
       // show error if selected file has status new
@@ -384,15 +401,15 @@ export default function Results(props) {
         return false;
       }
       // structure id is missing
-      if (model_action !== "predict" && !datalist[row].struct_id) {
-        errorMessage = "Structure id is missing for the selection.";
-        setAjaxMessage({
-          error: true,
-          text: errorMessage,
-        });
-      }
+      // if (model_action !== "predict" && !datalist[row].struct_id) {
+      //   errorMessage = "Structure id is missing for the selection.";
+      //   setAjaxMessage({
+      //     error: true,
+      //     text: errorMessage,
+      //   });
+      // } else
       // Datagroup id is missing
-      else if (model_action !== "predict" && !datalist[row].datagroup_id) {
+      if (model_action !== "predict" && !datalist[row].datagroup_id) {
         errorMessage = "Datagroup id is missing for the selection.";
         setAjaxMessage({
           error: true,
@@ -448,7 +465,7 @@ export default function Results(props) {
       setIsTrainingReqInProcess(true);
       setCreateModelDialogStatus(false);
       api
-        .post(URL_MAP.TRAIN_RETRAIN_MODEL, {
+        .post(model_action === "train" ? URL_MAP.TRAIN_MODEL: URL_MAP.TRAIN_RETRAIN_MODEL, {
           ...createModelPayload,
         })
         .then((response) => {
@@ -598,6 +615,30 @@ export default function Results(props) {
                 color="primary"
                 disabled={rowsSelected.length === 0}
                 onClick={() => {
+                  setAjaxMessage(null);
+                  let stopFlag = false;
+                  let dg_id = '';
+                  let errorMessage;
+                  rowsSelected.forEach((row) => {
+                    if(!stopFlag && dg_id !== '' && dg_id !== datalist[row].datagroup_id){
+                      stopFlag = true;
+                      errorMessage = 'Data Group must be the same for all the selected files.';
+                    }
+                    dg_id = datalist[row].datagroup_id;
+
+                    if(!stopFlag && datalist[row].img_status !== 'reviewed'){
+                      stopFlag = true;
+                      errorMessage = 'Please select only Reviewed file(s).';
+                    }
+                  });
+
+                  if(stopFlag){
+                    setAjaxMessage({
+                      error: true,
+                      text: errorMessage,
+                    });
+                    return false;
+                  }
                   setCreateModelDialogStatus(true);
                 }}
               />
@@ -644,7 +685,42 @@ export default function Results(props) {
               >
                 <DialogContent>
                   <Typography variant="h5">Enter Model Details</Typography>
+                  <IconButton
+                    variant="outlined"
+                    onClick={() => {
+                      setTrainSettings(prevState => !prevState);
+                    }}
+                    style={{ zIndex: 9, top: '10px', right: '10px', position: "absolute" }}
+                  >
+                    <SettingsIcon style={{ fontSize: "1.2rem" }} color={trainSettings? 'primary' : ''} />
+                  </IconButton>
                   <Form>
+                  {trainSettings && <>
+                    <FormRow>
+                      <FormRowItem>
+                        <FormInputText label="EPOCHS" name='epochs' readOnly={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange}/>
+                      </FormRowItem>
+                      <FormRowItem>
+                        <FormInputCheck label="Auto" checked={epochsAuto} color="primary" onChange={() => setEpochsAuto(prevState => !prevState)} />
+                      </FormRowItem>
+                    </FormRow>
+                    <FormRow>
+                      <FormRowItem>
+                        <FormInputText label="Learning Rate" name='lr' readOnly={lrAuto} value={createModelFormData.lr} onChange={onTextChange}/>
+                      </FormRowItem>
+                      <FormRowItem>
+                        <FormInputCheck label="Auto" checked={lrAuto} color="primary" onChange={() => setLRAuto(prevState => !prevState)} />
+                      </FormRowItem>
+                    </FormRow>
+                    <FormRow>
+                      <FormRowItem>
+                        <FormInputText label="Batch Size" name='batch_size' readOnly={batchSizeAuto} value={createModelFormData.batch_size} onChange={onTextChange}/>
+                      </FormRowItem>
+                      <FormRowItem>
+                        <FormInputCheck label="Auto" checked={batchSizeAuto} color="primary" onChange={() => setBatchSizeAuto(prevState => !prevState)} />
+                      </FormRowItem>
+                    </FormRow>
+                    </>}
                     <FormRow>
                       <FormRowItem>
                         <FormInputText
