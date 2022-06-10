@@ -383,7 +383,7 @@ export default function Results(props) {
     }
 
     createModelPayload.files = [];
-    createModelPayload.settings = {epochs: +createModelFormData.epochs, lr: createModelFormData.lr, batch_size: +createModelFormData.batch_size};
+    createModelPayload.settings = {epochs: +createModelFormData.epochs, lr: +createModelFormData.lr, batch_size: +createModelFormData.batch_size};
 
     rowsSelected.map((row) => {
       createModelPayload.files.push(datalist[row].image_name);
