@@ -76,9 +76,9 @@ export default function Results(props) {
     new_model_name: "",
     new_model_desc: "",
     new_model_type: "", // ner
-    epochs: '2',
-    lr: '0.000000001',
-    batch_size: '2',
+    epochs: '', // 2
+    lr: '', // 0.000000001
+    batch_size: '', // 2
   };
   const [trainSettings, setTrainSettings] = useState(false);
   const [epochsAuto, setEpochsAuto] = useState(true);
@@ -382,8 +382,35 @@ export default function Results(props) {
       createModelPayload["version"] = version || "";
     }
 
+    if (trainSettings === true && epochsAuto === false && +createModelFormData.epochs < 1) {
+      errorMessage = "EPOCHS Should be a number or should be Auto.";
+      setAjaxMessage({
+        error: true,
+        text: errorMessage,
+      });
+      return false;
+    }
+
+    if (trainSettings === true && lrAuto === false && (createModelFormData.lr.indexOf('.') < 0 || +createModelFormData.lr < 1)) {
+      errorMessage = "LR Should be a decimal value or should be Auto.";
+      setAjaxMessage({
+        error: true,
+        text: errorMessage,
+      });
+      return false;
+    }
+
+    if (trainSettings === true && batchSizeAuto === false && (+createModelFormData.batch_size % 2 !== 0 || +createModelFormData.batch_size < 2)) {
+      errorMessage = "Batch Size Should be multiple of 2 or should be Auto.";
+      setAjaxMessage({
+        error: true,
+        text: errorMessage,
+      });
+      return false;
+    }
+
     createModelPayload.files = [];
-    createModelPayload.settings = {epochs: +createModelFormData.epochs, lr: +createModelFormData.lr, batch_size: +createModelFormData.batch_size};
+    createModelPayload.settings = {epochs: trainSettings === false || epochsAuto? '' : +createModelFormData.epochs, lr: trainSettings === false || lrAuto? '' : +createModelFormData.lr, batch_size: trainSettings === false || batchSizeAuto? '' : +createModelFormData.batch_size};
 
     rowsSelected.map((row) => {
       createModelPayload.files.push(datalist[row].image_name);
@@ -415,6 +442,7 @@ export default function Results(props) {
           error: true,
           text: errorMessage,
         });
+        return false;
       } else {
         let existingFileIndexWithSameId = createModelPayload.data_lists.findIndex(
           (o) => o.id === datalist[row]._id
@@ -460,8 +488,11 @@ export default function Results(props) {
       }
       return row;
     });
+    delete createModelPayload["action"];
+    delete createModelPayload["data_lists"];
+    delete createModelPayload["model_type"];
     console.log("createModelPayload", createModelPayload);
-    if (createModelPayload.data_lists.length > 0 && !errorMessage) {
+    if (!errorMessage) { //createModelPayload.data_lists.length > 0 &&
       setIsTrainingReqInProcess(true);
       setCreateModelDialogStatus(false);
       api
@@ -698,7 +729,7 @@ export default function Results(props) {
                   {trainSettings && <>
                     <FormRow>
                       <FormRowItem>
-                        <FormInputText label="EPOCHS" name='epochs' readOnly={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange}/>
+                        <FormInputText label="EPOCHS" name='epochs' disabled={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange}/>
                       </FormRowItem>
                       <FormRowItem>
                         <FormInputCheck label="Auto" checked={epochsAuto} color="primary" onChange={() => setEpochsAuto(prevState => !prevState)} />
@@ -706,7 +737,7 @@ export default function Results(props) {
                     </FormRow>
                     <FormRow>
                       <FormRowItem>
-                        <FormInputText label="Learning Rate" name='lr' readOnly={lrAuto} value={createModelFormData.lr} onChange={onTextChange}/>
+                        <FormInputText label="Learning Rate" name='lr' disabled={lrAuto} value={createModelFormData.lr} onChange={onTextChange}/>
                       </FormRowItem>
                       <FormRowItem>
                         <FormInputCheck label="Auto" checked={lrAuto} color="primary" onChange={() => setLRAuto(prevState => !prevState)} />
@@ -714,7 +745,7 @@ export default function Results(props) {
                     </FormRow>
                     <FormRow>
                       <FormRowItem>
-                        <FormInputText label="Batch Size" name='batch_size' readOnly={batchSizeAuto} value={createModelFormData.batch_size} onChange={onTextChange}/>
+                        <FormInputText label="Batch Size" name='batch_size' disabled={batchSizeAuto} value={createModelFormData.batch_size} onChange={onTextChange}/>
                       </FormRowItem>
                       <FormRowItem>
                         <FormInputCheck label="Auto" checked={batchSizeAuto} color="primary" onChange={() => setBatchSizeAuto(prevState => !prevState)} />
