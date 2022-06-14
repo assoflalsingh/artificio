@@ -367,6 +367,7 @@ export default function Results(props) {
     modelID
   ) => {
     let errorMessage = "";
+    setAjaxMessage(null);
     let createModelPayload = {
       model_name: model_name,
       model_desc: model_desc,
@@ -383,7 +384,7 @@ export default function Results(props) {
     }
 
     if (trainSettings === true && epochsAuto === false && +createModelFormData.epochs < 1) {
-      errorMessage = "EPOCHS Should be a number or should be Auto.";
+      errorMessage = "Epochs should be a number or Auto.";
       setAjaxMessage({
         error: true,
         text: errorMessage,
@@ -391,8 +392,8 @@ export default function Results(props) {
       return false;
     }
 
-    if (trainSettings === true && lrAuto === false && (createModelFormData.lr.indexOf('.') < 0 || +createModelFormData.lr < 1)) {
-      errorMessage = "LR Should be a decimal value or should be Auto.";
+    if (trainSettings === true && lrAuto === false && (createModelFormData.lr.indexOf('.') < 1 || createModelFormData.lr.length < 1)) {
+      errorMessage = "LR should be a decimal value or Auto.";
       setAjaxMessage({
         error: true,
         text: errorMessage,
@@ -401,7 +402,7 @@ export default function Results(props) {
     }
 
     if (trainSettings === true && batchSizeAuto === false && (+createModelFormData.batch_size % 2 !== 0 || +createModelFormData.batch_size < 2)) {
-      errorMessage = "Batch Size Should be multiple of 2 or should be Auto.";
+      errorMessage = "Batch Size should be multiple of 2 or Auto.";
       setAjaxMessage({
         error: true,
         text: errorMessage,
@@ -503,7 +504,7 @@ export default function Results(props) {
           setIsTrainingReqInProcess(false);
           setAjaxMessage({
             error: false,
-            text: response.data,
+            text: response.data?.data,
           });
           fetchModels();
           setCreateModelFormData(createModelDefault);
@@ -729,7 +730,7 @@ export default function Results(props) {
                   {trainSettings && <>
                     <FormRow>
                       <FormRowItem>
-                        <FormInputText label="EPOCHS" name='epochs' disabled={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange}/>
+                        <FormInputText label="Epochs" name='epochs' disabled={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange}/>
                       </FormRowItem>
                       <FormRowItem>
                         <FormInputCheck label="Auto" checked={epochsAuto} color="primary" onChange={() => setEpochsAuto(prevState => !prevState)} />
