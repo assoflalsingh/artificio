@@ -12,9 +12,10 @@ import { getInstance, URL_MAP } from '../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import Loader from "../../components/ImageAnnotation/helpers/Loader";
 import SelectModelDialog from "../../components/SelectModelDialog";
-import { Form, FormInputText, FormRow, FormRowItem, doValidation, FormInputCheck } from "../../components/FormElements";
+import { Form, FormInputText, FormRow, FormRowItem, doValidation, FormInputCheck, FormInputSelect } from "../../components/FormElements";
 import SettingsIcon from '@material-ui/icons/Settings';
-import DeleteIcon from "@material-ui/icons/Clear";
+import AssignDataGroup from './AssignDataGroup';
+import AssignDataStructure from './AssignDataStructure';
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -54,6 +55,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const statusArr = ['IN PROCESS', 'REVIEWED'];
+const settingValidation = {
+  validators: ["required", { type: "regex", param: "^[0-9]*$" }],
+  messages: [
+    "This field is required",
+    "Only Digits are allowed here.",
+  ],
+};
 
 export default function Results(props) {
   const {uploadCounter} = props;
@@ -62,6 +71,11 @@ export default function Results(props) {
 	const [annotateOpen, setAnnotateOpen] = useState(false);
   const api = getInstance(localStorage.getItem('token'));
   const [massAnchorEl, setMassAnchorEl] = useState();
+  const [massActionEl, setMassActionEl] = useState();
+  const [showAssignDG, setShowAssignDG] = useState(false);
+  const [showAssignStruct, setShowAssignStruct] = useState(false);
+  const [showChangeStatus, setShowChangeStatus] = useState(false);
+  const [updateStatusTo, setUpdateStatusTo] = useState(null);
   const [rowsSelected, setRowsSelected] = useState([]);
   const [pageMessage, setPageMessage] = useState(null);
   const [datalistMessage, setDatalistMessage] = useState(null);
@@ -198,12 +212,108 @@ export default function Results(props) {
     isRowSelectable: ()=> true
   };
 
+  const onAssignData = (type, id, name) => {
+    handleClose();
+    setPageMessage("Assigning...");
+    let data_lists = {};
+    rowsSelected.map((i) => {
+      let row = datalist[i];
+      data_lists[row._id] = data_lists[row._id] || [];
+      data_lists[row._id].push(row.page_no);
+      return i;
+    });
+
+    api
+      .post(URL_MAP.ASSIGN_DATA, {
+        type: type,
+        datum: id,
+        data_lists: data_lists,
+      })
+      .then(() => {
+        setAjaxMessage({
+          error: false,
+          text: "Assignment success !!",
+        });
+        let newDatalist = [...datalist];
+        rowsSelected.forEach((i) => {
+          if (type === "datagroup") {
+            newDatalist[i].datagroup_name = name;
+          } else {
+            newDatalist[i].struct_name = name;
+          }
+        });
+        setDatalist(newDatalist);
+      })
+      .catch((error) => {
+        if (error.response) {
+          setAjaxMessage({
+            error: true,
+            text: error.response.data.message,
+          });
+        } else {
+          console.error(error);
+        }
+      })
+      .then(() => {
+        setPageMessage(null);
+      });
+  };
+
+  const onMassMenuClick = (event) => {
+    setMassActionEl(event.currentTarget);
+  };
+
+  const onChangeStatus = async () => {
+    handleClose();
+    setPageMessage("Waiting for API to be ready.");
+    return;
+    // setPageMessage("Updating the files status...");
+    let allResp = await Promise.all(
+      rowsSelected.map(async (i) => {
+        let row = datalist[i];
+        try {
+          await api.post(URL_MAP.UPDATE_FILE_STATUS, {
+            document_id: row._id,
+            page_no: row.page_no,
+            status: updateStatusTo,
+          });
+          return i;
+        } catch (error) {
+          return error;
+        }
+      })
+    );
+
+    let newDatalist = [...datalist];
+    rowsSelected.forEach((i) => {
+      newDatalist[i].img_status = updateStatusTo;
+    });
+
+    // for (let i = 0; i < allResp.length; i++) {
+    //   if (typeof allResp[i] != "number") {
+    //     let error = allResp[i];
+    //     if (error.response) {
+    //       setAjaxMessage({
+    //         error: true,
+    //         text: error.response.data.message,
+    //       });
+    //     } else {
+    //       console.error(error);
+    //     }
+    //   }
+    // }
+    setRowsSelected([]);
+    setDatalist(newDatalist);
+    setPageMessage(null);
+  };
+
   const onDownloadMenuClick = (event) => {
     setMassAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setMassAnchorEl(null);
+    setMassActionEl(null);
   };
 
   const parseGetDataList = (data) => {
@@ -573,10 +683,18 @@ export default function Results(props) {
     if (fieldValidators) {
       value = value && value?.toString().length > 0 ? value : "";
       errMsg = doValidation(
-        value,
+        (name === 'lr'? value.replaceAll(".",""): value),
         fieldValidators.validators,
         fieldValidators.messages
-      );
+        );
+      if(errMsg === ''){
+        if( name === 'lr' && value.indexOf('.') < 1){
+          errMsg = 'LR value should be in decimal.';
+        }
+        if( name === 'batch_size' && +value % 2 !== 0){
+          errMsg = 'Batch Size should be multiple of 2.';
+        }
+      }
       setCreateModelErr((prevErr) => ({
         ...prevErr,
         [name]: errMsg,
@@ -584,6 +702,18 @@ export default function Results(props) {
     }
     return errMsg;
   };
+
+  const clearError = (name) => {
+    setCreateModelFormData((prevData) => ({
+      ...prevData,
+      [name]: '',
+    }));
+
+    setCreateModelErr((prevErr) => ({
+      ...prevErr,
+      [name]: '',
+    }));
+  }
 
   const createModelFormValidators = {
     new_model_name: {
@@ -603,6 +733,9 @@ export default function Results(props) {
         "Text allowed with max length of 200.",
       ],
     },
+    epochs: settingValidation,
+    lr: settingValidation,
+    batch_size: settingValidation,
   };
 
   const onCreateModelAPI = () => {
@@ -730,26 +863,35 @@ export default function Results(props) {
                   {trainSettings && <>
                     <FormRow>
                       <FormRowItem>
-                        <FormInputText label="Epochs" name='epochs' disabled={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange}/>
+                        <FormInputText label="Epochs" name='epochs' disabled={epochsAuto} value={createModelFormData.epochs} onChange={onTextChange} errorMsg={createModelErr.epochs}/>
                       </FormRowItem>
                       <FormRowItem>
-                        <FormInputCheck label="Auto" checked={epochsAuto} color="primary" onChange={() => setEpochsAuto(prevState => !prevState)} />
-                      </FormRowItem>
-                    </FormRow>
-                    <FormRow>
-                      <FormRowItem>
-                        <FormInputText label="Learning Rate" name='lr' disabled={lrAuto} value={createModelFormData.lr} onChange={onTextChange}/>
-                      </FormRowItem>
-                      <FormRowItem>
-                        <FormInputCheck label="Auto" checked={lrAuto} color="primary" onChange={() => setLRAuto(prevState => !prevState)} />
+                        <FormInputCheck label="Auto" checked={epochsAuto} color="primary" onChange={() => {
+                          setEpochsAuto(prevState => !prevState);
+                          clearError('epochs');
+                          }} />
                       </FormRowItem>
                     </FormRow>
                     <FormRow>
                       <FormRowItem>
-                        <FormInputText label="Batch Size" name='batch_size' disabled={batchSizeAuto} value={createModelFormData.batch_size} onChange={onTextChange}/>
+                        <FormInputText label="Learning Rate" name='lr' disabled={lrAuto} value={createModelFormData.lr} onChange={onTextChange} errorMsg={createModelErr.lr}/>
                       </FormRowItem>
                       <FormRowItem>
-                        <FormInputCheck label="Auto" checked={batchSizeAuto} color="primary" onChange={() => setBatchSizeAuto(prevState => !prevState)} />
+                        <FormInputCheck label="Auto" checked={lrAuto} color="primary" onChange={() => {
+                          setLRAuto(prevState => !prevState);
+                          clearError('lr');
+                          }} />
+                      </FormRowItem>
+                    </FormRow>
+                    <FormRow>
+                      <FormRowItem>
+                        <FormInputText label="Batch Size" name='batch_size' disabled={batchSizeAuto} value={createModelFormData.batch_size} onChange={onTextChange} errorMsg={createModelErr.batch_size}/>
+                      </FormRowItem>
+                      <FormRowItem>
+                        <FormInputCheck label="Auto" checked={batchSizeAuto} color="primary" onChange={() => {
+                          setBatchSizeAuto(prevState => !prevState);
+                          clearError('batch_size');
+                          }} />
                       </FormRowItem>
                     </FormRow>
                     </>}
@@ -807,7 +949,68 @@ export default function Results(props) {
             </Box>
           </Box>
           <>
+          <AssignDataGroup
+            open={showAssignDG}
+            onClose={() => {
+              setShowAssignDG(false);
+            }}
+            onOK={onAssignData}
+            api={api}
+          />
+          <AssignDataStructure
+            open={showAssignStruct}
+            onClose={() => {
+              setShowAssignStruct(false);
+            }}
+            onOK={onAssignData}
+            api={api}
+          />
+          <Dialog
+            disableBackdropClick
+            disableEscapeKeyDown
+            open={showChangeStatus}
+            onClose={() => {
+              setShowChangeStatus(false);
+            }}
+          >
+            <DialogContent>
+              <FormInputSelect
+                hasSearch
+                label="Change Status To"
+                onChange={(e, value) => {
+                  setUpdateStatusTo(value);
+                }}
+                value={updateStatusTo}
+                options={statusArr}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowChangeStatus(false)} color="primary">
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowChangeStatus(false);
+                  onChangeStatus();
+                }}
+                color="primary"
+              >
+                Ok
+              </Button>
+            </DialogActions>
+          </Dialog>
           <Box display="flex">
+            <Button
+              name="mass-action"
+              disabled={rowsSelected.length === 0}
+              variant="outlined"
+              style={{ height: "2rem", marginRight: 10 }}
+              size="small"
+              endIcon={<ChevronRightOutlinedIcon />}
+              onClick={onMassMenuClick}
+            >
+              Mass action
+            </Button>
               <Button disabled={rowsSelected.length === 0} variant='outlined' style={{height: '2rem'}} size="small"
                 endIcon={<ChevronRightOutlinedIcon />} onClick={onDownloadMenuClick}>Download</Button>
               {rowsSelected.length > 0 && <Typography style={{marginTop:'auto', marginBottom:'auto', marginLeft:'0.25rem'}}>{rowsSelected.length} selected.</Typography>}
@@ -829,6 +1032,23 @@ export default function Results(props) {
               >
                 <MenuItem onClick={()=>{setMassAnchorEl(null); postDownloadRequest('csv', true)}}>CSV by data group</MenuItem>
                 <MenuItem onClick={()=>{setMassAnchorEl(null); postDownloadRequest('csv', false)}}>CSV by data structure</MenuItem>
+              </Popover>
+              <Popover
+                open={Boolean(massActionEl)}
+                onClose={handleClose}
+                anchorEl={massActionEl}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+              >
+                <MenuItem onClick={()=>{setMassActionEl(null); setShowAssignDG(true)}}>Assign Data Group</MenuItem>
+                <MenuItem onClick={()=>{setMassActionEl(null); setShowAssignStruct(true)}}>Assign Data Structure</MenuItem>
+                <MenuItem onClick={() => {setMassActionEl(null); setShowChangeStatus(true)}}>Change Status</MenuItem>
               </Popover>
             </>
           <MUIDataTable
