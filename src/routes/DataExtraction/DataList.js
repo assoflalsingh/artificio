@@ -40,12 +40,13 @@ import Loader from "../../components/ImageAnnotation/helpers/Loader";
 import {
   Form,
   FormInputText,
-  FormInputSelect,
   FormRow,
   FormRowItem,
   doValidation,
 } from "../../components/FormElements";
 import SelectModelDialog from "../../components/SelectModelDialog";
+import AssignDataGroup from "./AssignDataGroup";
+import AssignDataStructure from "./AssignDataStructure";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -109,128 +110,6 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
   },
 }));
-
-function AsssignDataGroup({ open, onClose, onOK, api }) {
-  const [datagroupOpts, setDatagroupOpts] = useState();
-  const [datagroup, setDatagroup] = useState(null);
-  const [opLoading, setOpLoading] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      setOpLoading(true);
-      api
-        .get(URL_MAP.GET_DATAGROUP_NAMES)
-        .then((res) => {
-          let data = res.data.data;
-          setDatagroupOpts(data);
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .then(() => {
-          setOpLoading(false);
-        });
-    }
-  }, [open]);
-
-  return (
-    <Dialog
-      disableBackdropClick
-      disableEscapeKeyDown
-      open={open}
-      onClose={onClose}
-    >
-      <DialogContent>
-        <FormInputSelect
-          hasSearch
-          label="Assign Data gGroup"
-          onChange={(e, value) => {
-            setDatagroup(value);
-          }}
-          loading={opLoading}
-          value={datagroup}
-          options={datagroupOpts}
-          labelKey="name"
-          valueKey="_id"
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            onClose();
-            onOK("datagroup", datagroup._id, datagroup.name);
-          }}
-          color="primary"
-        >
-          Ok
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
-function AsssignDataStructure({ open, onClose, onOK, api }) {
-  const [structOpts, setStructOpts] = useState();
-  const [struct, setStruct] = useState(null);
-  const [opLoading, setOpLoading] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      setOpLoading(true);
-      api
-        .get(URL_MAP.GET_STRUCTURES)
-        .then((res) => {
-          let data = res.data.data;
-          setStructOpts(data);
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .then(() => {
-          setOpLoading(false);
-        });
-    }
-  }, [open]);
-  return (
-    <Dialog
-      disableBackdropClick
-      disableEscapeKeyDown
-      open={open}
-      onClose={onClose}
-    >
-      <DialogContent>
-        <FormInputSelect
-          hasSearch
-          label="Assign structure"
-          onChange={(e, value) => {
-            setStruct(value);
-          }}
-          loading={opLoading}
-          value={struct}
-          options={structOpts}
-          labelKey="name"
-          valueKey="_id"
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            onClose();
-            onOK("structure", struct._id, struct.name);
-          }}
-          color="primary"
-        >
-          OK
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
 
 function DataList(props) {
   const createModelDefault = {
@@ -1048,7 +927,7 @@ function DataList(props) {
           </Dialog>
         </Box>
       </Box>
-      <AsssignDataGroup
+      <AssignDataGroup
         open={showAssignDG}
         onClose={() => {
           setShowAssignDG(false);
@@ -1056,7 +935,7 @@ function DataList(props) {
         onOK={onAssignData}
         api={api}
       />
-      <AsssignDataStructure
+      <AssignDataStructure
         open={showAssignStruct}
         onClose={() => {
           setShowAssignStruct(false);
