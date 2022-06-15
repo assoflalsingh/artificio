@@ -14,9 +14,7 @@ const useStyles = makeStyles((theme) => ({
     // backgroundColor: theme.palette.background.paper,
     // marginTop: theme.spacing(2),
     marginBottom: theme.spacing(4),
-    borderBottomLeftRadius: '5px',
-    borderBottomRightRadius: '5px',
-    borderTopRightRadius: '5px',
+    borderRadius: '5px',
     boxShadow: '0px 2px 1px -1px rgb(57 63 77 / 20%), 0px 1px 1px 0px rgb(57 63 77 / 14%), 0px 1px 3px 0px rgb(57 63 77 / 12%)',
   },
   main_selected: {
