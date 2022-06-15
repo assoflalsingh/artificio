@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme)=>({
   },
   leftSide: {
     minWidth: '250px',
-    backgroundColor: theme.palette.common.white,
+    backgroundColor: 'transparent',
     borderRadius: 0,
   },
   rightSide: {
@@ -38,9 +38,10 @@ const useStyles = makeStyles((theme)=>({
 
   },
   logoContainer: {
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: theme.palette.grey[200]
+    // borderBottomColor: theme.palette.grey[200]
+    boxShadow: 'none',
+    position: 'relative',
+    top: '6px',
   },
   logoImg: {
     margin: 'auto',
