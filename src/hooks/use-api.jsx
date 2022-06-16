@@ -23,9 +23,12 @@ const useApi = () => {
 			callBack(resp.data.data);
 		}).catch((err)=>{
 			if (err.response) {
+				let errResponseData = err.response.data;
 				// client received an error response (5xx, 4xx)
-				if(err.response.data.message) {
-					setError(err.response.data.message);
+				if(!errResponseData.success) {
+					setError(errResponseData.message);
+				} else if(errResponseData.message.length > 0) {
+					setError(errResponseData.message);
 				} else {
 					setError(err.response.statusText + '. Contact administrator.');
 				}
