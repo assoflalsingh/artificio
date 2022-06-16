@@ -85,6 +85,7 @@ export const URL_MAP = {
   GET_DATA_LIST: 'data-list/',
   GET_ANNOTATION_DETAILS: 'data-list/annotation-details/',
   UPDATE_FILE_STATUS: 'data-list/update-file-status/',
+  FETCH_MODELS_FOR_DG: 'ner-model/fetch-models/',
 
   GET_DOWNLOADS_LIST: 'downloads/',
   SCHEDULE_DOWNLOAD_REQUEST: 'downloads/schedule/',

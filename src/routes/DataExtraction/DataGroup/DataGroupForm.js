@@ -3,6 +3,7 @@ import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import {getInstance, URL_MAP} from '../../../others/artificio_api.instance';
 import { Form, FormInputText, FormInputSelect, FormRow, FormRowItem, doValidation, FormInputCheck } from '../../../components/FormElements';
 import Alert from '@material-ui/lab/Alert';
+import useApi from '../../../hooks/use-api';
 
 const dataAnalyticsOptions = [{label: "", name: 'data_analytics', value: true}];
 const defaults = {
@@ -30,6 +31,7 @@ export default function DataGroupForm({initFormData, ...props}) {
   const [dataStructOpts, setDataStructOpts] = useState([]);
 
   const api = getInstance(localStorage.getItem('token'));
+  const {isLoading, apiRequest, error} = useApi();
 
   const formValidators = {
     name: {
@@ -40,6 +42,13 @@ export default function DataGroupForm({initFormData, ...props}) {
 
   useEffect(()=>{
     setOpLoading(true);
+
+    if(initFormData?._id.length > 0){
+      apiRequest({url: `${URL_MAP.FETCH_MODELS_FOR_DG}${initFormData._id}/`}, (resp) => {
+        setPtmOpts(resp.models);
+      });
+      error && console.log(error);
+    }
 
     // {
     //   users: [
@@ -57,7 +66,7 @@ export default function DataGroupForm({initFormData, ...props}) {
     api.get(URL_MAP.GET_DATAGROUP_PREQUISITES).then((resp)=>{
       let data = resp.data.data;
       setUserOpts(data.users);
-      setPtmOpts(data.ptms);
+      // setPtmOpts(data.ptms);
       setLabelOpts(data.labels);
       setDataStructOpts(data.data_structs);
 
@@ -166,12 +175,12 @@ tempResponse=api.patch(url,newFormData)
       });
     }
   }
-  console.log("form data->",formData);
+
   return (
     <>
     <Box display="flex">
       <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data Group</Typography>
-      {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
+      {(opLoading || isLoading) && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
     </Box>
     <Form>
       <FormRow>
@@ -192,7 +201,7 @@ tempResponse=api.patch(url,newFormData)
         </FormRowItem>
         <FormRowItem>
           <FormInputSelect label="Pre-trained model" name='ptm' onChange={onTextChange} disabled={formData.data_struct !== ''}
-            firstEmpty={true} loading={opLoading} value={formData.ptm} options={ptmOpts} />
+            firstEmpty={true} loading={opLoading} value={formData.ptm} options={ptmOpts} labelKey='model_name' valueKey='_id' />
         </FormRowItem>
       </FormRow>
       <FormRow>
