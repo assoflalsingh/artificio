@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Backdrop,
@@ -47,6 +47,8 @@ import {
 import SelectModelDialog from "../../components/SelectModelDialog";
 import AssignDataGroup from "./AssignDataGroup";
 import AssignDataStructure from "./AssignDataStructure";
+import { ArrowDropDownCircle } from "@material-ui/icons";
+import useApi from "../../hooks/use-api";
 
 const useStyles = makeStyles((theme) => ({
   rightAlign: {
@@ -111,21 +113,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const createModelDefault = {
+  new_model_name: "",
+  new_model_desc: "",
+  new_model_type: "classifier",
+};
+
 function DataList(props) {
-  const createModelDefault = {
-    new_model_name: "",
-    new_model_desc: "",
-    new_model_type: "classifier",
-  };
   const { history, uploadCounter } = props;
   const classes = useStyles();
   const [annotateOpen, setAnnotateOpen] = useState(false);
   const api = getInstance(localStorage.getItem("token"));
   const [massAnchorEl, setMassAnchorEl] = useState();
   const [createModelDialogStatus, setCreateModelDialogStatus] = useState();
-  const [createModelFormData, setCreateModelFormData] = useState(
-    createModelDefault
-  );
+  const [createModelFormData, setCreateModelFormData] = useState(createModelDefault);
   const [showModelListDialog, setShowModelListDialog] = useState();
   const [isTrainingReqInProcess, setIsTrainingReqInProcess] = useState(false);
   const [createModelErr, setCreateModelErr] = useState({});
@@ -139,6 +140,10 @@ function DataList(props) {
   const [ajaxMessage, setAjaxMessage] = useState(null);
   const [refreshCounter, setRefreshCounter] = useState(1);
   const [modelsList, setModelsList] = useState([]);
+  const [openPredict, setOpenPredict] = React.useState(false);
+  const predictRef = useRef();
+  const {apiRequest, error} = useApi();
+  const [dglist, setDgList] = useState([]);
 
   const createModelFormValidators = {
     new_model_name: {
@@ -413,6 +418,7 @@ function DataList(props) {
         let newDatalist = [...datalist];
         rowsSelected.forEach((i) => {
           if (type === "datagroup") {
+            newDatalist[i].datagroup_id = id;
             newDatalist[i].datagroup_name = name;
           } else {
             newDatalist[i].struct_name = name;
@@ -730,17 +736,70 @@ function DataList(props) {
       });
     }
   };
-  useEffect(() => {
-    if (!uploadCounter) return;
-    fetchDataList();
-  }, [uploadCounter]);
+
   const hideErrorMessage = () => {
     setAjaxMessage(null);
   };
   // API CALL on did mount for getting all the Models.
   useEffect(() => {
     fetchModels();
-  }, []); // Or [] if effect doesn't need props or state
+
+    apiRequest({url: URL_MAP.GET_DATAGROUPS}, (resp) => {
+      setDgList(resp.datagroups);
+    });
+
+    if (!uploadCounter) return;
+    fetchDataList();
+
+  }, [uploadCounter]);
+
+  const handlePredictClose = (event) => {
+    if (predictRef.current && predictRef.current.contains(event.target)) {
+      return;
+    }
+    setOpenPredict(false);
+  };
+
+  const handleToggle = () => {
+    setOpenPredict(prevState => !prevState);
+  }
+
+  const predictNER = () => {
+    handleToggle();
+    let params = [];
+    let errors = [];
+    rowsSelected.forEach((row) => {
+      if(datalist[row].datagroup_id === undefined){
+        errors.push(`Please assign Data group to the ${datalist[row].file} file.`);
+      }
+      let param = {datagroup_id: datalist[row].datagroup_id, files: [datalist[row].image_name]};
+      dglist.forEach((dg) => {
+        if(param.datagroup_id === dg._id){
+          if(dg.ptm.length < 1){
+            errors.push(`Pretrained model assignment missing for Data group ${datalist[row].datagroup_id}.`);
+          }else{
+            param.model_id = dg.ptm;
+          }
+        }
+      });
+      params.push(param);
+    });
+
+    if(errors.length > 0){
+      setAjaxMessage({
+        error: true,
+        text: errors.join('\n'),
+      });
+    }else{
+      apiRequest({url: URL_MAP.PREDICT_NER, method: 'post', params: {data: params}}, (resp) => {
+        setAjaxMessage({
+          error: false,
+          text: resp,
+        });
+      });
+      error && console.log(error);
+    }
+  }
 
   return (
     <>
@@ -844,6 +903,43 @@ function DataList(props) {
               setShowModelListDialog("predict");
             }}
           />
+          <Button ref={predictRef} className={classes.ml1}
+            variant="contained"
+            label="Predict"
+            size="small"
+            color="primary"
+            onClick={() => handleToggle()}
+            disabled={rowsSelected.length === 0}
+          >
+            Predict &nbsp;
+            <ArrowDropDownCircle />
+          </Button>
+          <Popover open={openPredict} anchorEl={predictRef.current} role={undefined} transition disablePortal
+            onClose={handlePredictClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+          >
+            <MenuItem
+              onClick={(event) => {
+                setMassAnchorEl(null);
+                setShowModelListDialog("predict");
+              }}
+              >Classification
+            </MenuItem>
+            <MenuItem
+              onClick={(event) => {
+                setMassAnchorEl(null);
+                predictNER();
+              }}
+              >Predict NER
+            </MenuItem>
+        </Popover>
           {isTrainingReqInProcess && <Loader />}
           {/* Dialog for Selecting Existing Model */}
           <SelectModelDialog
