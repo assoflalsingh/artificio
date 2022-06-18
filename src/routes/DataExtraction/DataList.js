@@ -694,7 +694,7 @@ function DataList(props) {
     setDatalist([]);
     setRowsSelected([]);
     api
-      .get(URL_MAP.GET_DATA_LIST, { params: {status:["new","ready","classified"] }})
+      .get(URL_MAP.GET_DATA_LIST, { params: {status:["new","ready","classified","ner predicted","ner predict queue","started ner predict"] }})
       .then((res) => {
         let data = res.data.data;
         let contr = refreshCounter + 1;
