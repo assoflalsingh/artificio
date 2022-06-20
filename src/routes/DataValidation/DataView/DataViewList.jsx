@@ -32,7 +32,7 @@ export default function DataViewList({setFormData, ...props}) {
   const classes = useStyles();
   const [openDataViewGrid, setOpenDataViewGrid] = useState(false);
   const [dataViewId, setDataViewId] = useState(0);
-  const [dglist, setDgList] = useState(testData);
+  const [dvlist, setDVList] = useState(testData);
   const {isLoading, apiRequest, error} = useApi();
 
   const showDGForm = ()=>{props.loadDataViewForm(true);};
@@ -41,7 +41,7 @@ export default function DataViewList({setFormData, ...props}) {
     showDGForm();
   };
   const onNameClick = (dataIndex)=>{
-    setFormData(dglist[dataIndex]);
+    setFormData(dvlist[dataIndex]);
     showDGForm();
   };
   const showDataViewGrid = (dataIndex)=>{
@@ -55,21 +55,21 @@ export default function DataViewList({setFormData, ...props}) {
 
   const columns = [
     {
-      name: "name",
+      name: "dataview_name",
       label: "Name",
       options: {
         filter: true,
         sort: true,
         draggable: true,
-        customBodyRenderLite: (dataIndex, rowIndex) => {
+        customBodyRenderLite: (dataIndex) => {
           return (
-            <Link href="#" onClick={(e)=>{e.preventDefault();onNameClick(dataIndex)}}>{dglist[dataIndex].name}</Link>
+            <Link href="#" onClick={(e)=>{e.preventDefault();onNameClick(dataIndex)}}>{dvlist[dataIndex].dataview_name}</Link>
           );
         }
       },
     },
     {
-      name: "desc",
+      name: "dataview_desc",
       label: "Description",
       options: {
         filter: true,
@@ -84,7 +84,7 @@ export default function DataViewList({setFormData, ...props}) {
         filter: false,
         sort: false,
         draggable: false,
-        customBodyRenderLite: (dataIndex, rowIndex) => {
+        customBodyRenderLite: (dataIndex) => {
           return <IconButton variant="outlined" onClick={()=>showDataViewGrid(dataIndex)}>
             <TableChartIcon style={{fontSize: '1.2rem'}} />
           </IconButton>
@@ -113,17 +113,17 @@ export default function DataViewList({setFormData, ...props}) {
     },
   };
 
-  const fetchDGList = useCallback(() => {
-    setDgList([]);
+  const fetchDVList = useCallback(() => {
+    setDVList([]);
 
-    apiRequest({url: URL_MAP.GET_DATAGROUPS}, (resp) => {
-      setDgList(resp.datagroups);
+    apiRequest({url: URL_MAP.DATA_VIEW, }, (resp) => {
+      setDVList(resp);
     });
   },[apiRequest]);
 
   useEffect(()=>{
-    // fetchDGList();
-  },[fetchDGList]);
+    fetchDVList();
+  },[fetchDVList]);
 
   return (
     <>
@@ -131,12 +131,12 @@ export default function DataViewList({setFormData, ...props}) {
         title={<>
         <Box style={{display: 'flex', flexWrap: 'wrap'}}>
           <Typography color="primary" variant="h6">Data View</Typography>
-          <RefreshIconButton className={classes.ml1} title="Refresh List" onClick={()=>{fetchDGList()}}/>
+          <RefreshIconButton className={classes.ml1} title="Refresh List" onClick={()=>{fetchDVList()}}/>
           <CompactAddButton className={classes.ml1} color="secondary" label="Create Data View" onClick={onCreateDGClick} />
           {isLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading data...</Typography></>}
         </Box>
         </>}
-        data={dglist}
+        data={dvlist}
         columns={columns}
         options={options}
       />

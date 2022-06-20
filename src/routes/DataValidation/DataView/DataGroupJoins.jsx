@@ -66,9 +66,7 @@ const DataGroupJoins = (props) => {
 				}
 			});
 
-			if(completedJoins.length > 0){
-				props.setFormData((prevFormData)=>({...prevFormData, joins: completedJoins}));
-			}
+			props.setFormData((prevFormData)=>({...prevFormData, joins: completedJoins.length > 0 ? completedJoins: []}));
 
 			return [...dataArray];
 		});
