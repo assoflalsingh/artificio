@@ -52,20 +52,7 @@ const defaultRowData = [{
 	"total": 5
 }];
 
-const appendZero = (val) => {
-	return (val <= 9 ? '0': '')+val;
-}
-
-let dt = new Date();
-const today = `${appendZero(dt.getDate())}/${appendZero(dt.getMonth()+1)}/${dt.getFullYear()}`;
-
-const DemoAgGrid = () => {
-
- const gridRef = useRef(); // Optional - for accessing Grid's API
- const [rowData, setRowData] = useState(defaultRowData); // Set rowData to Array of Objects, one Object per Row
-
- // Each Column Definition results in one Column.
- const [columnDefs, setColumnDefs] = useState([{headerName: 'Test Header', children: [
+const colDefs = [{headerName: 'Test Header', children: [
 	{
 		// headerName: 'Athlete',
 		field: 'athlete',
@@ -74,36 +61,49 @@ const DemoAgGrid = () => {
 		headerCheckboxSelectionFilteredOnly: true,
 		checkboxSelection: true,
 		rowDrag: true,
-	},
-	{ field: 'age',
-		cellStyle: params => {
-				if (+params.value < 18) {
-						//mark police cells as red
-						return {backgroundColor: '#aaa'};
-				}
-				return null;
-		}
-	},
-	{ field: 'country', minWidth: 150 },
-	{ field: 'year' }, //, rowGroup: true
-	{ field: 'date', minWidth: 150 },
-	{ field: 'sport', minWidth: 150 },
-	{ field: 'gold' },
-	{ field: 'silver' },
-	{ field: 'bronze' },
-	{ field: 'total' },
-  //  {field: 'make', headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true,},
-  //  {field: 'model'},
-  //  {field: 'price', type: 'numberColumn'} //filter: true, except test search box
- ]}]);
+	 },
+	 { field: 'age',
+	 cellStyle: params => {
+		 if (+params.value < 18) {
+			 //mark police cells as red
+				 return {backgroundColor: '#aaa'};
+			 }
+			 return null;
+		 }
+	 },
+	 { field: 'country', minWidth: 150 },
+	 { field: 'year' }, //, rowGroup: true
+	 { field: 'date', minWidth: 150 },
+	 { field: 'sport', minWidth: 150 },
+	 { field: 'gold' },
+	 { field: 'silver' },
+	 { field: 'bronze' },
+	 { field: 'total' },
+	 //  {field: 'make', headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true,},
+	 //  {field: 'model'},
+	 //  {field: 'price', type: 'numberColumn'} //filter: true, except test search box
+ ]}];
+
+const appendZero = (val) => {
+	return (val <= 9 ? '0': '')+val;
+}
+
+let dt = new Date();
+const today = `${appendZero(dt.getDate())}/${appendZero(dt.getMonth()+1)}/${dt.getFullYear()}`;
+
+const DvAgGrid = (props) => {
+ 	const gridRef = useRef(); // Optional - for accessing Grid's API
+ 	const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
+	 // Each Column Definition results in one Column.
+ 	const [columnDefs, setColumnDefs] = useState([]);
 
  // DefaultColDef sets props common to all Columns
- const defaultColDef = useMemo( ()=> ({
-     sortable: true,
-     resizable: true,
-     enableRowGroup: true,
-		 editable: true,
-     // make every column use 'text' filter by default
+ const defaultColDef = useMemo(()=> ({
+	 sortable: true,
+	 resizable: true,
+	 enableRowGroup: true,
+	 editable: true,
+	 // make every column use 'text' filter by default
      filter: 'agTextColumnFilter',
      // enable floating filters by default
      floatingFilter: true,
@@ -262,19 +262,55 @@ const onCellValueChanged = useCallback((event) => {
 	console.log(event.rowIndex, event.oldValue, event.newValue);
 }, []);
 
+useEffect(() => {
+	// console.log(props.gridata);
+	let rows = [];
+	let gridData = props.gridata.map(d => {
+		let prepareData = {headerName: d.group_name.replaceAll("_"," "), children: {}};
+		if(d.labels.length > 0){
+			let cols = Object.keys(d.labels[0]);
+				prepareData.children = cols.map((col) => {
+					return {field: col};
+				});
+			rows = rows.concat(d.labels);
+		}
+		return prepareData;
+	});
+	setColumnDefs(gridData);
+	setRowData(rows);
+},[props.gridata]);
+
+console.log('rowData', rowData);
+console.log('rowData', rowData.length > 0);
+if(rowData.length < 1){
+	return <div style={{
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "#383838",
+    opacity: "0.8",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    zIndex: "1000",
+  }}>No Data found to render with grid.</div>;
+}
+
 return (
 	<div style={{ marginTop: '16px'}}>
 		{/* Example using Grid's API */}
 		{/* <Form>
 			<FormRow>
 		<FormRowItem> */}
-					<FormInputText label="Quick Search" name='quick_search' onChange={onQuickFilterChanged}/>
+					{rowData.length > 0 && <FormInputText label="Quick Search" name='quick_search' onChange={onQuickFilterChanged}/>}
 				{/* </FormRowItem>
 			</FormRow>
 		</Form> */}
 
 		{/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
-		<div className="ag-theme-alpine" style={{ height: '90vh'}}> 
+		{rowData.length > 0 && <div className="ag-theme-alpine" style={{ height: '90vh'}}> 
 			<AgGridReact
 				ref={gridRef} // Ref for accessing Grid's API
 				rowData={rowData} // Row Data for Rows
@@ -287,7 +323,7 @@ return (
 				enableRangeSelection={true}
 				animateRows={true} // Optional - set to 'true' to have rows animate when sorted
 				onCellValueChanged={onCellValueChanged}
-				getContextMenuItems={getContextMenuItems}
+				// getContextMenuItems={getContextMenuItems}
 				multiSortKey={'ctrl'}
 				rowSelection='multiple' // Options 'single', 'multiple' - allows click selection of rows
 				// autoGroupColumnDef={autoGroupColumnDef}
@@ -298,9 +334,9 @@ return (
 				// sideBar={['columns','filters']}
 				// statusBar={statusBar}
 				/>
-		</div>
+		</div>}
 	</div>
 );
 };
 
-export default DemoAgGrid;
+export default DvAgGrid;

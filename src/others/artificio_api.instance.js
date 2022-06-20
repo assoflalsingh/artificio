@@ -89,6 +89,7 @@ export const URL_MAP = {
   PREDICT_NER: 'ner-model/predict/',
 
   DATA_VIEW: 'dataview/',
+  GET_DATA_VIEW_DATA: 'dataview/get-data/',
 
   GET_DOWNLOADS_LIST: 'downloads/',
   SCHEDULE_DOWNLOAD_REQUEST: 'downloads/schedule/',
