@@ -11,17 +11,17 @@ import useApi from '../../../hooks/use-api';
 import DataGroupJoins from './DataGroupJoins';
 
 // const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
-const lineItemsTableData = [{label: "", name: 'include_items_table', value: true}];
+const lineItemsTableData = [{label: "", name: 'line_item', value: true}];
 const defaults = {
-  name: '',
-  desc: '',
-  data_group: [],
-  records: 1000,
-  past_days: -30,
-  future_days: 30,
-  from_date: '',
-  to_date: '',
-  include_items_table: lineItemsTableData[0].value,
+  dataview_name: '',
+  dataview_desc: '',
+  datagroups: [],
+  default_rows: 1000,
+  days_before: -30,
+  days_after: 30,
+  date_from: '',
+  date_to: '',
+  line_item: lineItemsTableData[0].value,
 }
 const useStyles = makeStyles((theme) => ({
   dateSelector: {
@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const appendZero = (val) => {
+	return (val <= 9 ? '0': '')+val;
+}
 
 export default function DataViewForm({initFormData, ...props}) {
   const editMode = (initFormData != null);
@@ -43,7 +46,7 @@ export default function DataViewForm({initFormData, ...props}) {
   const classes = useStyles();
 
   const formValidators = {
-    name: {
+    dataview_name: {
       validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
       messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
     }
@@ -55,17 +58,15 @@ export default function DataViewForm({initFormData, ...props}) {
     });
     apiRequest({url: URL_MAP.GET_DATAGROUP_PREQUISITES}, (response) =>{
       setLabesList(response.labels);
-      if(editMode) {
-        let formLabels = response.labels.filter((label)=>{
-          return initFormData.assign_label.indexOf(label._id) > -1;
-        });
-        setFormData({
-          ...defaults,
-          ...initFormData,
-          assign_label: formLabels,
-        });
-      }
     });
+    if(editMode) {
+      console.log(initFormData);
+      setFormData({
+        ...initFormData,
+        date_from: '',
+        date_to: '',
+      });
+    }
   }, [apiRequest, editMode, initFormData]);
 
   const validateField = (name, value) => {
@@ -87,7 +88,7 @@ export default function DataViewForm({initFormData, ...props}) {
       name = e.target.name;
       value = e.target.type === 'checkbox'? e.target.checked : e.target.value;
     }
-    if(name === 'past_days'){
+    if(name === 'days_before'){
       if(value === '-'){
         value = '';
       }
@@ -118,16 +119,18 @@ export default function DataViewForm({initFormData, ...props}) {
     if(isFormValid) {
       let newFormData = {
         ...formData,
-        data_group: formData.data_group.map((label)=>label._id),
+        date_from: formData.date_from? `${formData.date_from.getFullYear()}-${appendZero(formData.date_from.getMonth()+1)}-${appendZero(formData.date_from.getDate())}` : '',
+        date_to: formData.date_to? `${formData.date_to.getFullYear()}-${appendZero(formData.date_to.getMonth()+1)}-${appendZero(formData.date_to.getDate())}`: '',
+        datagroups: formData.datagroups.map((label)=>label._id),
+        joins: formData.joins?.length > 0? formData.joins : [] ,
       }
       console.log("newFormData: ",newFormData);
-      // setSaving(true);
-      // let url = editMode ? URL_MAP.UPDATE_DATA_GROUP : URL_MAP.CREATE_DATA_GROUP;
-      // apiRequest({url: url, params: newFormData}, () =>{
-      //   setFormSuccess('Data View created sucessfully.');
-      //   if(!editMode) setFormData(defaults);
-      //   setSaving(false);
-      // });
+      setSaving(true);
+      apiRequest({url: URL_MAP.DATA_VIEW, params: newFormData, method: 'post'}, () =>{
+        setFormSuccess('Data View created sucessfully.');
+        if(!editMode) setFormData(defaults);
+        setSaving(false);
+      });
     }
   }
 
@@ -150,31 +153,31 @@ export default function DataViewForm({initFormData, ...props}) {
     <Form>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Name" required name='name'
-            value={formData.name} errorMsg={formDataErr.name} onChange={onTextChange} disabled={editMode}/>
+          <FormInputText label="Name" required name='dataview_name'
+            value={formData.dataview_name} errorMsg={formDataErr.dataview_name} onChange={onTextChange} disabled={editMode}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="Description" name='desc' value={formData.desc} onChange={onTextChange}/>
+          <FormInputText label="Description" name='dataview_desc' value={formData.dataview_desc} onChange={onTextChange}/>
         </FormRowItem>
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Relative Days Data Selection" name='past_days' value={formData.past_days} onChange={onTextChange}/>
+          <FormInputText label="Relative Days Data Selection" name='days_before' value={formData.days_before} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="To" sideLabel={true} name='future_days' value={formData.future_days} onChange={onTextChange}/>
+          <FormInputText label="To" sideLabel={true} name='days_after' value={formData.days_after} onChange={onTextChange}/>
         </FormRowItem>
         <FormRowItem>
           <FormInput label="Relative Date From">
             <CustomField>
-              <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={formData.from_date } placeholderText="Select Date" onChange={date => onTextChange(date, "from_date")} />
+              <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={formData.date_from } placeholderText="Select Date" onChange={date => onTextChange(date, "date_from")} />
             </CustomField>
           </FormInput>
         </FormRowItem>
         <FormRowItem>
           <FormInput label="To" sideLabel={true}>
             <CustomField>
-              <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={formData.to_date } placeholderText="Select Date" minDate={formData.from_date} onChange={date => onTextChange(date, "to_date")} />
+              <DatePicker className={`${classes.dateSelector} MuiInputBase-input MuiOutlinedInput-input`} selected={formData.date_to } placeholderText="Select Date" minDate={formData.date_from} onChange={date => onTextChange(date, "date_to")} />
             </CustomField>
           </FormInput>
         </FormRowItem>
@@ -184,13 +187,13 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputCheck color="primary" label="Include Line Items / Table Data" formData={formData} options={lineItemsTableData} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputText label="Default no of records (rows)" name="records" value={formData.records} onChange={onTextChange} />
+          <FormInputText label="Default no of records (rows)" name="default_rows" value={formData.default_rows} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect hasSearch multiple label="Data Group" name='data_group' onChange={(e, value)=>{onTextChange(value, 'data_group')}} loading={isLoading} value={formData.data_group} options={dgList} labelKey='name' valueKey='id' />
+          <FormInputSelect hasSearch multiple label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={isLoading} value={formData.datagroups} options={dgList} labelKey='name' valueKey='id' />
         </FormRowItem>
       </FormRow>
-      {formData.data_group.length > 1 && <DataGroupJoins selectedDataGroups={formData.data_group} labelsList={labelsList} setFormData={setFormData} />}
+      {formData.datagroups.length > 1 && <DataGroupJoins selectedDataGroups={formData.datagroups} labelsList={labelsList} setFormData={setFormData} />}
       {(error || formSuccess) &&
       <FormRow>
         <FormRowItem>

@@ -892,17 +892,6 @@ function DataList(props) {
             }}
           />
           </Tooltip>
-          <CompactButton
-            className={classes.ml1}
-            label="Predict"
-            variant="contained"
-            color="primary"
-            disabled={rowsSelected.length === 0}
-            onClick={() => {
-              setMassAnchorEl(null);
-              setShowModelListDialog("predict");
-            }}
-          />
           <Button ref={predictRef} className={classes.ml1}
             variant="contained"
             label="Predict"

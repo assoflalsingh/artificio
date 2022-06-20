@@ -88,6 +88,8 @@ export const URL_MAP = {
   FETCH_MODELS_FOR_DG: 'ner-model/fetch-models/',
   PREDICT_NER: 'ner-model/predict/',
 
+  DATA_VIEW: 'dataview/',
+
   GET_DOWNLOADS_LIST: 'downloads/',
   SCHEDULE_DOWNLOAD_REQUEST: 'downloads/schedule/',
 
