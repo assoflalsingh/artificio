@@ -1,12 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Dialog } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Clear";
 import IconButton from "@material-ui/core/IconButton";
 import "ag-grid-community/dist/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/dist/styles/ag-theme-alpine.css"; // Optional theme CSS
-import DemoAgGrid from "./DemoAgGrid";
+import DvAgGrid from "./DvAgGrid";
+import { URL_MAP } from '../../../others/artificio_api.instance';
+import useApi from "../../../hooks/use-api";
+import { useState } from "react";
+import Loader from "../../../components/ImageAnnotation/helpers/Loader";
 
 const DataViewGrid = (props) => {
+  const {isLoading, apiRequest, error} = useApi();
+  const [dataViewData, setDataViewData] = useState([]);
+
+  useEffect(() => {
+    if(props.dataViewId.length > 0){
+      apiRequest({url: `${URL_MAP.GET_DATA_VIEW_DATA}${props.dataViewId}/`}, (resp) => {
+        setDataViewData(resp);
+      });
+      error && console.log(error);
+    }
+  },[props.dataViewId, apiRequest, error]);
+
   return (
     <Dialog
       fullScreen
@@ -15,7 +31,8 @@ const DataViewGrid = (props) => {
       // disableBackdropClick
       disableEscapeKeyDown
     >
-      <DemoAgGrid />
+      {!isLoading && <DvAgGrid gridata={dataViewData} />}
+      {isLoading && <Loader />}
       <IconButton
         variant="outlined"
         onClick={props.onClose}

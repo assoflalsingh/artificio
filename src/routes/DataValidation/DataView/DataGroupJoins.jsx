@@ -64,6 +64,7 @@ const DataGroupJoins = (props) => {
 					delete saveObj['dest_labels'];
 					return {...saveObj};
 				}
+				return false;
 			});
 
 			props.setFormData((prevFormData)=>({...prevFormData, joins: completedJoins.length > 0 ? completedJoins: []}));
@@ -91,7 +92,7 @@ const DataGroupJoins = (props) => {
 		});
 	},[props.selectedDataGroups]);
 
-	console.log(joins);
+	// console.log(joins);
 
     return (<>{joins.map((join,i)=>{
 			return <FormRow key={i} style={{position:'relative'}}>

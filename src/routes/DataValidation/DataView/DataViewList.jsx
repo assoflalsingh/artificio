@@ -7,6 +7,7 @@ import { URL_MAP } from '../../../others/artificio_api.instance';
 import Alert from '@material-ui/lab/Alert';
 import useApi from '../../../hooks/use-api';
 import TableChartIcon from "@material-ui/icons/TableChart";
+import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from "@material-ui/core/IconButton";
 import DataViewGrid from './DataViewGrid';
 
@@ -31,7 +32,7 @@ const testData = [{name: 'ADSingh', desc: 'Developer', actions: ''}];
 export default function DataViewList({setFormData, ...props}) {
   const classes = useStyles();
   const [openDataViewGrid, setOpenDataViewGrid] = useState(false);
-  const [dataViewId, setDataViewId] = useState(0);
+  const [dataViewId, setDataViewId] = useState(-1);
   const [dvlist, setDVList] = useState(testData);
   const {isLoading, apiRequest, error} = useApi();
 
@@ -45,11 +46,14 @@ export default function DataViewList({setFormData, ...props}) {
     showDGForm();
   };
   const showDataViewGrid = (dataIndex)=>{
-    setDataViewId(dataIndex);
+    setDataViewId(dvlist[dataIndex]._id);
     setOpenDataViewGrid(true);
   };
+  const deleteDataView = (dataIndex)=>{
+    console.log(dvlist[dataIndex]);
+  };
   const closeDataViewGrid = ()=>{
-    setDataViewId(0);
+    setDataViewId(-1);
     setOpenDataViewGrid(false);
   };
 
@@ -85,9 +89,14 @@ export default function DataViewList({setFormData, ...props}) {
         sort: false,
         draggable: false,
         customBodyRenderLite: (dataIndex) => {
-          return <IconButton variant="outlined" onClick={()=>showDataViewGrid(dataIndex)}>
+          return (<>
+          <IconButton variant="outlined" onClick={()=>showDataViewGrid(dataIndex)}>
             <TableChartIcon style={{fontSize: '1.2rem'}} />
           </IconButton>
+          <IconButton variant="outlined" onClick={()=>deleteDataView(dataIndex)}>
+            <DeleteIcon style={{fontSize: '1.2rem'}} />
+          </IconButton>
+          </>);
         }
       }
     },
@@ -116,7 +125,7 @@ export default function DataViewList({setFormData, ...props}) {
   const fetchDVList = useCallback(() => {
     setDVList([]);
 
-    apiRequest({url: URL_MAP.DATA_VIEW, }, (resp) => {
+    apiRequest({url: URL_MAP.DATA_VIEW}, (resp) => {
       setDVList(resp);
     });
   },[apiRequest]);
@@ -140,7 +149,7 @@ export default function DataViewList({setFormData, ...props}) {
         columns={columns}
         options={options}
       />
-      <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewID={dataViewId} />
+      <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewId={dataViewId} />
       <Snackbar open={Boolean(error)} autoHideDuration={6000} >
         {error && <Alert severity="error">{error}</Alert>}
       </Snackbar>

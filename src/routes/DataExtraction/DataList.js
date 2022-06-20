@@ -751,7 +751,7 @@ function DataList(props) {
     if (!uploadCounter) return;
     fetchDataList();
 
-  }, [uploadCounter]);
+  }, [uploadCounter, apiRequest]);
 
   const handlePredictClose = (event) => {
     if (predictRef.current && predictRef.current.contains(event.target)) {
