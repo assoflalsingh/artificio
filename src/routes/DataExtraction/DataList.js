@@ -782,7 +782,23 @@ function DataList(props) {
           }
         }
       });
-      params.push(param);
+      if(errors.length > 0){
+        return;
+      }
+      if(params.length > 0){
+        let dgFound = false;
+        params.forEach(prm => {
+          if(prm.datagroup_id === param.datagroup_id){
+            prm.files.push(param.files[0]);
+            dgFound = true;
+          }
+        });
+        if(!dgFound){
+          params.push(param);
+        }
+      }else{
+        params.push(param);
+      }
     });
 
     if(errors.length > 0){
