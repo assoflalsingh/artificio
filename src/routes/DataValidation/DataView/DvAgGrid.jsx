@@ -126,6 +126,24 @@ const autoGroupColumnDef = useMemo(() => {
 	};
 }, []);
 
+useEffect(() => {
+	console.log(props.gridata);
+	let rows = [];
+	let gridColsDef = props.gridata.map(d => {
+		let prepareData = {headerName: d.group_name.replaceAll("_"," "), children: []};
+		if(d.labels.length > 0){
+			let cols = Object.keys(d.labels[0]);
+				prepareData.children = cols.map((col) => {
+					return {field: col, };
+				});
+			rows = rows.concat(d.labels);
+		}
+		return prepareData;
+	});
+	setColumnDefs(gridColsDef);
+	setRowData(rows);
+},[props.gridata]);
+
 // const statusBar = useMemo( ()=> ({
 // 	statusPanels: [
 // 			{
@@ -202,8 +220,22 @@ const addColToGrid = useCallback((clickedCol) => {
 	});
  }, []);
 
-const getContextMenuItems = useCallback((params) => {
-	var result = [
+ const getContextMenuItems = useCallback((params) => {
+	console.log('columnDefs[0]?.children[0]?.field ',columnDefs[0]?.children[0]?.field);
+	 var result = [
+		{
+			// custom item
+			// name: 'Delete "' + params.node?.data[columnDefs[0]?.children[0]?.field] + '" row',
+			name: 'Delete row',
+			action: () => {
+				removeRowById(params.node.rowIndex);
+			},
+			cssClasses: ['redFont', 'bold'],
+			// disabled: true,
+			// icon: '',
+			tooltip: 'Delete Row',
+			// subMenu: [{},{}],
+		},
 		{
 			name: 'Duplicate Row',
 			action: () => {
@@ -215,29 +247,18 @@ const getContextMenuItems = useCallback((params) => {
 			name: 'Insert Row',
 			subMenu: [{
 				// custom item
-				name: 'Insert Above "' + params.node?.data[columnDefs[0].children[0].field] + '" row',
+				// name: 'Insert Above "' + params.node?.data[columnDefs[0]?.children[0]?.field] + '" row',
+				name: 'Insert Above row',
 				action: () => {
 					addRowToGrid(+params.node.rowIndex);
 				},
 			},{
 				// custom item
-				name: 'Insert Below "' + params.node?.data[columnDefs[0].children[0].field] + '" row',
+				name: 'Insert Below "' + params.node?.data[columnDefs[0]?.children[0]?.field] + '" row',
 				action: () => {
 					addRowToGrid(+params.node.rowIndex + 1);
 				},
 			}],
-		},
-		{
-			// custom item
-			name: 'Delete "' + params.node?.data[columnDefs[0].children[0].field] + '" row',
-			action: () => {
-				removeRowById(params.node.rowIndex);
-			},
-			cssClasses: ['redFont', 'bold'],
-			// disabled: true,
-			// icon: '',
-			tooltip: 'Delete Row',
-			// subMenu: [{},{}],
 		},
 		{
 			name: 'Insert Column',
@@ -247,7 +268,9 @@ const getContextMenuItems = useCallback((params) => {
 			},
 		},
 		'separator',
-		...params.defaultItems
+		'chartRange',
+		'separator',
+		...params.defaultItems,
 	];
 	return result;
 }, []);
@@ -261,24 +284,6 @@ const onQuickFilterChanged = useCallback((e) => {
 const onCellValueChanged = useCallback((event) => {
 	console.log(event.rowIndex, event.oldValue, event.newValue);
 }, []);
-
-useEffect(() => {
-	// console.log(props.gridata);
-	let rows = [];
-	let gridData = props.gridata.map(d => {
-		let prepareData = {headerName: d.group_name.replaceAll("_"," "), children: {}};
-		if(d.labels.length > 0){
-			let cols = Object.keys(d.labels[0]);
-				prepareData.children = cols.map((col) => {
-					return {field: col};
-				});
-			rows = rows.concat(d.labels);
-		}
-		return prepareData;
-	});
-	setColumnDefs(gridData);
-	setRowData(rows);
-},[props.gridata]);
 
 console.log('rowData', rowData);
 console.log('rowData', rowData.length > 0);
@@ -323,7 +328,7 @@ return (
 				enableRangeSelection={true}
 				animateRows={true} // Optional - set to 'true' to have rows animate when sorted
 				onCellValueChanged={onCellValueChanged}
-				// getContextMenuItems={getContextMenuItems}
+				getContextMenuItems={getContextMenuItems}
 				multiSortKey={'ctrl'}
 				rowSelection='multiple' // Options 'single', 'multiple' - allows click selection of rows
 				// autoGroupColumnDef={autoGroupColumnDef}
