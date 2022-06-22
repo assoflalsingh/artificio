@@ -15,6 +15,8 @@ const useApi = () => {
 
 		if(requestConfig.method === 'post'){
 			request = api.post(requestConfig.url, requestConfig.params);
+		}else if(requestConfig.method === 'patch'){
+			request = api.patch(requestConfig.url, requestConfig.params);
 		}else{
 			request = api.get(requestConfig.url);
 		}
