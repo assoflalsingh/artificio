@@ -260,7 +260,7 @@ export default function LabelForm({initFormData, ...props}) {
   return (
     <>
     <Box display="flex">
-      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data Set</Typography>
+      <Typography color="primary" variant="h6" gutterBottom>{editMode ? "Edit": "Create"} Data Flow</Typography>
       {opLoading && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Loading...</Typography></>}
     </Box>
     <Form>
@@ -276,7 +276,7 @@ export default function LabelForm({initFormData, ...props}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect multiple label="App Usage" hasSearch required name='app_usage' onChange={(e, value)=>{onTextChange(value, 'app_usage')}}
+          <FormInputSelect multiple label="App Flow" hasSearch required name='app_usage' onChange={(e, value)=>{onTextChange(value, 'app_usage')}}
             labelKey='app_usage' valueKey='_id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.app_usage} 
             value={formData.app_usage} options={appUsageOpts} 
           />
