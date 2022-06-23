@@ -13,7 +13,7 @@ const DataGroupJoins = (props) => {
 	const getLabels = (value) => {
 		if(value === '') return [];
 		let selectedDataGroup = props.selectedDataGroups.filter((group) => group._id === value);
-		let respectiveLabels = props.labelsList.filter((label) => selectedDataGroup[0].assign_label.indexOf(label._id) >= 0);
+		let respectiveLabels = props.labelsList.filter((label) => selectedDataGroup[0]?.assign_label.indexOf(label._id) >= 0);
 		return respectiveLabels;
 	}
 	
@@ -57,18 +57,16 @@ const DataGroupJoins = (props) => {
 			fieldObj[nameArr[0]] = value;
 			dataArray[+nameArr[1]] = fieldObj;
 
-			let completedJoins = dataArray.filter((data) => {
+			let completedJoins = [];
+			dataArray.forEach((data) => {
 				if(data.source_group.length > 0 && data.source_label.length > 0 && data.dest_group.length > 0 && data.dest_label.length > 0){
 					let saveObj = {...data};
-					delete saveObj['source_labels'];
-					delete saveObj['dest_labels'];
-					return {...saveObj};
+					delete saveObj.source_labels;
+					delete saveObj.dest_labels;
+					completedJoins.push({...saveObj});
 				}
-				return false;
 			});
-
 			props.setFormData((prevFormData)=>({...prevFormData, joins: completedJoins.length > 0 ? completedJoins: []}));
-
 			return [...dataArray];
 		});
   }
@@ -92,21 +90,19 @@ const DataGroupJoins = (props) => {
 		});
 	},[props.selectedDataGroups]);
 
-	// console.log(joins);
-
     return (<>{joins.map((join,i)=>{
 			return <FormRow key={i} style={{position:'relative'}}>
 				<FormRowItem>
-					<FormInputSelect label={`Source Data Group - ${i+1}`} name={`source_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.source_group} labelKey='name' valueKey='_id' />
+					<FormInputSelect label={`Source Data Group - ${i+1}`} name={`source_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.source_group} labelKey='_id' valueKey='_id' />
 				</FormRowItem>
 				<FormRowItem>
-					<FormInputSelect label={`Source Label - ${i+1}`} name={`source_label-${i}`} onChange={onTextChange} options={join.source_labels} value={join.source_label} labelKey='name' valueKey='_id' />
+					<FormInputSelect label={`Source Label - ${i+1}`} name={`source_label-${i}`} onChange={onTextChange} options={join.source_labels} value={join.source_label} labelKey='_id' valueKey='_id' />
 				</FormRowItem>
 				<FormRowItem>
-					<FormInputSelect label={`Destination Data Group - ${i+1}`} name={`dest_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.dest_group} labelKey='name' valueKey='_id' />
+					<FormInputSelect label={`Destination Data Group - ${i+1}`} name={`dest_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.dest_group} labelKey='_id' valueKey='_id' />
 				</FormRowItem>
 				<FormRowItem>
-					<FormInputSelect label={`Destination Label - ${i+1}`} name={`dest_label-${i}`} onChange={onTextChange} options={join.dest_labels} value={join.dest_label} labelKey='name' valueKey='_id' />
+					<FormInputSelect label={`Destination Label - ${i+1}`} name={`dest_label-${i}`} onChange={onTextChange} options={join.dest_labels} value={join.dest_label} labelKey='_id' valueKey='_id' />
 					<IconButton variant="outlined" onClick={()=>removeJoin(i)} style={{zIndex:9, top: 8, right: 0, position: 'absolute'}}><DeleteIcon style={{fontSize: '1.2rem'}} /></IconButton>
 				</FormRowItem>
 			</FormRow>

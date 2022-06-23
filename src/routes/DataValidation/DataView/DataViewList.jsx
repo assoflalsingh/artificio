@@ -34,7 +34,8 @@ export default function DataViewList({setFormData, ...props}) {
   const [openDataViewGrid, setOpenDataViewGrid] = useState(false);
   const [dataViewId, setDataViewId] = useState(-1);
   const [dvlist, setDVList] = useState(testData);
-  const {isLoading, apiRequest, error} = useApi();
+  const {isLoading, apiRequest: getAllDataViews, error} = useApi();
+  const {isLoading: deletingDV, apiRequest: delDataView, error: errorDVDel} = useApi();
 
   const showDGForm = ()=>{props.loadDataViewForm(true);};
   const onCreateDGClick = ()=>{
@@ -51,6 +52,10 @@ export default function DataViewList({setFormData, ...props}) {
   };
   const deleteDataView = (dataIndex)=>{
     console.log(dvlist[dataIndex]);
+    delDataView({url: `${URL_MAP.DATA_VIEW}${dvlist[dataIndex]._id}/`, method: 'delete'}, (response) => {
+      console.log(response);
+      fetchDVList();
+    })
   };
   const closeDataViewGrid = ()=>{
     setDataViewId(-1);
@@ -93,7 +98,7 @@ export default function DataViewList({setFormData, ...props}) {
           <IconButton variant="outlined" onClick={()=>showDataViewGrid(dataIndex)}>
             <TableChartIcon style={{fontSize: '1.2rem'}} />
           </IconButton>
-          <IconButton variant="outlined" onClick={()=>deleteDataView(dataIndex)}>
+          <IconButton variant="outlined" onClick={()=>deleteDataView(dataIndex)} style={{marginLeft: '40px'}}>
             <DeleteIcon style={{fontSize: '1.2rem'}} />
           </IconButton>
           </>);
@@ -125,17 +130,17 @@ export default function DataViewList({setFormData, ...props}) {
   const fetchDVList = useCallback(() => {
     setDVList([]);
 
-    apiRequest({url: URL_MAP.DATA_VIEW}, (resp) => {
+    getAllDataViews({url: URL_MAP.DATA_VIEW}, (resp) => {
       setDVList(resp);
     });
-  },[apiRequest]);
+  },[getAllDataViews]);
 
   useEffect(()=>{
     fetchDVList();
   },[fetchDVList]);
 
   return (
-    <>
+    <>{deletingDV && <> <CircularProgress size={24} style={{marginLeft: 15, position: 'relative', top: 4}} /><Typography style={{alignSelf:'center'}}>&nbsp;Deleting Data View...</Typography></>}
       <MUIDataTable
         title={<>
         <Box style={{display: 'flex', flexWrap: 'wrap'}}>
@@ -151,7 +156,7 @@ export default function DataViewList({setFormData, ...props}) {
       />
       <DataViewGrid open={openDataViewGrid} onClose={closeDataViewGrid} dataViewId={dataViewId} />
       <Snackbar open={Boolean(error)} autoHideDuration={6000} >
-        {error && <Alert severity="error">{error}</Alert>}
+        {(error || errorDVDel) && <Alert severity="error">{error || errorDVDel}</Alert>}
       </Snackbar>
     </>
   )

@@ -17,6 +17,8 @@ const useApi = () => {
 			request = api.post(requestConfig.url, requestConfig.params);
 		}else if(requestConfig.method === 'patch'){
 			request = api.patch(requestConfig.url, requestConfig.params);
+		}else if(requestConfig.method === 'delete'){
+			request = api.delete(requestConfig.url, requestConfig.params);
 		}else{
 			request = api.get(requestConfig.url);
 		}
