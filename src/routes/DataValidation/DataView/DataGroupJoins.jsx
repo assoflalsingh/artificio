@@ -5,15 +5,19 @@ import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Clear";
 import IconButton from "@material-ui/core/IconButton";
 
-const defaultField = {source_group: '', source_label: '', dest_group: '', dest_label: '', source_labels: [], dest_labels: []};
+const defaultField = {source_group: '', source_label: '', source_labels: [], destination_group: '', destination_label: '', destination_labels: []};
 
 const DataGroupJoins = (props) => {
-	const [joins, setJoinData] = useState([defaultField]);
+	const [joins, setJoinData] = useState([...props.joins, {...defaultField}]);
 
-	const getLabels = (value) => {
+  const getLabels = (value) => {
 		if(value === '') return [];
-		let selectedDataGroup = props.selectedDataGroups.filter((group) => group._id === value);
-		let respectiveLabels = props.labelsList.filter((label) => selectedDataGroup[0]?.assign_label.indexOf(label._id) >= 0);
+		let respectiveLabels = [];
+		props.dgList.forEach((dg) => {
+			if(dg._id === value){
+				respectiveLabels = [...dg.assign_label];
+			}
+		});
 		return respectiveLabels;
 	}
 	
@@ -41,17 +45,17 @@ const DataGroupJoins = (props) => {
 			let fieldObj = {...dataArray[+nameArr[1]]};
 
 			if(nameArr[0] === 'source_group' && value !== ''){
-				if(fieldObj.dest_group === value){
+				if(fieldObj.destination_group === value){
 					value = fieldObj.source_group;
 				}else{
 					fieldObj.source_labels = getLabels(value);
 				}
 			}
-			if(nameArr[0] === 'dest_group' && value !== ''){
+			if(nameArr[0] === 'destination_group' && value !== ''){
 				if(fieldObj.source_group === value){
-					value = fieldObj.dest_group;
+					value = fieldObj.destination_group;
 				}else{
-					fieldObj.dest_labels = getLabels(value);
+					fieldObj.destination_labels = getLabels(value);
 				}
 			}
 			fieldObj[nameArr[0]] = value;
@@ -59,10 +63,10 @@ const DataGroupJoins = (props) => {
 
 			let completedJoins = [];
 			dataArray.forEach((data) => {
-				if(data.source_group.length > 0 && data.source_label.length > 0 && data.dest_group.length > 0 && data.dest_label.length > 0){
+				if(data.source_group?.length > 0 && data.source_label?.length > 0 && data.destination_group?.length > 0 && data.destination_label?.length > 0){
 					let saveObj = {...data};
 					delete saveObj.source_labels;
-					delete saveObj.dest_labels;
+					delete saveObj.destination_labels;
 					completedJoins.push({...saveObj});
 				}
 			});
@@ -74,15 +78,23 @@ const DataGroupJoins = (props) => {
 	useEffect(() => {
 		setJoinData((prevState) => {
 			let joinsArr = prevState.map((join)=>{
-				if(join.source_group.length > 0 && props.selectedDataGroups.find((sGroup) => sGroup._id === join.source_group) === undefined){
-					join.source_group = '';
-					join.source_label = '';
-					join.source_labels = [];
+				if(join.source_group.length > 0){
+					if(props.selectedDataGroups.findIndex(sDG => sDG._id === join.source_group) < 0){
+						join.source_group = '';
+						join.source_label = '';
+						join.source_labels = [];
+					}else{
+						join.source_labels = getLabels(join.source_group);
+					}
 				}
-				if(join.dest_label.length > 0 && props.selectedDataGroups.find((sGroup) => sGroup._id === join.dest_group) === undefined){
-					join.dest_group = '';
-					join.dest_label = '';
-					join.dest_labels = [];
+				if(join.destination_group.length > 0){
+					if(props.selectedDataGroups.findIndex(sDG => sDG._id === join.destination_group) < 0){
+						join.destination_group = '';
+						join.destination_label = '';
+						join.destination_labels = [];
+					}else{
+						join.destination_labels = getLabels(join.destination_group);
+					}
 				}
 				return join;
 			});
@@ -99,10 +111,10 @@ const DataGroupJoins = (props) => {
 					<FormInputSelect label={`Source Label - ${i+1}`} name={`source_label-${i}`} onChange={onTextChange} options={join.source_labels} value={join.source_label} labelKey='_id' valueKey='_id' />
 				</FormRowItem>
 				<FormRowItem>
-					<FormInputSelect label={`Destination Data Group - ${i+1}`} name={`dest_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.dest_group} labelKey='_id' valueKey='_id' />
+					<FormInputSelect label={`Destination Data Group - ${i+1}`} name={`destination_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.destination_group} labelKey='_id' valueKey='_id' />
 				</FormRowItem>
 				<FormRowItem>
-					<FormInputSelect label={`Destination Label - ${i+1}`} name={`dest_label-${i}`} onChange={onTextChange} options={join.dest_labels} value={join.dest_label} labelKey='_id' valueKey='_id' />
+					<FormInputSelect label={`Destination Label - ${i+1}`} name={`destination_label-${i}`} onChange={onTextChange} options={join.destination_labels} value={join.destination_label} labelKey='_id' valueKey='_id' />
 					<IconButton variant="outlined" onClick={()=>removeJoin(i)} style={{zIndex:9, top: 8, right: 0, position: 'absolute'}}><DeleteIcon style={{fontSize: '1.2rem'}} /></IconButton>
 				</FormRowItem>
 			</FormRow>
