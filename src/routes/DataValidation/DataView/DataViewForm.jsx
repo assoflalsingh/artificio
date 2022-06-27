@@ -16,6 +16,7 @@ const defaults = {
   dataview_name: '',
   dataview_desc: '',
   datagroups: [],
+  joins:[],
   default_rows: 1000,
   days_before: -30,
   days_after: 30,
@@ -41,7 +42,6 @@ export default function DataViewForm({initFormData, ...props}) {
   const [formDataErr, setFormDataErr] = useState({});
   const [formSuccess, setFormSuccess] = useState('');
   const [dgList, setDGList] = useState([]);
-  const [labelsList, setLabesList] = useState([]);
   const {isLoading, apiRequest: prequisitesReq, error} = useApi();
   const {isLoading: dgIsLoading, apiRequest: dgReq, error: dgError} = useApi();
   const {isLoading: savingDV, apiRequest: saveDVReq, error: dvError} = useApi();
@@ -51,25 +51,53 @@ export default function DataViewForm({initFormData, ...props}) {
     dataview_name: {
       validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
       messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
+    },
+    datagroups : {
+      validators: ['required'],
+      messages: ['This field is required'],
     }
   }
 
   useEffect(()=>{
-    dgReq({url: URL_MAP.GET_DATAGROUPS}, (response) => {
-      setDGList(response.datagroups);
-    });
-    prequisitesReq({url: URL_MAP.GET_DATAGROUP_PREQUISITES}, (response) =>{
-      setLabesList(response.labels);
-    });
-    if(editMode) {
-      initFormData.datagroups = initFormData.datagroups.filter((dg) => dg !== null);
-      setFormData({
-        ...initFormData,
-        date_from: '',
-        date_to: '',
+    if(dgList.length < 1){
+      dgReq({url: URL_MAP.GET_DATAGROUPS}, (response) => {
+        setDGList(response.datagroups);
+
+        if(editMode) {
+          let initDatagroups = response.datagroups.filter((dgVal) => initFormData.datagroups.indexOf(dgVal._id) >= 0);
+          setFormData((prevState) => {
+            let fillForm = {
+              ...prevState,
+              ...initFormData,
+              joins: [],
+              datagroups: initDatagroups,
+              date_from: '',
+              date_to: '',
+            };
+            fillForm.joins = initFormData.joins.map((join) => {
+              let joinData = {...join};
+              if(joinData.source_group.length > 0){
+                response.datagroups.forEach((dg) => {
+                  if(dg._id === joinData.source_group){
+                    joinData.source_labels = [...dg.assign_label];
+                  }
+                });
+              }
+              if(joinData.destination_group.length > 0){
+                response.datagroups.forEach((dg) => {
+                  if(dg._id === joinData.destination_group){
+                    joinData.destination_labels = [...dg.assign_label];
+                  }
+                });
+              }
+              return joinData;
+            });
+            return fillForm;
+          });
+        }
       });
     }
-  }, [dgReq, prequisitesReq, editMode, initFormData]);
+  }, [dgReq, prequisitesReq, editMode, initFormData, dgList]);
 
   const validateField = (name, value) => {
     let errMsg = '';
@@ -119,13 +147,22 @@ export default function DataViewForm({initFormData, ...props}) {
     console.log("formData: ",formData);
 
     if(isFormValid) {
+      let joinsData = [];
+      formData.joins.forEach((data) => {
+				if(data.source_group?.length > 0 && data.source_label?.length > 0 && data.destination_group?.length > 0 && data.destination_label?.length > 0){
+					let saveObj = {...data};
+					delete saveObj.source_labels;
+					delete saveObj.destination_labels;
+					joinsData.push({...saveObj});
+				}
+			});
       let newFormData = {};
       newFormData = {
         ...formData,
         date_from: formData.date_from? `${formData.date_from.getFullYear()}-${appendZero(formData.date_from.getMonth()+1)}-${appendZero(formData.date_from.getDate())}` : '',
         date_to: formData.date_to? `${formData.date_to.getFullYear()}-${appendZero(formData.date_to.getMonth()+1)}-${appendZero(formData.date_to.getDate())}`: '',
-        datagroups: formData.datagroups.map((label)=>label._id),
-        joins: formData.joins?.length > 0? formData.joins : [] ,
+        datagroups: formData.datagroups.map((group) => group._id),
+        joins: joinsData,
       }
       if(editMode){
         delete newFormData._id;
@@ -195,13 +232,13 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputText label="Default no of records (rows)" name="default_rows" value={formData.default_rows} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
-        <FormInputSelect hasSearch multiple label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={dgIsLoading} value={formData.datagroups} options={dgList} labelKey='_id' valueKey='_id' />
+          <FormInputSelect required hasSearch multiple errorMsg={formDataErr.datagroups} label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={dgIsLoading} value={formData.datagroups} options={dgList} labelKey='_id' />
         </FormRowItem>
         <FormRowItem>
           <FormInputSelect label="Usage" name='usage' onChange={onTextChange} value={formData.usage} options={['Training','Live']} />
         </FormRowItem>
       </FormRow>
-      {formData.datagroups.length > 1 && <DataGroupJoins selectedDataGroups={formData.datagroups} labelsList={labelsList} setFormData={setFormData} />}
+      {formData.datagroups.length > 1 && dgList.length > 1 && <DataGroupJoins selectedDataGroups={formData.datagroups} dgList={dgList} joins={[...formData.joins]} setFormData={setFormData} />}
       {(error || dgError || dvError || formSuccess) &&
       <FormRow>
         <FormRowItem>

@@ -73,7 +73,7 @@ export function FormRowItem({children, ...props}) {
 export function CustomField({children}) {
   return (
   <div style={{marginTop: '0.25rem'}} className='MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth'>
-    <div class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-fullWidth MuiInputBase-formControl">{children}
+    <div className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-fullWidth MuiInputBase-formControl">{children}
       {/* <fieldset aria-hidden="true" className="PrivateNotchedOutline-root-174 MuiOutlinedInput-notchedOutline" style={{paddingLeft: '8px', top: 0}}><legend className="PrivateNotchedOutline-legend-175" style={{width: '0.01px'}}><span></span></legend></fieldset> */}
     </div>
   </div>);
@@ -130,7 +130,7 @@ export function FormInput({children, info, ...props}) {
 function getDefaultValidator(name) {
   const VALIDATORS = {
     'required': (value)=>{
-      return (value !== null && value !== '' && typeof(value) !== 'undefined');
+      return (value !== null && value !== '' && value.length > 0 && typeof(value) !== 'undefined');
     },
     'email': (value)=>{
       return /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(value);
