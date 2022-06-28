@@ -42,6 +42,7 @@ export default function DataViewForm({initFormData, ...props}) {
   const [formDataErr, setFormDataErr] = useState({});
   const [formSuccess, setFormSuccess] = useState('');
   const [dgList, setDGList] = useState([]);
+  const [labelsList, setLabelsList] = useState([]);
   const {isLoading, apiRequest: prequisitesReq, error} = useApi();
   const {isLoading: dgIsLoading, apiRequest: dgReq, error: dgError} = useApi();
   const {isLoading: savingDV, apiRequest: saveDVReq, error: dvError} = useApi();
@@ -62,6 +63,7 @@ export default function DataViewForm({initFormData, ...props}) {
     if(dgList.length < 1){
       dgReq({url: URL_MAP.GET_DATAGROUPS}, (response) => {
         setDGList(response.datagroups);
+        setLabelsList(response.labels);
 
         if(editMode) {
           let initDatagroups = response.datagroups.filter((dgVal) => initFormData.datagroups.indexOf(dgVal._id) >= 0);
@@ -79,14 +81,14 @@ export default function DataViewForm({initFormData, ...props}) {
               if(joinData.source_group.length > 0){
                 response.datagroups.forEach((dg) => {
                   if(dg._id === joinData.source_group){
-                    joinData.source_labels = [...dg.assign_label];
+                    joinData.source_labels = response.labels.filter((label) => dg.assign_label.indexOf(label._id) >= 0);
                   }
                 });
               }
               if(joinData.destination_group.length > 0){
                 response.datagroups.forEach((dg) => {
                   if(dg._id === joinData.destination_group){
-                    joinData.destination_labels = [...dg.assign_label];
+                    joinData.destination_labels = response.labels.filter((label) => dg.assign_label.indexOf(label._id) >= 0);
                   }
                 });
               }
@@ -232,13 +234,13 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputText label="Default no of records (rows)" name="default_rows" value={formData.default_rows} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect required hasSearch multiple errorMsg={formDataErr.datagroups} label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={dgIsLoading} value={formData.datagroups} options={dgList} labelKey='_id' />
+          <FormInputSelect required hasSearch multiple errorMsg={formDataErr.datagroups} label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={dgIsLoading} value={formData.datagroups} options={dgList} labelKey='name' />
         </FormRowItem>
         <FormRowItem>
           <FormInputSelect label="Usage" name='usage' onChange={onTextChange} value={formData.usage} options={['Training','Live']} />
         </FormRowItem>
       </FormRow>
-      {formData.datagroups.length > 1 && dgList.length > 1 && <DataGroupJoins selectedDataGroups={formData.datagroups} dgList={dgList} joins={[...formData.joins]} setFormData={setFormData} />}
+      {formData.datagroups.length > 1 && dgList.length > 1 && <DataGroupJoins selectedDataGroups={formData.datagroups} dgList={dgList} labelsList={labelsList} joins={[...formData.joins]} setFormData={setFormData} />}
       {(error || dgError || dvError || formSuccess) &&
       <FormRow>
         <FormRowItem>
