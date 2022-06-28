@@ -9,7 +9,8 @@ import { useCallback } from "react";
 const defaultField = {source_group: '', source_label: '', source_labels: [], destination_group: '', destination_label: '', destination_labels: []};
 
 const DataGroupJoins = (props) => {
-	const [joins, setJoinData] = useState([...props.joins, {...defaultField}]);
+	const [joins, setJoinData] = useState([...props.joins]);
+	const {setFormData} = props;
 
   const getLabels = useCallback((value) => {
 		if(value === '') return [];
@@ -26,9 +27,23 @@ const DataGroupJoins = (props) => {
 		setJoinData((prevState) => [...prevState, {...defaultField}]);
 	}
 
+	const saveToform = useCallback((joinsArr) => {
+		let completedJoins = [];
+		joinsArr.forEach((data) => {
+			if(data.source_group?.length > 0 && data.source_label?.length > 0 && data.destination_group?.length > 0 && data.destination_label?.length > 0){
+				let saveObj = {...data};
+				delete saveObj.source_labels;
+				delete saveObj.destination_labels;
+				completedJoins.push({...saveObj});
+			}
+		});
+		setFormData((prevFormData)=>({...prevFormData, joins: completedJoins.length > 0 ? completedJoins: []}));
+	},[setFormData]);
+
 	const removeJoin = (index) => {
 		setJoinData((prevState) => {
 			let updatedArr = prevState.filter((elem, indx)=> indx !== index);
+			saveToform(updatedArr);
 			return [...updatedArr];
 		});
 	}
@@ -61,17 +76,8 @@ const DataGroupJoins = (props) => {
 			}
 			fieldObj[nameArr[0]] = value;
 			dataArray[+nameArr[1]] = fieldObj;
+			saveToform(dataArray);
 
-			let completedJoins = [];
-			dataArray.forEach((data) => {
-				if(data.source_group?.length > 0 && data.source_label?.length > 0 && data.destination_group?.length > 0 && data.destination_label?.length > 0){
-					let saveObj = {...data};
-					delete saveObj.source_labels;
-					delete saveObj.destination_labels;
-					completedJoins.push({...saveObj});
-				}
-			});
-			props.setFormData((prevFormData)=>({...prevFormData, joins: completedJoins.length > 0 ? completedJoins: []}));
 			return [...dataArray];
 		});
   }
