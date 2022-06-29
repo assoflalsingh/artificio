@@ -1170,7 +1170,7 @@ function RouterBackButton() {
   );
 }
 
-export default function(props) {
+export default function DataListDefault(props) {
   const classes = useStyles();
   const { uploadCounter, annotationSuccessCB } = props;
   return (

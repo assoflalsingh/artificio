@@ -4,7 +4,7 @@ import { Route, Switch as RouteSwitch} from 'react-router-dom';
 import LabelForm from './LabelForm';
 import LabelList from './LabelList';
 
-export default function({match}) {
+export default function Labels({match}) {
   const [formData, setFormData] = useState(null);
 
   return (

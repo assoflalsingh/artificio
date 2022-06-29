@@ -1,7 +1,7 @@
 /**
  * Root reducer that combines all the reducers present in the App & encapsulates the Store data into Immutable object.
  */
-export default (state={}, action) => {
+const userReducer = (state={}, action) => {
   switch(action.type) {
     case 'SET_USER': {
       return {
@@ -36,4 +36,5 @@ const setUserLoading = ()=>({
   type: 'SET_USER_LOADING'
 });
 
+export default userReducer;
 export {setUser, setUserLoading};
