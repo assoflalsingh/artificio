@@ -4,85 +4,6 @@ import 'ag-grid-enterprise'; // To use enterprise features
 import 'ag-grid-community/dist/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'; // Optional theme CSS
 import { FormInputText } from '../../../components/FormElements';
-// import { Box } from '@material-ui/core';
-
-const defaultRowData = [{
-	"athlete": "Michael Phelps",
-	"age": 23,
-	"country": "United States",
-	"year": 2008,
-	"date": "24/08/2008",
-	"sport": "Swimming",
-	"gold": 8,
-	"silver": 0,
-	"bronze": 0,
-	"total": 8
-},{
-	"athlete": "Natalie Coughlin",
-	"age": 25,
-	"country": "United States",
-	"year": 2008,
-	"date": "24/08/2008",
-	"sport": "Swimming",
-	"gold": 1,
-	"silver": 2,
-	"bronze": 3,
-	"total": 6
-},{
-	"athlete": "Aleksey Nemov",
-	"age": 24,
-	"country": "Russia",
-	"year": 2000,
-	"date": "01/10/2000",
-	"sport": "Gymnastics",
-	"gold": 2,
-	"silver": 1,
-	"bronze": 3,
-	"total": 6
-},{
-	"athlete": "Alicia Coutts",
-	"age": 24,
-	"country": "Australia",
-	"year": 2012,
-	"date": "12/08/2012",
-	"sport": "Swimming",
-	"gold": 1,
-	"silver": 3,
-	"bronze": 1,
-	"total": 5
-}];
-
-const colDefs = [{headerName: 'Test Header', children: [
-	{
-		// headerName: 'Athlete',
-		field: 'athlete',
-		minWidth: 180,
-		headerCheckboxSelection: true,
-		headerCheckboxSelectionFilteredOnly: true,
-		checkboxSelection: true,
-		rowDrag: true,
-	 },
-	 { field: 'age',
-	 cellStyle: params => {
-		 if (+params.value < 18) {
-			 //mark police cells as red
-				 return {backgroundColor: '#aaa'};
-			 }
-			 return null;
-		 }
-	 },
-	 { field: 'country', minWidth: 150 },
-	 { field: 'year' }, //, rowGroup: true
-	 { field: 'date', minWidth: 150 },
-	 { field: 'sport', minWidth: 150 },
-	 { field: 'gold' },
-	 { field: 'silver' },
-	 { field: 'bronze' },
-	 { field: 'total' },
-	 //  {field: 'make', headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true,},
-	 //  {field: 'model'},
-	 //  {field: 'price', type: 'numberColumn'} //filter: true, except test search box
- ]}];
 
 const appendZero = (val) => {
 	return (val <= 9 ? '0': '')+val;
@@ -127,19 +48,11 @@ const autoGroupColumnDef = useMemo(() => {
 }, []);
 
 useEffect(() => {
-	console.log(props.gridata);
 	let rows = [];
-	let gridColsDef = props.gridata.map(d => {
-		let prepareData = {headerName: d.group_name.replaceAll("_"," "), children: []};
-		if(d.labels.length > 0){
-			let cols = Object.keys(d.labels[0]);
-				prepareData.children = cols.map((col) => {
-					return {field: col, };
-				});
-			rows = rows.concat(d.labels);
-		}
-		return prepareData;
+	let gridColsDef = props.gridata.headers?.map((header) => {
+		return {headerName: header.group_name, children: header.labels};
 	});
+	rows = props.gridata.rows?.length > 0 ? props.gridata.rows : [];
 	setColumnDefs(gridColsDef);
 	setRowData(rows);
 },[props.gridata]);
@@ -248,13 +161,14 @@ const addColToGrid = useCallback((clickedCol) => {
 			subMenu: [{
 				// custom item
 				// name: 'Insert Above "' + params.node?.data[columnDefs[0]?.children[0]?.field] + '" row',
-				name: 'Insert Above row',
+				name: 'Insert Above this row',
 				action: () => {
 					addRowToGrid(+params.node.rowIndex);
 				},
 			},{
 				// custom item
-				name: 'Insert Below "' + params.node?.data[columnDefs[0]?.children[0]?.field] + '" row',
+				// name: 'Insert Below "' + params.node?.data[columnDefs[0]?.children[0]?.field] + '" row',
+				name: 'Insert Below this row',
 				action: () => {
 					addRowToGrid(+params.node.rowIndex + 1);
 				},
@@ -285,22 +199,21 @@ const onCellValueChanged = useCallback((event) => {
 	console.log(event.rowIndex, event.oldValue, event.newValue);
 }, []);
 
-console.log('rowData', rowData);
-console.log('rowData', rowData.length > 0);
-if(rowData.length < 1){
+if(rowData?.length < 1){
 	return <div style={{
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    background: "#383838",
+    // background: "#ccc",
     opacity: "0.8",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    zIndex: "1000",
-  }}>No Data found to render with grid.</div>;
+    zIndex: "1",
+	// color: '#484848',
+  }}>No data found.</div>;
 }
 
 return (
@@ -309,13 +222,13 @@ return (
 		{/* <Form>
 			<FormRow>
 		<FormRowItem> */}
-					{rowData.length > 0 && <FormInputText label="Quick Search" name='quick_search' onChange={onQuickFilterChanged}/>}
+					{rowData?.length > 0 && <FormInputText label="Quick Search" name='quick_search' onChange={onQuickFilterChanged}/>}
 				{/* </FormRowItem>
 			</FormRow>
 		</Form> */}
 
 		{/* On div wrapping Grid a) specify theme CSS Class Class and b) sets Grid size */}
-		{rowData.length > 0 && <div className="ag-theme-alpine" style={{ height: '90vh'}}> 
+		{rowData?.length > 0 && <div className="ag-theme-alpine" style={{ height: '90vh'}}> 
 			<AgGridReact
 				ref={gridRef} // Ref for accessing Grid's API
 				rowData={rowData} // Row Data for Rows
