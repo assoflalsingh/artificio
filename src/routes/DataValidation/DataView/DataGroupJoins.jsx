@@ -109,7 +109,7 @@ const DataGroupJoins = (props) => {
 		});
 	},[props.selectedDataGroups, getLabels]);
 
-    return (<>{joins.map((join,i)=>{
+    return (<><hr style={{color: 'inherit', marginTop: '2rem'}}/><h3>Data Group Joins</h3>{joins.map((join,i)=>{
 			return <FormRow key={i} style={{position:'relative'}}>
 				<FormRowItem>
 					<FormInputSelect label={`Source Data Group - ${i+1}`} name={`source_group-${i}`} onChange={onTextChange} options={props.selectedDataGroups} value={join.source_group} labelKey='name' valueKey='_id' />

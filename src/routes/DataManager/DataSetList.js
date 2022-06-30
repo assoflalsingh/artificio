@@ -98,7 +98,7 @@ function DataSetList({ history }) {
   const [latestSelectionDetails, setLatestSelectionDetails] = useState({});
   const columns = [
     {
-      name: "data_set_id",
+      name: "data_flow_id",
       label: "Data Flow",
       options: {
         filter: true,
@@ -111,7 +111,7 @@ function DataSetList({ history }) {
               to={{
                 pathname: "/create-dataset",
                 params: {
-                  data_set_id: value,
+                  data_flow_id: value,
                   emails: tableMeta.rowData[1],
                   desc: tableMeta.rowData[2],
                   app_usage: tableMeta.rowData[4],
@@ -173,8 +173,8 @@ function DataSetList({ history }) {
       type: "string",
     },
     {
-      name: "app_usage",
-      label: "Application Usage",
+      name: "app_flow",
+      label: "Application Flow",
       options: {
         filter: true,
         sort: true,
@@ -277,7 +277,7 @@ function DataSetList({ history }) {
     files.forEach((file, i) => {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("data_set_id", latestSelectionDetails._id);
+      formData.append("data_flow_id", latestSelectionDetails._id);
       formData.append("app_id", CURRENT_APP_ID);
       formData.append(
         "app_usage",
