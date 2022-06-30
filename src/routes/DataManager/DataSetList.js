@@ -495,7 +495,7 @@ function RouterBackButton() {
   );
 }
 
-export default function() {
+export default function DataSet() {
   const classes = useStyles();
 
   return (

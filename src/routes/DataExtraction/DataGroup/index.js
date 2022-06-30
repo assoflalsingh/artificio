@@ -4,7 +4,7 @@ import { Route, Switch as RouteSwitch} from 'react-router-dom';
 import DataGroupForm from './DataGroupForm';
 import DataGroupList from './DataGroupList';
 
-export default function({match}) {
+export default function DataGroup({match}) {
   const [formData, setFormData] = useState(null);
 
   return (
