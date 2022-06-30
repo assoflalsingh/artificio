@@ -327,7 +327,7 @@ function DataSetList({ history }) {
     setDataSetlist([]);
     setRowsSelected([]);
     api
-      .get(URL_MAP.GET_DATA_SETS)
+      .get(URL_MAP.GET_DATA_FLOWS)
       .then((res) => {
         let data = res.data.data;
         setDataSetlist(data);
