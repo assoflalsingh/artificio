@@ -72,15 +72,15 @@ export const URL_MAP = {
   TRAIN_MODEL:'ner-model/train/',
 
   GET_APP_USAGE: 'appusage/',
-  GET_DATA_SETS: 'dataset/',
-  CREATE_DATA_SETS: 'dataset/',
-  GET_DATA_SETS_RESULTS: 'dataset/results/',
+  GET_DATA_FLOWS: 'dataflow/',
+  CREATE_DATA_FLOW: 'dataflow/',
+  GET_DATA_FLOW_RESULTS: 'dataflow/results/',
 
   CREATE_STRUCTURE: 'structures/',
   GET_STRUCTURES: 'structures/',
   GET_STRUCTURE_TEMPLATE: 'structures/template/',
 
-  GET_DATASET_EMAILS: 'dataset/emails/',
+  GET_DATAFLOW_EMAILS: 'dataflow/emails/',
   GET_THUMBNAILS: 'data-list/thumbnails/',
   GET_DATA_LIST: 'data-list/',
   GET_ANNOTATION_DETAILS: 'data-list/annotation-details/',

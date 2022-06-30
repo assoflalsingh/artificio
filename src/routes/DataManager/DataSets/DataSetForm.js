@@ -70,7 +70,7 @@ export default function LabelForm({initFormData, ...props}) {
         // fetch app usage data
         const usageResponse = await api.get(URL_MAP.GET_APP_USAGE);
         // fetch emails data
-        const emailsResponse = await api.get(URL_MAP.GET_DATASET_EMAILS);
+        const emailsResponse = await api.get(URL_MAP.GET_DATAFLOW_EMAILS);
 
         // fetch Ocr data
         const ocrResponse = await api.get(URL_MAP.GET_OCR_DETAILS);
@@ -234,7 +234,7 @@ export default function LabelForm({initFormData, ...props}) {
           dataSetPayload.ner_version = "";
         }
        
-      api.post(URL_MAP.CREATE_DATA_SETS, dataSetPayload).then((resp)=>{
+      api.post(URL_MAP.CREATE_DATA_FLOW, dataSetPayload).then((resp)=>{
         setFormSuccess('Dataset created sucessfully.');
         if(!editMode) setFormData(defaults);
       }).catch((err)=>{
