@@ -9,6 +9,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useApi from '../../../hooks/use-api';
 import DataGroupJoins from './DataGroupJoins';
+import ChartDisplay from './ChartDisplay';
 
 // const viewType = [{label: "Single", value:"single"},{label: "Multiple", value:"multiple"}];
 const lineItemsTableData = [{label: "", name: 'line_item', value: true}];
@@ -17,12 +18,13 @@ const defaults = {
   dataview_desc: '',
   datagroups: [],
   joins:[],
+  chart_display: [],
   default_rows: 1000,
   days_before: -30,
   days_after: 30,
   date_from: '',
   date_to: '',
-  usage:'',
+  application_id:'',
   line_item: lineItemsTableData[0].value,
 }
 const useStyles = makeStyles((theme) => ({
@@ -72,6 +74,7 @@ export default function DataViewForm({initFormData, ...props}) {
               ...prevState,
               ...initFormData,
               joins: [],
+              chart_display: [],
               datagroups: initDatagroups,
               date_from: '',
               date_to: '',
@@ -93,6 +96,19 @@ export default function DataViewForm({initFormData, ...props}) {
                 });
               }
               return joinData;
+            });
+
+            initFormData.chart_display = initFormData.chart_display || [];
+            fillForm.chart_display = initFormData.chart_display.map((attr) => {
+              let attrData = {...attr};
+              if(attrData.group.length > 0){
+                response.datagroups.forEach((dg) => {
+                  if(dg._id === attrData.group){
+                    attrData.source_labels = response.labels.filter((label) => dg.assign_label.indexOf(label._id) >= 0);
+                  }
+                });
+              }
+              return attrData;
             });
             return fillForm;
           });
@@ -158,6 +174,14 @@ export default function DataViewForm({initFormData, ...props}) {
 					joinsData.push({...saveObj});
 				}
 			});
+      let attrsData = [];
+      formData.chart_display.forEach((data) => {
+				if(data.group?.length > 0 && data.label?.length > 0 && data.chart_data_type?.length > 0){
+					let saveObj = {...data};
+					delete saveObj.source_labels;
+					attrsData.push({...saveObj});
+				}
+			});
       let newFormData = {};
       newFormData = {
         ...formData,
@@ -165,6 +189,7 @@ export default function DataViewForm({initFormData, ...props}) {
         date_to: formData.date_to? `${formData.date_to.getFullYear()}-${appendZero(formData.date_to.getMonth()+1)}-${appendZero(formData.date_to.getDate())}`: '',
         datagroups: formData.datagroups.map((group) => group._id),
         joins: joinsData,
+        chart_display: attrsData,
       }
       if(editMode){
         delete newFormData._id;
@@ -234,13 +259,16 @@ export default function DataViewForm({initFormData, ...props}) {
           <FormInputText label="Default no of records (rows)" name="default_rows" value={formData.default_rows} onChange={onTextChange} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect required hasSearch multiple errorMsg={formDataErr.datagroups} label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={dgIsLoading} value={formData.datagroups} options={dgList} labelKey='name' />
+          <FormInputSelect label="Application ID" name='application_id' onChange={onTextChange} value={formData.application_id} options={['Training','Live']} />
         </FormRowItem>
         <FormRowItem>
-          <FormInputSelect label="Usage" name='usage' onChange={onTextChange} value={formData.usage} options={['Training','Live']} />
+          <FormInputSelect required hasSearch multiple errorMsg={formDataErr.datagroups} label="Data Group" name='datagroups' onChange={(e, value)=>{onTextChange(value, 'datagroups')}} loading={dgIsLoading} value={formData.datagroups} options={dgList} labelKey='name' />
         </FormRowItem>
       </FormRow>
       {formData.datagroups.length > 1 && dgList.length > 1 && <DataGroupJoins selectedDataGroups={formData.datagroups} dgList={dgList} labelsList={labelsList} joins={[...formData.joins]} setFormData={setFormData} />}
+
+      {formData.datagroups.length >= 1 && dgList.length > 1 && <ChartDisplay selectedDataGroups={formData.datagroups} dgList={dgList} labelsList={labelsList} chart_display={[...formData.chart_display]} setFormData={setFormData} />}
+
       {(error || dgError || dvError || formSuccess) &&
       <FormRow>
         <FormRowItem>
