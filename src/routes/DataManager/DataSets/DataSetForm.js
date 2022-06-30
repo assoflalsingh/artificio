@@ -7,9 +7,9 @@ import {useAsyncEffect} from 'use-async-effect';
 
 export default function LabelForm({initFormData, ...props}) {
   const defaults = {    
-    data_set_id: '',
+    data_flow_id: '',
     desc: '',
-    app_usage: [],
+    app_flow: [],
     data_type: '',
     emails: [],
     ocr_model:'',
@@ -38,7 +38,7 @@ export default function LabelForm({initFormData, ...props}) {
   const api = getInstance(localStorage.getItem('token'));
 
   const formValidators = {
-    data_set_id: {
+    data_flow_id: {
       validators: ['required', {type:'regex', param:'^[A-Za-z0-9_]{1,20}$'}],
       messages: ['This field is required', 'Only alpha-numeric & underscore allowed with max length of 20.'],
     },
@@ -46,7 +46,7 @@ export default function LabelForm({initFormData, ...props}) {
       validators: ['required', {type:'regex', param:'^.{0,200}$'}],
       messages: ['This field is required', 'Text allowed with max length of 200.'],
     },
-    app_usage: {
+    app_flow: {
       validators: ['required'],
       messages: ['This field is required'],
     },
@@ -100,14 +100,14 @@ export default function LabelForm({initFormData, ...props}) {
         // edit mode
         if(editMode) {
           let formAppUsage = usageResponse?.data?.data.filter((label)=>{
-            return Object.keys(initFormData.app_usage).indexOf(label._id) > -1;
+            return Object.keys(initFormData.app_flow).indexOf(label._id) > -1;
           });
           
           const classifyModel = classifyData.filter((model)=>(model.model_id === initFormData.classify_model && model.version===initFormData.classify_version))[0]?._id || "" ;
           const nerModel = nerData.filter((model)=>(model.model_id === initFormData.ner_model && model.version===initFormData.ner_version))[0]?._id || "";
           setFormData({
             ...initFormData,
-            app_usage: formAppUsage,
+            app_flow: formAppUsage,
             emails: initFormData.emails,
             classify_model:classifyModel,
             ner_model:nerModel
@@ -137,13 +137,13 @@ export default function LabelForm({initFormData, ...props}) {
   
 
   useEffect(() => {
-    const ocr = formData.app_usage.length?formData.app_usage.findIndex((el)=>el.app_usage==="20-AI OCR")!== -1:false;
-    const classy = formData.app_usage.length?formData.app_usage.findIndex((el)=>el.app_usage==="30-Classification")!== -1:false;
-    const ner = formData.app_usage.length?formData.app_usage.findIndex((el)=>el.app_usage==="40-Entity Extraction")!== -1:false;
+    const ocr = formData.app_flow.length?formData.app_flow.findIndex((el)=>el.app_flow==="20-AI OCR")!== -1:false;
+    const classy = formData.app_flow.length?formData.app_flow.findIndex((el)=>el.app_flow==="30-Classification")!== -1:false;
+    const ner = formData.app_flow.length?formData.app_flow.findIndex((el)=>el.app_flow==="40-Entity Extraction")!== -1:false;
     setOcrPresent(ocr);
     setClassifyPresent(classy);
     setNerPresent(ner);
-  }, [formData.app_usage]);
+  }, [formData.app_flow]);
 
 
   const validateField = (name, value) => {
@@ -198,10 +198,10 @@ export default function LabelForm({initFormData, ...props}) {
     if(isFormValid) {
       setSaving(true);
       let dataSetPayload = {
-        "data_set_id":formData.data_set_id,
+        "data_flow_id":formData.data_flow_id,
         "desc": formData.desc ,
         "email_ids": formData.emails.map((label)=>{return {'id':label.id, "email":label.email}}),
-        "app_usage": formData.app_usage.map((label)=>label._id),
+        "app_flow": formData.app_flow.map((label)=>label._id),
         "app_id": CURRENT_APP_ID,
         "update":editMode || false,
         "_id": editMode ? formData._id : null
@@ -266,8 +266,8 @@ export default function LabelForm({initFormData, ...props}) {
     <Form>
       <FormRow>
         <FormRowItem>
-          <FormInputText label="Data Flow ID" required name='data_set_id' placeholder="Data Flow ID here.."
-            value={formData.data_set_id} errorMsg={formDataErr.data_set_id} onChange={onTextChange} disabled={editMode}/>
+          <FormInputText label="Data Flow ID" required name='data_flow_id' placeholder="Data Flow ID here.."
+            value={formData.data_flow_id} errorMsg={formDataErr.data_flow_id} onChange={onTextChange} disabled={editMode}/>
         </FormRowItem>
         <FormRowItem>
           <FormInputText label="Description" required name='desc' placeholder="Description here.."
@@ -276,9 +276,8 @@ export default function LabelForm({initFormData, ...props}) {
       </FormRow>
       <FormRow>
         <FormRowItem>
-          <FormInputSelect multiple label="App Flow" hasSearch required name='app_usage' onChange={(e, value)=>{onTextChange(value, 'app_usage')}}
-            labelKey='app_usage' valueKey='_id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.app_usage} 
-            value={formData.app_usage} options={appUsageOpts} 
+          <FormInputSelect multiple label="Application Flow" hasSearch required name='app_flow' onChange={(e, value)=>{onTextChange(value, 'app_flow')}}
+            labelKey='app_flow' valueKey='_id' firstEmpty={true} loading={opLoading} errorMsg={formDataErr.app_flow} value={formData.app_flow} options={appUsageOpts}
           />
         </FormRowItem>
         <FormRowItem>
@@ -288,7 +287,7 @@ export default function LabelForm({initFormData, ...props}) {
           />
         </FormRowItem>
       </FormRow>
-      {/* {formData.app_usage.length>0 && ( */}
+      {/* {formData.app_flow.length>0 && ( */}
       <FormRow>
         <>
           {ocrPresent && (
