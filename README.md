@@ -101,3 +101,11 @@ Launches the test runner in the interactive watch mode.<br />
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br />
+![page screen shot](https://raw.githubusercontent.com/assoflalsingh/artificio/master/public/1659184369633.png)
+![page screen shot](https://raw.githubusercontent.com/assoflalsingh/artificio/master/public/1659184369635.png)
+![page screen shot](https://raw.githubusercontent.com/assoflalsingh/artificio/master/public/1659184369653.png)
+![page screen shot](https://raw.githubusercontent.com/assoflalsingh/artificio/master/public/1659184369669.png)
+![page screen shot](https://raw.githubusercontent.com/assoflalsingh/artificio/master/public/1659184369686.png)
+![page screen shot](https://raw.githubusercontent.com/assoflalsingh/artificio/master/public/1659184369698.png)
+
+
