@@ -1,4 +1,4 @@
-This is the front end for the artificio.ai app.
+This is the front end for the [artificio.ai](https://artificio.ai/) app.
 
 ## Deploy the app to prod
 ```
